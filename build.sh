@@ -32,6 +32,9 @@ run() {
 }
 
 function clone_update() {
+    if [ "$DO_SHOW_CONFIGURE" == "true" ]; then
+	return
+    fi
     if [ ! -d "$2" ] ; then
 	info "Cloning from $1"
 	run git clone "$1" "$ROOT_DIR/$2"
@@ -52,11 +55,21 @@ function build_cmake() {
     builddir=$ROOT_DIR/$3
     rootdir=$(readlink -f $root)
     shift 3
+    if [ "$DO_SHOW_CONFIGURE" == "true" ]; then
+	echo cd $builddir
+	echo cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
+	return
+    fi
+    if [ ! -e $builddir/Makefile ]; then
+	echo "Recreating builddir after unfinished configure"
+	run rm -rf $builddir
+    fi
     if [ $DO_CLEAN == true -o ! -e "$builddir" ] ; then
         run rm -rf $builddir
         run mkdir -p $builddir
         run pushd $builddir > /dev/null
         run cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
+	# TODO check if configure was sucessful
     else
         run pushd $builddir > /dev/null
     fi
@@ -71,11 +84,21 @@ function build_autoconf() {
     shift 3
     rootdir=$(readlink -f $root)
     configscript=$rootdir/configure
+    if [ "$DO_SHOW_CONFIGURE" == "true" ]; then
+	echo cd $builddir
+	echo $configscript "$@" --prefix=${INSTALL_DIR}
+	return
+    fi
+    if [ ! -e $builddir/Makefile ]; then
+	echo "Recreating builddir after unfinished configure"
+	run rm -rf $builddir
+    fi
     if [ $DO_CLEAN == true -o ! -e "$builddir" ] ; then
         run rm -rf $builddir
         run mkdir -p $builddir
         run pushd $builddir > /dev/null
 	run $configscript "$@" --prefix=${INSTALL_DIR}
+	# TODO check if configure was sucessful
     else
         run pushd $builddir > /dev/null
     fi
@@ -94,6 +117,7 @@ function usage() {
     -p		Create builddirs outside the source dirs
     -u		Update repositories
     -d		Dryrun, just show what would be executed
+    -s		Show configure commands for all given targets
 
   Available targets:
     $ALLTARGETS eclipse
@@ -192,12 +216,26 @@ BUILDDIR_SUFFIX="/build"
 LLVM_TARGETS=Patmos
 ECLIPSE_LLVM_TARGETS=Patmos
 
+# Set to the name of the clang binary to use for compiling LLVM
+# or leave empty to use cmake defaults
+CLANG_COMPILER=clang
+
+# Build gold binutils and LLVM LTO plugin
 BUILD_LTO=true
+
+# Create symlinks instead of copying files where applicable
+# (llvm, clang, gold)
 INSTALL_SYMLINKS=false
 
+# Additional arguments for cmake / configure
+LLVM_CMAKE_ARGS=
+GOLD_ARGS=
+
 MAKEJ= 
+
 DO_CLEAN=false
 DO_UPDATE=false
+DO_SHOW_CONFIGURE=false
 DRYRUN=false
 VERBOSE=false
 
@@ -210,7 +248,7 @@ fi
 
 
 # one-shot config
-while getopts ":chi:j:pud" opt; do
+while getopts ":chi:j:puds" opt; do
   case $opt in
     c) DO_CLEAN=true ;;
     h) usage; exit 0 ;;
@@ -219,6 +257,7 @@ while getopts ":chi:j:pud" opt; do
     p) BUILDDIR_SUBDIR=false ;;
     u) DO_UPDATE=true ;;
     d) DRYRUN=true; VERBOSE=true ;;
+    s) DO_SHOW_CONFIGURE=true ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       usage >&2
@@ -239,27 +278,31 @@ shift $((OPTIND-1))
 GITHUB_BASEURL=https://github.com/t-crest
 
 if [ "$BUILD_LTO" == "true" ]; then
-    LLVM_CMAKE_ARGS="-DLLVM_BINUTILS_INCDIR=$ROOT_DIR/gold/include"
-    GOLD_ARGS=--enable-plugins
+    LLVM_CMAKE_ARGS="$LLVM_CMAKE_ARGS -DLLVM_BINUTILS_INCDIR=$ROOT_DIR/gold/include"
+    GOLD_ARGS="$GOLD_ARGS --enable-plugins"
     NEWLIB_AR=patmos-ar
     NEWLIB_RANLIB=patmos-ranlib
 else
-    LLVM_CMAKE_ARGS=
-    GOLD_ARGS=
     NEWLIB_AR=patmos-llvm-ar
     NEWLIB_RANLIB=patmos-llvm-ranlib
 fi
 
-# TODO optionally check for available 'clang' in $PATH, use it for building LLVM (faster!)
-# TODO optionally use configure to build LLVM, for testing purposes!
-# TODO optionally create eclipse CMAKE configuration (using GCC and different ECLIPSE_LLVM_TARGETS)
-# TODO optionally just print out all configure / cmake strings
+if [ ! -z "$CLANG_COMPILER" ]; then
+    clang=`which $CLANG_COMPILER 2>/dev/null`
+    if [ -x $clang ]; then
+	LLVM_CMAKE_ARGS="$LLVM_CMAKE_ARGS -DCMAKE_C_COMPILER=$CLANG_COMPILER -DCMAKE_CXX_COMPILER=$CLANG_COMPILER++"
+    fi
+fi
 
 mkdir -p "${INSTALL_DIR}"
 
 TARGETS=${@-$ALLTARGETS}
 for target in $TARGETS; do
-  info "Processing '"$target"'"
+  if [ "$DO_SHOW_CONFIGURE" ]; then
+    info "Configure for '$target'"
+  else
+    info "Processing '"$target"'"
+  fi
   case $target in
   'llvm')
     clone_update ${GITHUB_BASEURL}/patmos-llvm.git llvm
@@ -269,10 +312,12 @@ for target in $TARGETS; do
     ;;
   'clang')
     clone_update ${GITHUB_BASEURL}/patmos-clang.git llvm/tools/clang
+    # TODO optionally use configure to build LLVM, for testing purposes!
     build_cmake llvm build_llvm llvm$BUILDDIR_SUFFIX "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS"
     ;;
   'eclipse')
-    
+    # TODO add options to use Eclipse generator, ensure g++ is used to compile
+    build_cmake llvm build_llvm llvm-eclipse$BUILDDIR_SUFFIX "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS"
     ;;
   'gold')
     clone_update ${GITHUB_BASEURL}/patmos-gold.git gold
@@ -282,7 +327,7 @@ for target in $TARGETS; do
     clone_update ${GITHUB_BASEURL}/patmos-newlib.git newlib
     build_autoconf newlib build_default newlib$BUILDDIR_SUFFIX --target=patmos-unknown-elf AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
         RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/llvm-ld \
-        CC_FOR_TARGET=${INSTALL_DIR}/bin/clang  CFLAGS_FOR_TARGET='-ccc-host-triple patmos-unknown-elf -O2'
+        CC_FOR_TARGET=${INSTALL_DIR}/bin/clang  "CFLAGS_FOR_TARGET='-ccc-host-triple patmos-unknown-elf -O2'"
     ;;
   'compiler-rt')
     clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git compiler-rt
@@ -290,7 +335,12 @@ for target in $TARGETS; do
     ;;
   'pasim')
     clone_update https://github.com/schoeberl/patmos.git patmos
-    build_cmake patmos/simulator build_default patmos$BUILDDIR_SUFFIX/simulator
+    if expr "$BUILDDIR_SUFFIX" : "/" > /dev/null; then
+	builddir=patmos$BUILDDIR_SUFFIX/simulator
+    else
+	builddir=patmos/simulator$BUILDDIR_SUFFIX
+    fi
+    build_cmake patmos/simulator build_default $builddir
     ;;
   'bench')
     clone_update ssh+git://tipca/home/fbrandne/repos/patmos-benchmarks bench
