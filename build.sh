@@ -160,31 +160,36 @@ function build_llvm() {
     
     run make $MAKEJ all || exit 1
 
-    if [ "$INSTALL_SYMLINKS" == "true" ]; then
-	run ln -sf $builddir/bin/clang $INSTALL_DIR/bin/patmos-clang
-	
+    if [ "$INSTALL_SYMLINKS" ]; then
+	cmd="ln -sf"
+	gold_installdir=$INSTALL_DIR/
     else
-	run make install || exit 1
+	# Not sure how to add a program prefix for cmake install.. so just copy what we need
+	cmd="cp -afv"
+	gold_installdir=$INSTALL_DIR/
     fi
+
+    echo "Installing files .. "
+
+    for file in `find $builddir/bin -type f -o -type l`; do
+	filename=`basename $file`
+	run rm -rf $INSTALL_DIR/bin/patmos-$filename
+	run $cmd $file $INSTALL_DIR/bin/patmos-$filename
+    done
 
     # TODO install LLVMgold.so and libLTO.so
     if [ "$BUILD_LTO" == "true" ]; then
-	
-	if [ "$INSTALL_SYMLINKS" ]; then
-	    cmd="ln -sf"
-	    dstdir=$INSTALL_DIR/
-	else
-	    cmd="cp -f"
-	    dstdir=$INSTALL_DIR/
-	fi
-	
+		
 	# bin is required, otherwise auto-loading of plugins does not work!
-	run mkdir -p $dstdir/bin
-	run mkdir -p $dstdir/lib/bfd-plugins
+	run mkdir -p $gold_installdir/bin
+	run mkdir -p $gold_installdir/lib/bfd-plugins
 
-	
+	run $cmd $builddir/lib/LLVMgold.so $INSTALL_DIR/lib/
+	run $cmd $builddir/lib/libLTO.so   $INSTALL_DIR/lib/
+
+	run ln -sf $INSTALL_DIR/lib/LLVMgold.so $gold_installdir/lib/bfd-plugins/
+	run ln -sf $INSTALL_DIR/lib/libLTO.so   $gold_installdir/lib/bfd-plugins/
     fi
-
 
 }
 
@@ -343,7 +348,7 @@ for target in $TARGETS; do
     build_cmake patmos/simulator build_default $builddir
     ;;
   'bench')
-    clone_update ssh+git://tipca/home/fbrandne/repos/patmos-benchmarks bench
+    clone_update ssh+git://tipca.imm.dtu.dk/home/fbrandne/repos/patmos-benchmarks bench
     build_cmake bench build_bench bench$BUILDDIR_SUFFIX "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/bench/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
     ;;
   *) echo "Don't know about $target." ;;
