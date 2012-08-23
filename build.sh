@@ -37,8 +37,8 @@ BUILDDIR_SUFFIX="/build"
 LLVM_TARGETS=Patmos
 ECLIPSE_LLVM_TARGETS=Patmos
 
-# Set to the name of the clang binary to use for compiling LLVM
-# or leave empty to use cmake defaults
+# Set to the name of the clang binary to use for compiling LLVM itself.
+# Leave empty to use cmake defaults
 CLANG_COMPILER=clang
 
 # Build gold binutils and LLVM LTO plugin
@@ -75,6 +75,9 @@ function info() {
 }
 
 run() {
+    if [ "$VERBOSE" == "true" ]; then
+	echo "$@"
+    fi
     if [ "$DRYRUN" != "true" ]; then
 	eval $@
 	ret=$?
@@ -82,8 +85,6 @@ run() {
 	    echo "$@ failed ($ret)!"
 	    return $ret
 	fi
-    elif [ "$VERBOSE" == "true" ]; then
-	echo "$@"
     fi
 }
 
@@ -232,6 +233,7 @@ function usage() {
     -u		Update repositories
     -d		Dryrun, just show what would be executed
     -s		Show configure commands for all given targets
+    -v		Show command that are executed
 
   Available targets:
     $ALLTARGETS eclipse
@@ -274,7 +276,7 @@ function build_llvm() {
 
     run make $MAKEJ all
 
-    if [ "$INSTALL_SYMLINKS" ]; then
+    if [ "$INSTALL_SYMLINKS" == "true" ]; then
 	cmd="ln -sf"
 	gold_installdir=$INSTALL_DIR/
     else
@@ -321,7 +323,7 @@ function build_bench() {
 
 
 # one-shot config
-while getopts ":chi:j:puds" opt; do
+while getopts ":chi:j:pudsv" opt; do
   case $opt in
     c) DO_CLEAN=true ;;
     h) usage; exit 0 ;;
@@ -331,6 +333,7 @@ while getopts ":chi:j:puds" opt; do
     u) DO_UPDATE=true ;;
     d) DRYRUN=true; VERBOSE=true ;;
     s) DO_SHOW_CONFIGURE=true ;;
+    v) VERBOSE=true ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       usage >&2
@@ -400,8 +403,8 @@ for target in $TARGETS; do
   'newlib')
     clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib)
     build_autoconf newlib build_default $(get_build_dir newlib) --target=patmos-unknown-elf AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
-        RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/llvm-ld \
-        CC_FOR_TARGET=${INSTALL_DIR}/bin/clang  "CFLAGS_FOR_TARGET='-ccc-host-triple patmos-unknown-elf -O2'"
+        RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
+        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-ccc-host-triple patmos-unknown-elf -O2'"
     ;;
   'compiler-rt')
     clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $(get_repo_dir compiler-rt)
