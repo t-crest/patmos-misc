@@ -1,0 +1,63 @@
+#!/bin/bash -e
+###############################################################################
+#
+# Script to grep + open a result in vim
+#
+# Daniel Prokesch <daniel@vmars.tuwien.ac.at>
+#
+###############################################################################
+
+
+
+IGNORE=".git|.hg|.svn"
+
+
+trap "cleanup" EXIT
+
+function cleanup {
+  test -f "$TMP" && rm "$TMP"
+}
+
+
+function display {
+  while read NUM LOC TXT; do
+    printf "\e[1;34m%6s  \e[0;36m%s\t\e[0m%s\n" "$NUM" "$LOC" "$TXT"
+  done < $1 | less -FRSX
+}
+
+function vim_entry {
+  vim $(awk 'NR=='$2'{print $2}' $1 | sed 's/:/ +/' )
+}
+
+
+SEARCH="${@?Go to what? - Usage: $(basename $0) <search_regex>}"
+
+TMP=$(mktemp)
+grep -rnwE --binary-files=without-match "$SEARCH" . | grep -vE "$IGNORE" | sed -e 's/:/ /2' -e 's/\\/\\\\/g'| nl > $TMP
+
+
+MAX=$(wc -l < $TMP)
+if [ $MAX -eq 0 ]; then
+  # no match found
+  echo "Nothing found."
+elif [ $MAX -eq 1 ]; then
+  # one match found
+  vim_entry $TMP 1
+else
+  # more than one match found
+  display $TMP
+  read -ep "Entry: " ENTRY
+  if [[ ! $ENTRY || ! $ENTRY =~ ^[0-9]+$ ]]; then
+    # nothing or not a number
+    echo "Abort."
+    exit 1
+  fi
+  if [[ $ENTRY -ge 1 && $ENTRY -le $MAX ]]; then
+    vim_entry $TMP $ENTRY
+  else
+    echo "Number out of range."
+  fi
+fi
+
+exit 0
+
