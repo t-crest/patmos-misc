@@ -97,9 +97,10 @@ function get_repo_dir() {
 	;;
     long)
 	case $repo in
-	patmos)	 echo "patmos" ;;
-	bench)   echo "patmos-benchmarks" ;;
-	*)	 echo "patmos-"$repo ;;
+	patmos)	  echo "patmos" ;;
+	patmos/*) echo $repo ;;
+	bench)    echo "patmos-benchmarks" ;;
+	*)	  echo "patmos-"$repo ;;
 	esac
 	;;
     prefix)
@@ -141,7 +142,7 @@ function clone_update() {
     elif [ ${DO_UPDATE} != false ] ; then
         #TODO find a better way (e.g. stash away only on demand)
 	info "Updating $1"
-        pushd "$target" > /dev/null
+        run pushd "$target" ">/dev/null"
         if [ "$DRYRUN" != "true" ]; then
 	    echo git stash
 	else
@@ -160,7 +161,7 @@ function clone_update() {
 		git stash pop
 	    fi
 	fi
-        popd > /dev/null
+        run popd ">/dev/null"
     fi
 }
 
@@ -182,14 +183,14 @@ function build_cmake() {
     if [ $DO_CLEAN == true -o ! -e "$builddir" ] ; then
         run rm -rf $builddir
         run mkdir -p $builddir
-        run pushd $builddir > /dev/null
+        run pushd $builddir ">/dev/null"
         run cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
 	# TODO check if configure was sucessful
     else
-        run pushd $builddir > /dev/null
+        run pushd $builddir ">/dev/null"
     fi
     $build_call $rootdir $builddir
-    run popd > /dev/null
+    run popd ">/dev/null"
 }
 
 function build_autoconf() {
@@ -211,14 +212,14 @@ function build_autoconf() {
     if [ $DO_CLEAN == true -o ! -e "$builddir" ] ; then
         run rm -rf $builddir
         run mkdir -p $builddir
-        run pushd $builddir > /dev/null
+        run pushd $builddir ">/dev/null"
 	run $configscript "$@" --prefix=${INSTALL_DIR}
 	# TODO check if configure was sucessful
     else
-        run pushd $builddir > /dev/null
+        run pushd $builddir ">/dev/null"
     fi
     $build_call $rootdir $builddir
-    run popd > /dev/null
+    run popd ">/dev/null"
 }
 
 function usage() {
@@ -322,8 +323,9 @@ function build_bench() {
 
 
 
+
 # one-shot config
-while getopts ":chi:j:pudsv" opt; do
+while getopts ":chi:j:pudsvx" opt; do
   case $opt in
     c) DO_CLEAN=true ;;
     h) usage; exit 0 ;;
@@ -334,6 +336,7 @@ while getopts ":chi:j:pudsv" opt; do
     d) DRYRUN=true; VERBOSE=true ;;
     s) DO_SHOW_CONFIGURE=true ;;
     v) VERBOSE=true ;;
+    x) set -x ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       usage >&2
@@ -411,7 +414,7 @@ for target in $TARGETS; do
     repo=$(get_repo_dir compiler-rt)
     build_cmake compiler-rt build_default $(get_build_dir compiler-rt) "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
     ;;
-  'pasim')
+  'patmos'|'pasim')
     clone_update https://github.com/schoeberl/patmos.git $(get_repo_dir patmos)
     build_cmake patmos/simulator build_default $(get_build_dir patmos)
     ;;
