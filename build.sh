@@ -14,6 +14,62 @@
 #
 ###############################################################################
 
+self=`readlink -f $0`
+CFGFILE=`dirname $self`/build.cfg
+
+########### user configs, overwrite in build.cfg ##############
+
+ALLTARGETS="gold llvm clang newlib compiler-rt pasim bench"
+
+#local_dir=`dirname $0` 
+#ROOT_DIR=`readlink -f $local_dir`
+ROOT_DIR=$(pwd)
+
+# Set to 'short' for llvm/clang/... directory names, 'long' for 
+# patmos-llvm/patmos-clang/.. or 'prefix' to use $(REPO_PREFIX)llvm/..
+REPO_NAMES=short
+REPO_PREFIX=
+
+INSTALL_DIR="$ROOT_DIR/local"
+BUILDDIR_SUFFIX="/build"
+
+#LLVM_TARGETS=all
+LLVM_TARGETS=Patmos
+ECLIPSE_LLVM_TARGETS=Patmos
+
+# Set to the name of the clang binary to use for compiling LLVM
+# or leave empty to use cmake defaults
+CLANG_COMPILER=clang
+
+# Build gold binutils and LLVM LTO plugin
+BUILD_LTO=true
+
+# Create symlinks instead of copying files where applicable
+# (llvm, clang, gold)
+INSTALL_SYMLINKS=false
+
+# Additional arguments for cmake / configure
+LLVM_CMAKE_ARGS=
+GOLD_ARGS=
+
+MAKEJ= 
+
+DO_CLEAN=false
+DO_UPDATE=false
+DO_SHOW_CONFIGURE=false
+DRYRUN=false
+VERBOSE=false
+
+#################### End of user configs #####################
+
+# user config
+if [ -f $CFGFILE ]; then
+  source $CFGFILE
+fi
+
+
+##################### Helper Functions ######################
+
 function info() {
     echo -e "\033[32m ===== $1 ===== \033[0m" >&2
 }
@@ -31,26 +87,83 @@ run() {
     fi
 }
 
+function get_repo_dir() {
+    local repo=$1
+
+    case $REPO_NAMES in
+    short)
+	echo $repo
+	;;
+    long)
+	case $repo in 
+	patmos)	 echo "patmos" ;;
+	bench)   echo "patmos-benchmarks" ;;
+	*)	 echo "patmos-"$repo ;;
+	esac
+	;;
+    prefix)
+	echo $REPO_PREFIX$repo
+	;;
+    *)
+	# TODO uhm.. make sure that this never happens by checking earlier
+	echo $repo
+	;;
+    esac
+}
+
+function get_build_dir() {
+    local repo=$(get_repo_dir $1)
+
+    if [ "$repo" == "patmos" ]; then
+	if expr "$BUILDDIR_SUFFIX" : "/" > /dev/null; then
+	    builddir=patmos$BUILDDIR_SUFFIX/simulator
+	else
+	    builddir=patmos/simulator$BUILDDIR_SUFFIX
+	fi
+    else 
+	builddir=$repo$BUILDDIR_SUFFIX
+    fi
+    echo $builddir
+}
+
 function clone_update() {
+    local srcurl=$1
+    local target=$ROOT_DIR/$2
+
     if [ "$DO_SHOW_CONFIGURE" == "true" ]; then
 	return
     fi
-    if [ ! -d "$2" ] ; then
-	info "Cloning from $1"
-	run git clone "$1" "$ROOT_DIR/$2"
+    if [ ! -d "$target" ] ; then
+	info "Cloning from $srcurl"
+	run git clone "$srcurl" "$target"
     elif [ ${DO_UPDATE} != false ] ; then
         #TODO find a better way (e.g. stash away only on demand)
-	info "Updating $2"
-        pushd "$ROOT_DIR/$2" > /dev/null
-        run git stash
+	info "Updating $1"
+        pushd "$target" > /dev/null
+        if [ "$DRYRUN" != "true" ]; then 
+	    echo git stash
+	else 
+	    ret=$(git stash)
+	    # TODO is there a better way of doing this?
+	    local skip_stash=false
+	    if [ "$ret" == "No local changes to save" ]; then
+		skip_stash=true
+	    fi
+	fi
         run git pull --rebase
-        run git stash pop
+        if [ "$DRYRUN" != "true" ]; then 
+	    echo git stash pop
+	else
+	    if [ "$skip_stash" != "true" ]; then
+		git stash pop
+	    fi
+	fi
         popd > /dev/null
     fi
 }
 
 function build_cmake() {
-    root=$ROOT_DIR/$1
+    root=$ROOT_DIR/$(get_repo_dir $1)
     build_call=$2
     builddir=$ROOT_DIR/$3
     rootdir=$(readlink -f $root)
@@ -78,7 +191,7 @@ function build_cmake() {
 }
 
 function build_autoconf() {
-    root=$ROOT_DIR/$1
+    root=$ROOT_DIR/$(get_repo_dir $1)
     build_call=$2
     builddir=$ROOT_DIR/$3
     shift 3
@@ -132,10 +245,10 @@ function build_gold() {
     local builddir=$2
 
     if [ "$BUILD_LTO" == "true" ]; then
-	run make $MAKEJ all || exit 1
+	run make $MAKEJ all
 	local install_target=install
     else
-	run make $MAKEJ all-gold || exit 1
+	run make $MAKEJ all-gold
 	local install_target=install-gold
     fi
 
@@ -150,7 +263,7 @@ function build_gold() {
 	    run ln -sf $builddir/binutils/strip-new $INSTALL_DIR/bin/patmos-strip
 	fi
     else 
-	run make $install_target || exit 1
+	run make $install_target
     fi
 }
 
@@ -158,7 +271,7 @@ function build_llvm() {
     local rootdir=$1
     local builddir=$2
     
-    run make $MAKEJ all || exit 1
+    run make $MAKEJ all
 
     if [ "$INSTALL_SYMLINKS" ]; then
 	cmd="ln -sf"
@@ -194,62 +307,16 @@ function build_llvm() {
 }
 
 function build_default() {
-    run make $MAKEJ all || exit 1
-    run make install || exit 1
+    run make $MAKEJ all
+    run make install
 }
 
 function build_bench() {
-    run make $MAKEJ all || exit 1
+    run make $MAKEJ all
 
     # TODO run tests, or make separate, optional target to run tests
 }
 
-
-ALLTARGETS="gold llvm clang newlib compiler-rt pasim bench"
-CFGFILE=build.cfg
-
-########### user configs, overwrite in build.cfg ##############
-
-#local_dir=`dirname $0` 
-#ROOT_DIR=`readlink -f $local_dir`
-ROOT_DIR=$(pwd)
-
-INSTALL_DIR="$ROOT_DIR/local"
-BUILDDIR_SUFFIX="/build"
-
-#LLVM_TARGETS=all
-LLVM_TARGETS=Patmos
-ECLIPSE_LLVM_TARGETS=Patmos
-
-# Set to the name of the clang binary to use for compiling LLVM
-# or leave empty to use cmake defaults
-CLANG_COMPILER=clang
-
-# Build gold binutils and LLVM LTO plugin
-BUILD_LTO=true
-
-# Create symlinks instead of copying files where applicable
-# (llvm, clang, gold)
-INSTALL_SYMLINKS=false
-
-# Additional arguments for cmake / configure
-LLVM_CMAKE_ARGS=
-GOLD_ARGS=
-
-MAKEJ= 
-
-DO_CLEAN=false
-DO_UPDATE=false
-DO_SHOW_CONFIGURE=false
-DRYRUN=false
-VERBOSE=false
-
-#################### End of user configs #####################
-
-# user config
-if [ -f $CFGFILE ]; then
-  source $CFGFILE
-fi
 
 
 # one-shot config
@@ -310,46 +377,44 @@ for target in $TARGETS; do
   fi
   case $target in
   'llvm')
-    clone_update ${GITHUB_BASEURL}/patmos-llvm.git llvm
+    clone_update ${GITHUB_BASEURL}/patmos-llvm.git $(get_repo_dir llvm)
     if ! expr "$TARGETS" : ".*\<clang\>.*" > /dev/null; then
-      build_cmake llvm build_llvm llvm$BUILDDIR_SUFFIX "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS"
+      build_cmake llvm build_llvm $(get_build_dir llvm) "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS"
     fi
     ;;
   'clang')
-    clone_update ${GITHUB_BASEURL}/patmos-clang.git llvm/tools/clang
+    clone_update ${GITHUB_BASEURL}/patmos-clang.git $(get_repo_dir llvm)/tools/clang
     # TODO optionally use configure to build LLVM, for testing purposes!
-    build_cmake llvm build_llvm llvm$BUILDDIR_SUFFIX "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS"
+    build_cmake llvm build_llvm $(get_build_dir llvm) "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS"
     ;;
   'eclipse')
     # TODO add options to use Eclipse generator, ensure g++ is used to compile
-    build_cmake llvm build_llvm llvm-eclipse$BUILDDIR_SUFFIX "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS"
+    LLVM_ECLIPSE_ARGS=" "
+    build_cmake llvm build_llvm $(get_build_dir llvm-eclipse) "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS $LLVM_ECLIPSE_ARGS"
     ;;
   'gold')
-    clone_update ${GITHUB_BASEURL}/patmos-gold.git gold
-    build_autoconf gold build_gold gold$BUILDDIR_SUFFIX --program-prefix=patmos- --enable-gold=yes --enable-ld=no $GOLD_ARGS
+    clone_update ${GITHUB_BASEURL}/patmos-gold.git $(get_repo_dir gold)
+    build_autoconf gold build_gold $(get_build_dir gold) --program-prefix=patmos- --enable-gold=yes --enable-ld=no $GOLD_ARGS
     ;;
   'newlib')
-    clone_update ${GITHUB_BASEURL}/patmos-newlib.git newlib
-    build_autoconf newlib build_default newlib$BUILDDIR_SUFFIX --target=patmos-unknown-elf AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
+    clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib)
+    build_autoconf newlib build_default $(get_build_dir newlib) --target=patmos-unknown-elf AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
         RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/llvm-ld \
         CC_FOR_TARGET=${INSTALL_DIR}/bin/clang  "CFLAGS_FOR_TARGET='-ccc-host-triple patmos-unknown-elf -O2'"
     ;;
   'compiler-rt')
-    clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git compiler-rt
-    build_cmake compiler-rt build_default compiler-rt$BUILDDIR_SUFFIX "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/compiler-rt/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
+    clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $(get_repo_dir compiler-rt)
+    repo=$(get_repo_dir compiler-rt)
+    build_cmake compiler-rt build_default $(get_build_dir compiler-rt) "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
     ;;
   'pasim')
-    clone_update https://github.com/schoeberl/patmos.git patmos
-    if expr "$BUILDDIR_SUFFIX" : "/" > /dev/null; then
-	builddir=patmos$BUILDDIR_SUFFIX/simulator
-    else
-	builddir=patmos/simulator$BUILDDIR_SUFFIX
-    fi
-    build_cmake patmos/simulator build_default $builddir
+    clone_update https://github.com/schoeberl/patmos.git $(get_repo_dir patmos)
+    build_cmake patmos/simulator build_default $(get_build_dir patmos)
     ;;
   'bench')
     clone_update ssh+git://tipca.imm.dtu.dk/home/fbrandne/repos/patmos-benchmarks bench
-    build_cmake bench build_bench bench$BUILDDIR_SUFFIX "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/bench/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
+    repo=$(get_repo_dir bench)
+    build_cmake bench build_bench $(get_build_dir bench) "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
     ;;
   *) echo "Don't know about $target." ;;
   esac
