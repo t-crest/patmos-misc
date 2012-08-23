@@ -419,7 +419,7 @@ for target in $TARGETS; do
     build_cmake patmos/simulator build_default $(get_build_dir patmos)
     ;;
   'bench')
-    clone_update ssh+git://tipca.imm.dtu.dk/home/fbrandne/repos/patmos-benchmarks bench
+    clone_update ssh+git://tipca.imm.dtu.dk/home/fbrandne/repos/patmos-benchmarks $(get_repo_dir bench)
     repo=$(get_repo_dir bench)
     build_cmake bench build_bench $(get_build_dir bench) "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
     ;;
