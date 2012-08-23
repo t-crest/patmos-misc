@@ -37,6 +37,9 @@ BUILDDIR_SUFFIX="/build"
 LLVM_TARGETS=Patmos
 ECLIPSE_LLVM_TARGETS=Patmos
 
+# build LLVM using configure instead of cmake
+LLVM_USE_CONFIGURE=false
+
 # Set to the name of the clang binary to use for compiling LLVM itself.
 # Leave empty to use cmake defaults
 CLANG_COMPILER=clang
@@ -50,6 +53,7 @@ INSTALL_SYMLINKS=false
 
 # Additional arguments for cmake / configure
 LLVM_CMAKE_ARGS=
+LLVM_CONFIGURE_ARGS=
 GOLD_ARGS=
 
 MAKEJ=
@@ -169,14 +173,14 @@ function build_cmake() {
     root=$ROOT_DIR/$(get_repo_dir $1)
     build_call=$2
     builddir=$ROOT_DIR/$3
-    rootdir=$(readlink -f $root)
+    rootdir=$(readlink -f $root || echo $root)
     shift 3
     if [ "$DO_SHOW_CONFIGURE" == "true" ]; then
 	echo cd $builddir
 	echo cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
 	return
     fi
-    if [ ! -e $builddir/Makefile ]; then
+    if [ -e $builddir -a ! -e $builddir/Makefile ]; then
 	echo "Recreating builddir after unfinished configure"
 	run rm -rf $builddir
     fi
@@ -198,14 +202,14 @@ function build_autoconf() {
     build_call=$2
     builddir=$ROOT_DIR/$3
     shift 3
-    rootdir=$(readlink -f $root)
+    rootdir=$(readlink -f $root || echo $root)
     configscript=$rootdir/configure
     if [ "$DO_SHOW_CONFIGURE" == "true" ]; then
 	echo cd $builddir
 	echo $configscript "$@" --prefix=${INSTALL_DIR}
 	return
     fi
-    if [ ! -e $builddir/Makefile ]; then
+    if [ -e $builddir -a ! -e $builddir/Makefile ]; then
 	echo "Recreating builddir after unfinished configure"
 	run rm -rf $builddir
     fi
@@ -249,8 +253,8 @@ function build_gold() {
     local builddir=$2
 
     if [ "$BUILD_LTO" == "true" ]; then
-	run make $MAKEJ all
-	local install_target=install
+	run make $MAKEJ all-gold all-binutils
+	local install_target="install-gold install-binutils"
     else
 	run make $MAKEJ all-gold
 	local install_target=install-gold
@@ -288,6 +292,10 @@ function build_llvm() {
 
     echo "Installing files .. "
 
+    if [ "$LLVM_USE_CONFIGURE" == "true" ]; then
+	builddir=$builddir/Debug+Asserts
+    fi
+
     for file in `find $builddir/bin -type f -o -type l`; do
 	filename=`basename $file`
 	run rm -rf $INSTALL_DIR/bin/patmos-$filename
@@ -321,6 +329,20 @@ function build_bench() {
     # TODO run tests, or make separate, optional target to run tests
 }
 
+
+function run_llvm_build() {
+    local eclipse_args=
+    if [ "$1"  == "eclipse" ]; then
+	eclipse_args="-G 'Eclipse CDT4 - Unix Makefiles' "
+    fi
+
+    if [ "$LLVM_USE_CONFIGURE" == "true" -a "$1" != "eclipse" ]; then
+	targets=$(echo $LLVM_TARGETS | tr '[:upper:]' '[:lower:]')
+	build_autoconf llvm build_llvm $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $LLVM_CONFIGURE_ARGS"
+    else
+	build_cmake llvm build_llvm $(get_build_dir llvm) "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS $eclipse_args"
+    fi
+}
 
 
 
@@ -357,7 +379,9 @@ shift $((OPTIND-1))
 GITHUB_BASEURL=https://github.com/t-crest
 
 if [ "$BUILD_LTO" == "true" ]; then
-    LLVM_CMAKE_ARGS="$LLVM_CMAKE_ARGS -DLLVM_BINUTILS_INCDIR=$ROOT_DIR/gold/include"
+    golddir=$(get_repo_dir gold)
+    LLVM_CMAKE_ARGS="$LLVM_CMAKE_ARGS -DLLVM_BINUTILS_INCDIR=$ROOT_DIR/$golddir/include"
+    LLVM_CONFIGURE_ARGS="$LLVM_CONFIGURE_ARGS --with-binutils-include=$ROOT_DIR/$golddir/include"
     GOLD_ARGS="$GOLD_ARGS --enable-plugins"
     NEWLIB_AR=patmos-ar
     NEWLIB_RANLIB=patmos-ranlib
@@ -386,18 +410,16 @@ for target in $TARGETS; do
   'llvm')
     clone_update ${GITHUB_BASEURL}/patmos-llvm.git $(get_repo_dir llvm)
     if ! expr "$TARGETS" : ".*\<clang\>.*" > /dev/null; then
-      build_cmake llvm build_llvm $(get_build_dir llvm) "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS"
+	run_llvm_build
     fi
     ;;
   'clang')
     clone_update ${GITHUB_BASEURL}/patmos-clang.git $(get_repo_dir llvm)/tools/clang
     # TODO optionally use configure to build LLVM, for testing purposes!
-    build_cmake llvm build_llvm $(get_build_dir llvm) "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS"
+    run_llvm_build
     ;;
   'eclipse')
-    # TODO add options to use Eclipse generator, ensure g++ is used to compile
-    LLVM_ECLIPSE_ARGS=" "
-    build_cmake llvm build_llvm $(get_build_dir llvm-eclipse) "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS $LLVM_ECLIPSE_ARGS"
+    run_llvm_build eclipse
     ;;
   'gold')
     clone_update ${GITHUB_BASEURL}/patmos-gold.git $(get_repo_dir gold)
