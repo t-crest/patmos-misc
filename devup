@@ -1,0 +1,130 @@
+#!/bin/bash
+#
+# This is a small script to update a set of svn and git repositories in one go
+#
+# Author: Stefan Hepp <hepp@complang.tuwien.ac.at>
+#
+
+BASE=$HOME/tcrest/
+GITBASE=$BASE/git
+SVNBASE=$BASE/svn
+
+SVNREPOS="tcrest tcapapers vmars"
+GITREPOS="patmos benchmarks newlib compiler-rt gold clang llvm"
+
+DO_STASH=false
+
+self=`readlink -f $0`
+cfgfile=`dirname $self`/devup.cfg
+
+if [ -f $cfgfile ]; then
+    . $cfgfile
+fi
+
+RED="\033[31m"
+NOCOLOR="\033[0m"
+
+function usage() {
+    echo "Usage: $0 [-s] [<repostype> ..] "
+    echo 
+    echo "  -s	    Use git stash before updating git"
+    echo 
+    echo "Repository types can be 'git' or 'svn'. Will update all types if omitted."
+    echo
+}
+
+function gitup() {
+    repo=$1
+    
+    if [ ! -d $GITBASE/$repo ]; then
+	return
+    fi
+
+    echo -e "* Updating$RED $repo" $NOCOLOR
+
+    pushd $GITBASE/$repo > /dev/null
+
+    if [ "$DO_STASH" == "true" ]; then
+	ret=$(git stash)
+	if [ "$?" != "0" ]; then
+	    echo "git stash failed!"
+	    exit 1
+	fi
+	# TODO is there a better way of doing this?
+	local skip_stash=false
+	if [ "$ret" == "No local changes to save" ]; then
+	    skip_stash=true
+	fi
+    fi
+    # ignore errors of pull .. 
+    (git pull --rebase; git status -uno) | while read a; do
+
+	if [ "$a" == "Current branch master is up to date." ]; then
+	    continue
+	fi
+
+	if [ "$a" == "# On branch master" ]; then
+	    continue
+	fi
+	if [ "$a" == "nothing to commit (use -u to show untracked files)" ]; then
+	    continue
+	fi
+
+	echo $a
+    done
+    if [ "$DO_STASH" == "true" -a "$skip_stash" != "true" ]; then
+	# continue on error .. 
+	git stash pop
+    fi
+
+    popd > /dev/null
+
+    echo 
+}
+
+function svnup() {
+    repo=$1
+
+    if [ ! -d $SVNBASE/$repo ]; then
+	return
+    fi
+
+    echo -e "* Updating$RED $repo" $NOCOLOR
+    svn up $SVNBASE/$repo
+    echo 
+}
+
+DO_UPDATE_ALL=true
+DO_UPDATE_GIT=false
+DO_UPDATE_SVN=false
+
+while [ ! -z "$1" ]; do
+    case $1 in
+    git) DO_UPDATE_ALL=false; DO_UPDATE_GIT=true ;;
+    svn) DO_UPDATE_ALL=false; DO_UPDATE_SVN=true ;;
+    -s) DO_STASH=true ;;
+    -h|--help)
+	usage
+	exit 0
+	;;
+    *) 
+	echo "Unknown option: $1"
+	exit 1
+	;;
+    esac
+    shift
+done
+
+
+if [ "$DO_UPDATE_GIT" == "true" -o "$DO_UPDATE_ALL" == "true" ]; then
+    for repo in $GITREPOS; do
+	gitup $repo
+    done
+fi
+
+if [ "$DO_UPDATE_SVN" == "true" -o "$DO_UPDATE_ALL" == "true" ]; then
+    for repo in $SVNREPOS; do
+	svnup $repo
+    done
+fi
+
