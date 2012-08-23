@@ -21,11 +21,11 @@ CFGFILE=`dirname $self`/build.cfg
 
 ALLTARGETS="gold llvm clang newlib compiler-rt pasim bench"
 
-#local_dir=`dirname $0` 
+#local_dir=`dirname $0`
 #ROOT_DIR=`readlink -f $local_dir`
 ROOT_DIR=$(pwd)
 
-# Set to 'short' for llvm/clang/... directory names, 'long' for 
+# Set to 'short' for llvm/clang/... directory names, 'long' for
 # patmos-llvm/patmos-clang/.. or 'prefix' to use $(REPO_PREFIX)llvm/..
 REPO_NAMES=short
 REPO_PREFIX=
@@ -52,7 +52,7 @@ INSTALL_SYMLINKS=false
 LLVM_CMAKE_ARGS=
 GOLD_ARGS=
 
-MAKEJ= 
+MAKEJ=
 
 DO_CLEAN=false
 DO_UPDATE=false
@@ -95,7 +95,7 @@ function get_repo_dir() {
 	echo $repo
 	;;
     long)
-	case $repo in 
+	case $repo in
 	patmos)	 echo "patmos" ;;
 	bench)   echo "patmos-benchmarks" ;;
 	*)	 echo "patmos-"$repo ;;
@@ -112,16 +112,17 @@ function get_repo_dir() {
 }
 
 function get_build_dir() {
-    local repo=$(get_repo_dir $1)
+    local repo=$1
+    local repodir=$(get_repo_dir $1)
 
     if [ "$repo" == "patmos" ]; then
-	if expr "$BUILDDIR_SUFFIX" : "/" > /dev/null; then
-	    builddir=patmos$BUILDDIR_SUFFIX/simulator
+	if [[ "$BUILDDIR_SUFFIX" =~ ^/ ]]; then
+	    builddir=$repodir/simulator$BUILDDIR_SUFFIX
 	else
-	    builddir=patmos/simulator$BUILDDIR_SUFFIX
+	    builddir=$repodir$BUILDDIR_SUFFIX/simulator
 	fi
-    else 
-	builddir=$repo$BUILDDIR_SUFFIX
+    else
+	builddir=$repodir$BUILDDIR_SUFFIX
     fi
     echo $builddir
 }
@@ -140,9 +141,9 @@ function clone_update() {
         #TODO find a better way (e.g. stash away only on demand)
 	info "Updating $1"
         pushd "$target" > /dev/null
-        if [ "$DRYRUN" != "true" ]; then 
+        if [ "$DRYRUN" != "true" ]; then
 	    echo git stash
-	else 
+	else
 	    ret=$(git stash)
 	    # TODO is there a better way of doing this?
 	    local skip_stash=false
@@ -151,7 +152,7 @@ function clone_update() {
 	    fi
 	fi
         run git pull --rebase
-        if [ "$DRYRUN" != "true" ]; then 
+        if [ "$DRYRUN" != "true" ]; then
 	    echo git stash pop
 	else
 	    if [ "$skip_stash" != "true" ]; then
@@ -262,7 +263,7 @@ function build_gold() {
 	    run ln -sf $builddir/binutils/ranlib $INSTALL_DIR/bin/patmos-ranlib
 	    run ln -sf $builddir/binutils/strip-new $INSTALL_DIR/bin/patmos-strip
 	fi
-    else 
+    else
 	run make $install_target
     fi
 }
@@ -270,7 +271,7 @@ function build_gold() {
 function build_llvm() {
     local rootdir=$1
     local builddir=$2
-    
+
     run make $MAKEJ all
 
     if [ "$INSTALL_SYMLINKS" ]; then
@@ -292,7 +293,7 @@ function build_llvm() {
 
     # TODO install LLVMgold.so and libLTO.so
     if [ "$BUILD_LTO" == "true" ]; then
-		
+
 	# bin is required, otherwise auto-loading of plugins does not work!
 	run mkdir -p $gold_installdir/bin
 	run mkdir -p $gold_installdir/lib/bfd-plugins
