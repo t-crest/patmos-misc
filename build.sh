@@ -56,7 +56,12 @@ LLVM_CMAKE_ARGS=
 LLVM_CONFIGURE_ARGS=
 GOLD_ARGS=
 
+GOLD_CFLAGS=
+GOLD_CXXFLAGS=
+NEWLIB_CFLAGS=
+
 MAKEJ=
+MAKE_VERBOSE=
 
 DO_CLEAN=false
 DO_UPDATE=false
@@ -169,12 +174,35 @@ function clone_update() {
     fi
 }
 
+function build_flags() {
+    local repo=$1
+
+
+    local cflagsname=$(echo "${repo}_CFLAGS" | tr '[a-z-/]' '[A-Z__]')
+    local cppflagsname=$(echo "${repo}_CPPFLAGS" | tr '[a-z-/]' '[A-Z__]')
+    local cxxflagsname=$(echo "${repo}_CXXFLAGS" | tr '[a-z-/]' '[A-Z__]')
+
+    if [ ! -z "${!cflagsname}$CFLAGS" ]; then
+	echo -n "CFLAGS='${!cflagsname} $CFLAGS'"
+    fi
+    if [ ! -z "${!cppflagsname}$CPPFLAGS" ]; then
+	echo -n " CPPFLAGS='${!cflagsname} $CPPFLAGS'"
+    fi
+    if [ ! -z "${!cxxflagsname}$CXXFLAGS" ]; then
+	echo -n " CXXFLAGS='${!cflagsname} $CXXFLAGS'"
+    fi
+}
+
 function build_cmake() {
-    root=$ROOT_DIR/$(get_repo_dir $1)
+    repo=$1
+    root=$ROOT_DIR/$(get_repo_dir $repo)
     build_call=$2
     builddir=$ROOT_DIR/$3
     rootdir=$(readlink -f $root || echo $root)
     shift 3
+
+    # TODO pass build_flags result to cmake 
+
     if [ "$DO_SHOW_CONFIGURE" == "true" ]; then
 	echo cd $builddir
 	echo cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
@@ -189,7 +217,6 @@ function build_cmake() {
         run mkdir -p $builddir
         run pushd $builddir ">/dev/null"
         run cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
-	# TODO check if configure was sucessful
     else
         run pushd $builddir ">/dev/null"
     fi
@@ -198,15 +225,20 @@ function build_cmake() {
 }
 
 function build_autoconf() {
-    root=$ROOT_DIR/$(get_repo_dir $1)
+    repo=$1
+    root=$ROOT_DIR/$(get_repo_dir $repo)
     build_call=$2
     builddir=$ROOT_DIR/$3
     shift 3
     rootdir=$(readlink -f $root || echo $root)
     configscript=$rootdir/configure
+
+    # Read out GOLD_CPPFLAGS, NEWLIB_CPPFLAGS, ..
+    local flags=$(build_flags $repo)
+
     if [ "$DO_SHOW_CONFIGURE" == "true" ]; then
 	echo cd $builddir
-	echo $configscript "$@" --prefix=${INSTALL_DIR}
+	echo "$flags" $configscript "$@" --prefix=${INSTALL_DIR}
 	return
     fi
     if [ -e $builddir -a ! -e $builddir/Makefile ]; then
@@ -217,8 +249,7 @@ function build_autoconf() {
         run rm -rf $builddir
         run mkdir -p $builddir
         run pushd $builddir ">/dev/null"
-	run $configscript "$@" --prefix=${INSTALL_DIR}
-	# TODO check if configure was sucessful
+	run "$flags" $configscript "$@" --prefix=${INSTALL_DIR}
     else
         run pushd $builddir ">/dev/null"
     fi
@@ -239,6 +270,7 @@ function usage() {
     -d		Dryrun, just show what would be executed
     -s		Show configure commands for all given targets
     -v		Show command that are executed
+    -V		Make make verbosive
 
   Available targets:
     $ALLTARGETS eclipse
@@ -253,10 +285,10 @@ function build_gold() {
     local builddir=$2
 
     if [ "$BUILD_LTO" == "true" ]; then
-	run make $MAKEJ all-gold all-binutils
+	run make $MAKEJ $MAKE_VERBOSE all-gold all-binutils
 	local install_target="install-gold install-binutils"
     else
-	run make $MAKEJ all-gold
+	run make $MAKEJ $MAKE_VERBOSE all-gold
 	local install_target=install-gold
     fi
 
@@ -269,9 +301,16 @@ function build_gold() {
 	    run ln -sf $builddir/binutils/nm-new $INSTALL_DIR/bin/patmos-nm
 	    run ln -sf $builddir/binutils/ranlib $INSTALL_DIR/bin/patmos-ranlib
 	    run ln -sf $builddir/binutils/strip-new $INSTALL_DIR/bin/patmos-strip
+
+	    # bin is required, otherwise auto-loading of plugins does not work!
+	    run mkdir -p $builddir/bin
+	    run mkdir -p $builddir/lib/bfd-plugins
+
+	    run ln -sf $INSTALL_DIR/lib/LLVMgold.so $builddir/lib/bfd-plugins/
+	    run ln -sf $INSTALL_DIR/lib/libLTO.so   $builddir/lib/bfd-plugins/
 	fi
     else
-	run make $install_target
+	run make $MAKE_VERBOSE $install_target
     fi
 }
 
@@ -279,15 +318,13 @@ function build_llvm() {
     local rootdir=$1
     local builddir=$2
 
-    run make $MAKEJ all
+    run make $MAKEJ $MAKE_VERBOSE all
 
     if [ "$INSTALL_SYMLINKS" == "true" ]; then
 	cmd="ln -sf"
-	gold_installdir=$INSTALL_DIR/
     else
 	# Not sure how to add a program prefix for cmake install.. so just copy what we need
 	cmd="cp -afv"
-	gold_installdir=$INSTALL_DIR/
     fi
 
     echo "Installing files .. "
@@ -298,33 +335,32 @@ function build_llvm() {
 
     for file in `find $builddir/bin -type f -o -type l`; do
 	filename=`basename $file`
-	run rm -rf $INSTALL_DIR/bin/patmos-$filename
 	run $cmd $file $INSTALL_DIR/bin/patmos-$filename
     done
 
     # TODO install LLVMgold.so and libLTO.so
     if [ "$BUILD_LTO" == "true" ]; then
 
-	# bin is required, otherwise auto-loading of plugins does not work!
-	run mkdir -p $gold_installdir/bin
-	run mkdir -p $gold_installdir/lib/bfd-plugins
-
 	run $cmd $builddir/lib/LLVMgold.so $INSTALL_DIR/lib/
 	run $cmd $builddir/lib/libLTO.so   $INSTALL_DIR/lib/
 
-	run ln -sf $INSTALL_DIR/lib/LLVMgold.so $gold_installdir/lib/bfd-plugins/
-	run ln -sf $INSTALL_DIR/lib/libLTO.so   $gold_installdir/lib/bfd-plugins/
+	# bin is required, otherwise auto-loading of plugins does not work!
+	run mkdir -p $INSTALL_DIR/bin
+	run mkdir -p $INSTALL_DIR/lib/bfd-plugins
+
+	run ln -sf ../LLVMgold.so $INSTALL_DIR/lib/bfd-plugins/
+	run ln -sf ../libLTO.so   $INSTALL_DIR/lib/bfd-plugins/
     fi
 
 }
 
 function build_default() {
-    run make $MAKEJ all
-    run make install
+    run make $MAKEJ $MAKE_VERBOSE all
+    run make $MAKE_VERBOSE install
 }
 
 function build_bench() {
-    run make $MAKEJ all
+    run make $MAKEJ $MAKE_VERBOSE all
 
     # TODO run tests, or make separate, optional target to run tests
 }
@@ -347,7 +383,7 @@ function run_llvm_build() {
 
 
 # one-shot config
-while getopts ":chi:j:pudsvx" opt; do
+while getopts ":chi:j:pudsvxV" opt; do
   case $opt in
     c) DO_CLEAN=true ;;
     h) usage; exit 0 ;;
@@ -358,6 +394,7 @@ while getopts ":chi:j:pudsvx" opt; do
     d) DRYRUN=true; VERBOSE=true ;;
     s) DO_SHOW_CONFIGURE=true ;;
     v) VERBOSE=true ;;
+    V) MAKE_VERBOSE="VERBOSE=1" ;;
     x) set -x ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -423,7 +460,7 @@ for target in $TARGETS; do
     ;;
   'gold')
     clone_update ${GITHUB_BASEURL}/patmos-gold.git $(get_repo_dir gold)
-    build_autoconf gold build_gold $(get_build_dir gold) --program-prefix=patmos- --enable-gold=yes --enable-ld=no $GOLD_ARGS
+    build_autoconf gold build_gold $(get_build_dir gold) --program-prefix=patmos- --enable-gold=yes --enable-ld=no "$GOLD_ARGS"
     ;;
   'newlib')
     clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib)
