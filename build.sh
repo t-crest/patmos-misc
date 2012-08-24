@@ -152,7 +152,7 @@ function clone_update() {
         #TODO find a better way (e.g. stash away only on demand)
 	info "Updating $1"
         run pushd "$target" ">/dev/null"
-        if [ "$DRYRUN" != "true" ]; then
+        if [ "$DRYRUN" == "true" ]; then
 	    echo git stash
 	else
 	    ret=$(git stash)
@@ -163,7 +163,7 @@ function clone_update() {
 	    fi
 	fi
         run git pull --rebase
-        if [ "$DRYRUN" != "true" ]; then
+        if [ "$DRYRUN" == "true" ]; then
 	    echo git stash pop
 	else
 	    if [ "$skip_stash" != "true" ]; then
