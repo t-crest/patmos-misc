@@ -333,9 +333,14 @@ function build_llvm() {
 	builddir=$builddir/Debug+Asserts
     fi
 
-    for file in `find $builddir/bin -type f -o -type l`; do
+    for file in `find $builddir/bin -type f`; do
 	filename=`basename $file`
 	run $cmd $file $INSTALL_DIR/bin/patmos-$filename
+    done
+    # symlinks have to be recreated anyway
+    for file in `find $builddir/bin -type l`; do
+	filename=`basename $file`
+	run "ln -sf" $file $INSTALL_DIR/bin/patmos-$filename
     done
 
     # TODO install LLVMgold.so and libLTO.so
