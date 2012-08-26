@@ -343,7 +343,6 @@ function build_llvm() {
 	run "ln -sf" $file $INSTALL_DIR/bin/patmos-$filename
     done
 
-    # TODO install LLVMgold.so and libLTO.so
     if [ "$BUILD_LTO" == "true" ]; then
 
 	run $cmd $builddir/lib/LLVMgold.so $INSTALL_DIR/lib/
@@ -433,7 +432,7 @@ else
 fi
 
 if [ ! -z "$CLANG_COMPILER" ]; then
-    clang=`which $CLANG_COMPILER 2>/dev/null`
+    clang=$(which $CLANG_COMPILER 2>/dev/null || echo "")
     if [ -x $clang ]; then
 	LLVM_CMAKE_ARGS="$LLVM_CMAKE_ARGS -DCMAKE_C_COMPILER=$CLANG_COMPILER -DCMAKE_CXX_COMPILER=$CLANG_COMPILER++"
     fi
