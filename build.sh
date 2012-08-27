@@ -441,7 +441,7 @@ fi
 
 if [ ! -z "$CLANG_COMPILER" ]; then
     clang=$(which $CLANG_COMPILER 2>/dev/null || echo -n "")
-    if [ -x $clang ]; then
+    if [ -x "$clang" ]; then
 	LLVM_CMAKE_ARGS="$LLVM_CMAKE_ARGS -DCMAKE_C_COMPILER=$CLANG_COMPILER -DCMAKE_CXX_COMPILER=$CLANG_COMPILER++"
     fi
 fi
@@ -463,7 +463,7 @@ for target in $TARGETS; do
     fi
     ;;
   'clang')
-    if [ ! -d $(get_repo_dir llvm) ]; then
+    if [ ! -d $ROOT_DIR/$(get_repo_dir llvm) ]; then
 	echo "Error: checkout llvm first. Run './build.sh llvm clang' instead."
 	exit 1
     fi
