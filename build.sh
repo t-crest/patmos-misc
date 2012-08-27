@@ -66,6 +66,7 @@ MAKE_VERBOSE=
 DO_CLEAN=false
 DO_UPDATE=false
 DO_SHOW_CONFIGURE=false
+DO_RUN_TESTS=false
 DRYRUN=false
 VERBOSE=false
 
@@ -271,6 +272,7 @@ function usage() {
     -s		Show configure commands for all given targets
     -v		Show command that are executed
     -V		Make make verbosive
+    -t		Run tests
 
   Available targets:
     $ALLTARGETS eclipse
@@ -366,7 +368,9 @@ function build_default() {
 function build_bench() {
     run make $MAKEJ $MAKE_VERBOSE all
 
-    # TODO run tests, or make separate, optional target to run tests
+    if [ "$DO_RUN_TESTS" == "true" ]; then
+        run make test
+    fi
 }
 
 
@@ -387,7 +391,7 @@ function run_llvm_build() {
 
 
 # one-shot config
-while getopts ":chi:j:pudsvxV" opt; do
+while getopts ":chi:j:pudsvxVt" opt; do
   case $opt in
     c) DO_CLEAN=true ;;
     h) usage; exit 0 ;;
@@ -399,6 +403,7 @@ while getopts ":chi:j:pudsvxV" opt; do
     s) DO_SHOW_CONFIGURE=true ;;
     v) VERBOSE=true ;;
     V) MAKE_VERBOSE="VERBOSE=1" ;;
+    t) DO_RUN_TESTS=true ;;
     x) set -x ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
