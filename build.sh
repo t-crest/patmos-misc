@@ -337,6 +337,9 @@ function build_llvm() {
 
     for file in `find $builddir/bin -type f`; do
 	filename=`basename $file`
+	
+	# TODO only copy if $file is newer, or if target is not a regular file
+	
 	run $cmd $file $INSTALL_DIR/bin/patmos-$filename
     done
     # symlinks have to be recreated anyway
@@ -437,7 +440,7 @@ else
 fi
 
 if [ ! -z "$CLANG_COMPILER" ]; then
-    clang=$(which $CLANG_COMPILER 2>/dev/null || echo "")
+    clang=$(which $CLANG_COMPILER 2>/dev/null || echo -n "")
     if [ -x $clang ]; then
 	LLVM_CMAKE_ARGS="$LLVM_CMAKE_ARGS -DCMAKE_C_COMPILER=$CLANG_COMPILER -DCMAKE_CXX_COMPILER=$CLANG_COMPILER++"
     fi
@@ -460,6 +463,10 @@ for target in $TARGETS; do
     fi
     ;;
   'clang')
+    if [ ! -d $(get_repo_dir llvm) ]; then
+	echo "Error: checkout llvm first. Run './build.sh llvm clang' instead."
+	exit 1
+    fi
     clone_update ${GITHUB_BASEURL}/patmos-clang.git $(get_repo_dir llvm)/tools/clang
     # TODO optionally use configure to build LLVM, for testing purposes!
     run_llvm_build
