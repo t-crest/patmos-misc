@@ -1,0 +1,50 @@
+
+# List of targets to build by default
+ALLTARGETS="gold llvm clang newlib compiler-rt pasim bench"
+
+# Root directory for all repositories
+ROOT_DIR=$(pwd)
+
+# Set to 'short' for llvm|clang|... directory names, 'long' for
+# patmos-llvm|patmos-clang|.. or 'prefix' to use $(REPO_PREFIX)llvm|..
+REPO_NAMES=short
+REPO_PREFIX=
+
+# Installation directory prefix
+INSTALL_DIR="$ROOT_DIR/local"
+# Directory suffix for directory containing generated files
+BUILDDIR_SUFFIX="/build"
+
+# Targets to support with patmos-clang
+#LLVM_TARGETS=all
+LLVM_TARGETS=Patmos
+ECLIPSE_LLVM_TARGETS=Patmos
+
+# build LLVM using configure instead of cmake
+LLVM_USE_CONFIGURE=false
+
+# Set to the name of the clang binary to use for compiling LLVM itself.
+# Leave empty to use cmake defaults
+CLANG_COMPILER=
+
+# Build gold binutils and LLVM LTO plugin
+BUILD_LTO=true
+
+# Create symlinks instead of copying files where applicable
+# (llvm, clang, gold)
+INSTALL_SYMLINKS=false
+
+# Additional arguments for cmake / configure
+LLVM_CMAKE_ARGS=
+LLVM_CONFIGURE_ARGS=
+GOLD_ARGS=
+
+GOLD_CFLAGS=
+GOLD_CXXFLAGS=
+NEWLIB_CFLAGS=
+
+# Commandline option to pass to make for parallel builds
+MAKEJ=-j2
+
+MAKE_VERBOSE=
+
