@@ -25,7 +25,7 @@ LLVM_USE_CONFIGURE=false
 
 # Set to the name of the clang binary to use for compiling LLVM itself.
 # Leave empty to use cmake defaults
-CLANG_COMPILER=
+CLANG_COMPILER=clang
 
 # Build gold binutils and LLVM LTO plugin
 BUILD_LTO=true
