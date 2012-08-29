@@ -98,6 +98,26 @@ run() {
     fi
 }
 
+function install() {
+    local src=$1
+    local dst=$2
+
+    if [ -f $src -a -d $dst ]; then
+	dst=$dst/$(basename $src)
+    fi
+
+    echo "Installing $src -> $dst"
+    if [ "$INSTALL_SYMLINKS" == "true" ]; then
+	run ln -sf $src $dst
+    else
+	if [ -L $dst ]; then
+	    rm -f $dst
+	fi
+	# TODO option to use hardlinking instead
+	run cp -uf $src $dst
+    fi
+}
+
 function get_repo_dir() {
     local repo=$1
 
@@ -322,13 +342,6 @@ function build_llvm() {
 
     run make $MAKEJ $MAKE_VERBOSE all
 
-    if [ "$INSTALL_SYMLINKS" == "true" ]; then
-	cmd="ln -sf"
-    else
-	# Not sure how to add a program prefix for cmake install.. so just copy what we need
-	cmd="cp -afv"
-    fi
-
     echo "Installing files .. "
 
     if [ "$LLVM_USE_CONFIGURE" == "true" ]; then
@@ -338,20 +351,22 @@ function build_llvm() {
     for file in `find $builddir/bin -type f`; do
 	filename=`basename $file`
 	
-	# TODO only copy if $file is newer, or if target is not a regular file
-	
-	run $cmd $file $INSTALL_DIR/bin/patmos-$filename
+	# Not sure how to add a program prefix for cmake install.. so just copy what we need
+	install $file $INSTALL_DIR/bin/patmos-$filename
     done
     # symlinks have to be recreated anyway
     for file in `find $builddir/bin -type l`; do
 	filename=`basename $file`
-	run "ln -sf" $file $INSTALL_DIR/bin/patmos-$filename
+	src=$(readlink $file)
+	run ln -sf patmos-$(basename $src) $INSTALL_DIR/bin/patmos-$filename
+    done
+
+    # install all shared libraries
+    for file in `find $builddir/lib -name "*.so"`; do
+	install $file $INSTALL_DIR/lib/
     done
 
     if [ "$BUILD_LTO" == "true" ]; then
-
-	run $cmd $builddir/lib/LLVMgold.so $INSTALL_DIR/lib/
-	run $cmd $builddir/lib/libLTO.so   $INSTALL_DIR/lib/
 
 	# bin is required, otherwise auto-loading of plugins does not work!
 	run mkdir -p $INSTALL_DIR/bin
