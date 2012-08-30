@@ -34,11 +34,14 @@ INSTALL_DIR="$ROOT_DIR/local"
 BUILDDIR_SUFFIX="/build"
 
 #LLVM_TARGETS=all
+#LLVM_TARGETS="ARM;Mips;Patmos;X86"
 LLVM_TARGETS=Patmos
 ECLIPSE_LLVM_TARGETS=Patmos
 
 # build LLVM using configure instead of cmake
 LLVM_USE_CONFIGURE=false
+# build LLVM using shared libraries instead of static libs
+LLVM_BUILD_SHAREd=false
 
 # Set to the name of the clang binary to use for compiling LLVM itself.
 # Leave empty to use cmake defaults
@@ -402,15 +405,21 @@ function build_bench() {
 
 function run_llvm_build() {
     local eclipse_args=
+    local config_args="--with-bug-report-url='https://github.com/t-crest/patmos-llvm/issues'"
+    local cmake_args="-DBUG_REPORT_URL='https://github.com/t-crest/patmos-llvm/issues'"
     if [ "$1"  == "eclipse" ]; then
-	eclipse_args="-G 'Eclipse CDT4 - Unix Makefiles' -DCMAKE_ECLIPSE_MAKE_ARGUMENTS=$MAKEJ -DCMAKE_ECLIPSE_VERSION='3.7 (Indigo)'"
+	cmake_args="$cmake_args -G 'Eclipse CDT4 - Unix Makefiles' -DCMAKE_ECLIPSE_MAKE_ARGUMENTS=$MAKEJ -DCMAKE_ECLIPSE_VERSION='3.7 (Indigo)'"
+    fi
+    if [ "$LLVM_BUILD_SHARED" == "true" ]; then
+	config_args="$config_args --enable-shared"
+	cmake_args="$cmake_args -DBUILD_SHARED_LIBS=ON"
     fi
 
     if [ "$LLVM_USE_CONFIGURE" == "true" -a "$1" != "eclipse" ]; then
-	targets=$(echo $LLVM_TARGETS | tr '[:upper:]' '[:lower:]')
-	build_autoconf llvm build_llvm $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $LLVM_CONFIGURE_ARGS --with-bug-report-url='https://github.com/t-crest/patmos-llvm/issues'"
+	targets=$(echo $LLVM_TARGETS | tr '[A-Z;]' '[a-z,]')
+	build_autoconf llvm build_llvm $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $config_args $LLVM_CONFIGURE_ARGS"
     else
-	build_cmake llvm build_llvm $(get_build_dir llvm) "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS $eclipse_args -DBUG_REPORT_URL='https://github.com/t-crest/patmos-llvm/issues'"
+	build_cmake llvm build_llvm $(get_build_dir llvm) "-DCMAKE_BUILD_TYPE=Debug -DLLVM_TARGETS_TO_BUILD='$LLVM_TARGETS' $cmake_args $LLVM_CMAKE_ARGS"
     fi
 }
 
