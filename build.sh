@@ -505,7 +505,7 @@ for target in $TARGETS; do
     build_cmake compiler-rt build_default $(get_build_dir compiler-rt) "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
     ;;
   'patmos'|'pasim')
-    clone_update https://github.com/schoeberl/patmos.git $(get_repo_dir patmos)
+    clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
     build_cmake patmos/simulator build_default $(get_build_dir patmos)
     ;;
   'bench')
