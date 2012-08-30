@@ -99,6 +99,7 @@ run() {
 }
 
 function install() {
+    # if $src is a directory, $dst must be the target directory, not the parent directory!
     local src=$1
     local dst=$2
 
@@ -108,13 +109,17 @@ function install() {
 
     echo "Installing $src -> $dst"
     if [ "$INSTALL_SYMLINKS" == "true" ]; then
+	if [ -d $src ]; then
+	    run rm -rf $dst
+	fi
 	run ln -sf $src $dst
     else
 	if [ -L $dst ]; then
 	    rm -f $dst
 	fi
 	# TODO option to use hardlinking instead
-	run cp -uf $src $dst
+	# TODO if $src is a directory, make sure we remove any trash in $dst (use rsync??)
+	run cp -ufr $src $dst
     fi
 }
 
@@ -365,6 +370,9 @@ function build_llvm() {
     for file in `find $builddir/lib -name "*.so"`; do
 	install $file $INSTALL_DIR/lib/
     done
+    
+    # Install system headers
+    install $builddir/lib/clang $INSTALL_DIR/lib/clang
 
     if [ "$BUILD_LTO" == "true" ]; then
 
@@ -395,14 +403,14 @@ function build_bench() {
 function run_llvm_build() {
     local eclipse_args=
     if [ "$1"  == "eclipse" ]; then
-	eclipse_args="-G 'Eclipse CDT4 - Unix Makefiles' "
+	eclipse_args="-G 'Eclipse CDT4 - Unix Makefiles' -DCMAKE_ECLIPSE_MAKE_ARGUMENTS=$MAKEJ -DCMAKE_ECLIPSE_VERSION='3.7 (Indigo)'"
     fi
 
     if [ "$LLVM_USE_CONFIGURE" == "true" -a "$1" != "eclipse" ]; then
 	targets=$(echo $LLVM_TARGETS | tr '[:upper:]' '[:lower:]')
-	build_autoconf llvm build_llvm $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $LLVM_CONFIGURE_ARGS"
+	build_autoconf llvm build_llvm $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $LLVM_CONFIGURE_ARGS --with-bug-report-url='https://github.com/t-crest/patmos/issues'"
     else
-	build_cmake llvm build_llvm $(get_build_dir llvm) "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS $eclipse_args"
+	build_cmake llvm build_llvm $(get_build_dir llvm) "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS $eclipse_args -DBUG_REPORT_URL='https://github.com/t-crest/patmos/issues'"
     fi
 }
 

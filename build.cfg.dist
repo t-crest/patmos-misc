@@ -17,6 +17,7 @@ BUILDDIR_SUFFIX="/build"
 
 # Targets to support with patmos-clang
 #LLVM_TARGETS=all
+#LLVM_TARGETS=ARM,Mips,X86,Patmos
 LLVM_TARGETS=Patmos
 ECLIPSE_LLVM_TARGETS=Patmos
 
