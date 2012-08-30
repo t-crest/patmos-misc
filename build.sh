@@ -408,9 +408,9 @@ function run_llvm_build() {
 
     if [ "$LLVM_USE_CONFIGURE" == "true" -a "$1" != "eclipse" ]; then
 	targets=$(echo $LLVM_TARGETS | tr '[:upper:]' '[:lower:]')
-	build_autoconf llvm build_llvm $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $LLVM_CONFIGURE_ARGS --with-bug-report-url='https://github.com/t-crest/patmos/issues'"
+	build_autoconf llvm build_llvm $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $LLVM_CONFIGURE_ARGS --with-bug-report-url='https://github.com/t-crest/patmos-llvm/issues'"
     else
-	build_cmake llvm build_llvm $(get_build_dir llvm) "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS $eclipse_args -DBUG_REPORT_URL='https://github.com/t-crest/patmos/issues'"
+	build_cmake llvm build_llvm $(get_build_dir llvm) "-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGETS -DCMAKE_BUILD_TYPE=Debug $LLVM_CMAKE_ARGS $eclipse_args -DBUG_REPORT_URL='https://github.com/t-crest/patmos-llvm/issues'"
     fi
 }
 
