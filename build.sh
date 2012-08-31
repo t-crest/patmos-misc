@@ -50,6 +50,9 @@ CLANG_COMPILER=clang
 # Build gold binutils and LLVM LTO plugin
 BUILD_LTO=true
 
+# Build newlib, compiler-rt and benchmarks with softfloats
+BUILD_SOFTFLOAT=true
+
 # Create symlinks instead of copying files where applicable
 # (llvm, clang, gold)
 INSTALL_SYMLINKS=false
@@ -58,14 +61,16 @@ INSTALL_SYMLINKS=false
 LLVM_CMAKE_ARGS=
 LLVM_CONFIGURE_ARGS=
 GOLD_ARGS=
+NEWLIB_ARGS=
 
 GOLD_CFLAGS=
 GOLD_CXXFLAGS=
 NEWLIB_CFLAGS=
 
 MAKEJ=
-MAKE_VERBOSE=
 
+# Internal options, set by command line
+MAKE_VERBOSE=
 DO_CLEAN=false
 DO_UPDATE=false
 DO_SHOW_CONFIGURE=false
@@ -395,6 +400,8 @@ function build_default() {
 }
 
 function build_bench() {
+    # TODO if we do not have BUILD_SOFTFLOAT=true, then do not build softfloat benchmarks!
+
     run make $MAKEJ $MAKE_VERBOSE all
 
     if [ "$DO_RUN_TESTS" == "true" ]; then
@@ -478,6 +485,10 @@ if [ ! -z "$CLANG_COMPILER" ]; then
     fi
 fi
 
+if [ "$BUILD_SOFTFLOAT" != "true" ]; then
+    NEWLIB_ARGS="--disable-newlib-io-float $NEWLIB_ARGS"
+fi
+
 mkdir -p "${INSTALL_DIR}"
 
 TARGETS=${@-$ALLTARGETS}
@@ -514,7 +525,7 @@ for target in $TARGETS; do
     clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib)
     build_autoconf newlib build_default $(get_build_dir newlib) --target=patmos-unknown-elf AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
         RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
-        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-ccc-host-triple patmos-unknown-elf -O2'"
+        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-ccc-host-triple patmos-unknown-elf -O2'" "$NEWLIB_ARGS"
     ;;
   'compiler-rt')
     clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $(get_repo_dir compiler-rt)

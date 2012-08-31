@@ -33,6 +33,9 @@ CLANG_COMPILER=clang
 # Build gold binutils and LLVM LTO plugin
 BUILD_LTO=true
 
+# Build newlib, compiler-rt and benchmarks with softfloats
+BUILD_SOFTFLOAT=true
+
 # Create symlinks instead of copying files where applicable
 # (llvm, clang, gold)
 INSTALL_SYMLINKS=false
@@ -41,6 +44,7 @@ INSTALL_SYMLINKS=false
 LLVM_CMAKE_ARGS=
 LLVM_CONFIGURE_ARGS=
 GOLD_ARGS=
+NEWLIB_ARGS=
 
 GOLD_CFLAGS=
 GOLD_CXXFLAGS=
@@ -48,6 +52,4 @@ NEWLIB_CFLAGS=
 
 # Commandline option to pass to make for parallel builds
 MAKEJ=-j2
-
-MAKE_VERBOSE=
 
