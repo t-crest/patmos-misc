@@ -41,7 +41,7 @@ ECLIPSE_LLVM_TARGETS=Patmos
 # build LLVM using configure instead of cmake
 LLVM_USE_CONFIGURE=false
 # build LLVM using shared libraries instead of static libs
-LLVM_BUILD_SHAREd=false
+LLVM_BUILD_SHARED=false
 
 # Set to the name of the clang binary to use for compiling LLVM itself.
 # Leave empty to use cmake defaults
