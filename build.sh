@@ -14,7 +14,17 @@
 #
 ###############################################################################
 
-self=`readlink -f $0`
+function abspath() {
+    local path=$1
+    # readlink -f does not work on OSX, so we do this manually 
+    if [ "${path:0:1}" == "/" ]; then
+	echo $path
+    else
+	echo $(pwd)/$path
+    fi
+}
+
+self=`abspath $0`
 CFGFILE=`dirname $self`/build.cfg
 
 ########### user configs, overwrite in build.cfg ##############
@@ -232,7 +242,7 @@ function build_cmake() {
     root=$ROOT_DIR/$(get_repo_dir $repo)
     build_call=$2
     builddir=$ROOT_DIR/$3
-    rootdir=$(readlink -f $root || echo $root)
+    rootdir=$(abspath $root)
     shift 3
 
     # TODO pass build_flags result to cmake 
@@ -264,7 +274,7 @@ function build_autoconf() {
     build_call=$2
     builddir=$ROOT_DIR/$3
     shift 3
-    rootdir=$(readlink -f $root || echo $root)
+    rootdir=$(abspath $root)
     configscript=$rootdir/configure
 
     # Read out GOLD_CPPFLAGS, NEWLIB_CPPFLAGS, ..
@@ -437,7 +447,7 @@ while getopts ":chi:j:pudsvxVt" opt; do
   case $opt in
     c) DO_CLEAN=true ;;
     h) usage; exit 0 ;;
-    i) INSTALL_DIR="$(readlink -f $OPTARG)" ;;
+    i) INSTALL_DIR="$(abspath $OPTARG)" ;;
     j) MAKEJ="-j$OPTARG" ;;
     p) BUILDDIR_SUBDIR=false ;;
     u) DO_UPDATE=true ;;
