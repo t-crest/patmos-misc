@@ -71,6 +71,10 @@ BUILD_SOFTFLOAT=true
 # (llvm, clang, gold)
 INSTALL_SYMLINKS=false
 
+# URL for the repository containing the benchmarks
+#BENCH_REPO_URL="ssh+git://tipca.imm.dtu.dk/home/fbrandne/repos/patmos-benchmarks"
+BENCH_REPO_URL=
+
 # Additional arguments for cmake / configure
 LLVM_CMAKE_ARGS=
 LLVM_CONFIGURE_ARGS=
@@ -551,9 +555,13 @@ for target in $TARGETS; do
     build_cmake patmos/simulator build_default $(get_build_dir patmos)
     ;;
   'bench')
-    clone_update ssh+git://tipca.imm.dtu.dk/home/fbrandne/repos/patmos-benchmarks $(get_repo_dir bench)
-    repo=$(get_repo_dir bench)
-    build_cmake bench build_bench $(get_build_dir bench) "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
+    if [ -z "$BENCH_REPO_URL" ]; then
+      echo "Benchmark repository URL is not configured, skipped. Set BENCH_REPO_URL to enable."
+    else
+      clone_update $BENCH_REPO_URL $(get_repo_dir bench)
+      repo=$(get_repo_dir bench)
+      build_cmake bench build_bench $(get_build_dir bench) "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
+    fi
     ;;
   *) echo "Don't know about $target." ;;
   esac

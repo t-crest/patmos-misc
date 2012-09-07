@@ -28,6 +28,10 @@ LLVM_BUILD_SHARED=false
 # skip checking out clang
 LLVM_OMIT_CLANG=false
 
+# URL for the repository containing the benchmarks
+#BENCH_REPO_URL="ssh+git://tipca.imm.dtu.dk/home/fbrandne/repos/patmos-benchmarks"
+BENCH_REPO_URL=
+
 # Set to the name of the clang binary to use for compiling LLVM itself.
 # Leave empty to use cmake defaults
 CLANG_COMPILER=clang
