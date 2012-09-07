@@ -137,7 +137,7 @@ function install() {
 	fi
 	# TODO option to use hardlinking instead
 	# TODO if $src is a directory, make sure we remove any trash in $dst (use rsync??)
-	run cp -ufr $src $dst
+	run cp -fR $src $dst
     fi
 }
 
