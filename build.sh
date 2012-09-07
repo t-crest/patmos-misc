@@ -131,9 +131,6 @@ function install() {
 
     echo "Installing $src -> $dst"
 
-    local dstdir=$(basename $src)
-    run mkdir -p $dstdir
-
     if [ "$INSTALL_SYMLINKS" == "true" ]; then
 	if [ -d $src ]; then
 	    run rm -rf $dst
@@ -382,6 +379,9 @@ function build_llvm() {
     if [ "$LLVM_USE_CONFIGURE" == "true" ]; then
 	builddir=$builddir/Debug+Asserts
     fi
+
+    run mkdir -p $INSTALL_DIR/bin
+    run mkdir -p $INSTALL_DIR/lib
 
     for file in `find $builddir/bin -type f`; do
 	filename=`basename $file`
