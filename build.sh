@@ -24,8 +24,10 @@ function abspath() {
     fi
 }
 
-self=`abspath $0`
-CFGFILE=`dirname $self`/build.cfg
+OS_NAME=$(uname)
+
+self=$(abspath $0)
+CFGFILE=$(dirname $self)/build.cfg
 
 ########### user configs, overwrite in build.cfg ##############
 
@@ -136,8 +138,12 @@ function install() {
 	    rm -f $dst
 	fi
 	# TODO option to use hardlinking instead
-	# TODO if $src is a directory, make sure we remove any trash in $dst (use rsync??)
-	run cp -fR $src $dst
+	# Maybe, if $src is a directory, make sure we remove any trash in $dst (use rsync??) .. should be optional, off by default!
+	if [ "$OS_NAME" == "Linux" ]; then
+	    run cp -fau $src $dst
+	else 
+	    run cp -fR $src $dst
+	fi
     fi
 }
 
