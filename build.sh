@@ -31,7 +31,7 @@ CFGFILE=$(dirname $self)/build.cfg
 
 ########### user configs, overwrite in build.cfg ##############
 
-ALLTARGETS="gold llvm clang newlib compiler-rt pasim bench"
+ALLTARGETS="gold llvm newlib compiler-rt pasim bench"
 
 #local_dir=`dirname $0`
 #ROOT_DIR=`readlink -f $local_dir`
@@ -54,6 +54,8 @@ ECLIPSE_LLVM_TARGETS=Patmos
 LLVM_USE_CONFIGURE=false
 # build LLVM using shared libraries instead of static libs
 LLVM_BUILD_SHARED=false
+# skip checking out clang
+LLVM_OMIT_CLANG=false
 
 # Set to the name of the clang binary to use for compiling LLVM itself.
 # Leave empty to use cmake defaults
@@ -128,6 +130,10 @@ function install() {
     fi
 
     echo "Installing $src -> $dst"
+
+    local dstdir=$(basename $src)
+    run mkdir -p $dstdir
+
     if [ "$INSTALL_SYMLINKS" == "true" ]; then
 	if [ -d $src ]; then
 	    run rm -rf $dst
@@ -517,17 +523,9 @@ for target in $TARGETS; do
   case $target in
   'llvm')
     clone_update ${GITHUB_BASEURL}/patmos-llvm.git $(get_repo_dir llvm)
-    if ! expr "$TARGETS" : ".*\<clang\>.*" > /dev/null; then
-	run_llvm_build
+    if [ "$LLVM_OMIT_CLANG" != "true" ]; then
+        clone_update ${GITHUB_BASEURL}/patmos-clang.git $(get_repo_dir llvm)/tools/clang
     fi
-    ;;
-  'clang')
-    if [ ! -d $ROOT_DIR/$(get_repo_dir llvm) ]; then
-	echo "Error: checkout llvm first. Run './build.sh llvm clang' instead."
-	exit 1
-    fi
-    clone_update ${GITHUB_BASEURL}/patmos-clang.git $(get_repo_dir llvm)/tools/clang
-    # TODO optionally use configure to build LLVM, for testing purposes!
     run_llvm_build
     ;;
   'eclipse')

@@ -1,6 +1,6 @@
 
 # List of targets to build by default
-ALLTARGETS="gold llvm clang newlib compiler-rt pasim bench"
+ALLTARGETS="gold llvm newlib compiler-rt pasim bench"
 
 # Root directory for all repositories
 ROOT_DIR=$(pwd)
@@ -25,6 +25,8 @@ ECLIPSE_LLVM_TARGETS=Patmos
 LLVM_USE_CONFIGURE=false
 # build LLVM using shared libraries instead of static libs
 LLVM_BUILD_SHARED=false
+# skip checking out clang
+LLVM_OMIT_CLANG=false
 
 # Set to the name of the clang binary to use for compiling LLVM itself.
 # Leave empty to use cmake defaults
