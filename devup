@@ -10,7 +10,7 @@ GITBASE=$BASE/git
 SVNBASE=$BASE/svn
 
 SVNREPOS="tcrest tcapapers vmars"
-GITREPOS="patmos benchmarks newlib compiler-rt gold clang llvm"
+GITREPOS="patmos benchmarks newlib compiler-rt gold clang llvm misc"
 
 DO_STASH=false
 
