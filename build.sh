@@ -75,6 +75,12 @@ INSTALL_SYMLINKS=false
 #BENCH_REPO_URL="ssh+git://tipca.imm.dtu.dk/home/fbrandne/repos/patmos-benchmarks"
 BENCH_REPO_URL=
 
+# Set the target architecture for gold
+# auto      use HOST on Linux, 'patmos-unknown-elf' otherwise
+# none      do not set --target
+# <target>  use <target> as target architecture
+GOLD_TARGET_ARCH=auto
+
 # Additional arguments for cmake / configure
 LLVM_CMAKE_ARGS=
 LLVM_CONFIGURE_ARGS=
@@ -491,6 +497,14 @@ shift $((OPTIND-1))
 
 # not config'able
 GITHUB_BASEURL=https://github.com/t-crest
+
+if [ "$GOLD_TARGET_ARCH" == "auto" ]; then
+    if [ "$OS_NAME" != "Linux" ]; then
+	GOLD_ARGS="$GOLD_ARGS --target=patmos-unknown-elf"
+    fi
+elif [ "$GOLD_TARGET_ARCH" != "none" ]; then
+    GOLD_ARGS="$GOLD_ARGS --target='$GOLD_TARGET_ARCH'"
+fi
 
 if [ "$BUILD_LTO" == "true" ]; then
     golddir=$(get_repo_dir gold)

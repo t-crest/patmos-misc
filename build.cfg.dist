@@ -46,6 +46,12 @@ BUILD_SOFTFLOAT=true
 # (llvm, clang, gold)
 INSTALL_SYMLINKS=false
 
+# Set the target architecture for gold
+# auto      use HOST on Linux, 'patmos-unknown-elf' otherwise
+# none      do not set --target
+# <target>  use <target> as target architecture
+GOLD_TARGET_ARCH=auto
+
 # Additional arguments for cmake / configure
 LLVM_CMAKE_ARGS=
 LLVM_CONFIGURE_ARGS=
