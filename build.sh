@@ -16,16 +16,25 @@
 
 function abspath() {
     local path=$1
-    # readlink -f does not work on OSX, so we do this manually 
-    if [ "${path:0:1}" == "/" ]; then
-	echo $path
-    else
-	echo $(pwd)/$path
-    fi
+    local pwd_restore="$(pwd)"
+
+    # readlink -f does not work on OSX, so we do this manually
+    cd $(dirname "$path")
+    path=$(basename "$path")
+    # follow chain of symlinks
+    while [ -L "$path" ]; do
+        path=$(readlink "$path")
+        cd $(dirname "$path")
+        path=$(basename "$path")
+    done
+    echo "$(pwd -P)/$path"
+    cd "$pwd_restore"
 }
+
 
 OS_NAME=$(uname)
 
+# physical location of this script, and the config
 self=$(abspath $0)
 CFGFILE=$(dirname $self)/build.cfg
 
