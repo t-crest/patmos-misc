@@ -10,6 +10,7 @@
 #
 
 DIR=${1:-.}
+EXCEPT="pasim"
 
 if [ ! -d $DIR ]; then
   echo "Error: Directory '"$DIR"' does not exist!" 1>&2
@@ -24,7 +25,7 @@ fi
 # following function only works for local links to local targets within $DIR
 function _sc_relink {
   local bname="${1##*/}"
-  if [[ ! $bname =~ ^patmos- ]]; then
+  if [[ ! $bname =~ ^patmos- && ! $EXCEPT =~ $(echo "\<$bname\>") ]]; then
     echo "Relink $bname" 1>&2
     ln -s -T "patmos-$(readlink $1)" "${1%/*}/patmos-$bname"
     rm $1
@@ -35,7 +36,7 @@ function _sc_relink {
 
 function _sc_rename {
   local bname="${1##*/}"
-  if [[ ! $bname =~ ^patmos- ]]; then
+  if [[ ! $bname =~ ^patmos- && ! $EXCEPT =~ $(echo "\<$bname\>") ]]; then
     echo "Rename $bname" 1>&2
     mv "$1" "${1%/*}/patmos-$bname"
   else
@@ -44,6 +45,7 @@ function _sc_rename {
 }
 
 export -f _sc_relink _sc_rename
+export EXCEPT
 
 find -P $DIR -type l -executable -exec bash -c '_sc_relink {}' \;
 find -P $DIR -type f -executable -exec bash -c '_sc_rename {}' \;
