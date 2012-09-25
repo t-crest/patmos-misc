@@ -1,0 +1,48 @@
+#!/bin/bash -e
+#
+# This is a small script to execute a git command on all git repositories configured for devup
+#
+# Author: Stefan Hepp <hepp@complang.tuwien.ac.at>
+#
+
+BASE=$HOME/tcrest/
+GITBASE=$BASE/git
+
+GITREPOS="patmos benchmarks newlib compiler-rt gold clang llvm misc"
+
+self=`readlink -f $0`
+cfgfile=`dirname $self`/devup.cfg
+
+if [ -f $cfgfile ]; then
+    . $cfgfile
+fi
+
+RED="\033[31m"
+NOCOLOR="\033[0m"
+
+function usage() {
+    echo "Usage: $0 <git command>"
+    echo
+}
+
+while [ ! -z "$1" ]; do
+    case $1 in
+    -h|--help)
+	usage
+	exit 0
+	;;
+    *) 
+	break
+	;;
+    esac
+    shift
+done
+
+for repo in $GITREPOS; do
+    echo -e "====$RED $repo$NOCOLOR ===="
+    pushd $GITBASE/$repo >/dev/null
+    git "$@"
+    popd >/dev/null
+    echo
+done
+
