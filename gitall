@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash 
 #
 # This is a small script to execute a git command on all git repositories configured for devup
 #
