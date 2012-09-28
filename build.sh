@@ -32,7 +32,7 @@ function abspath() {
 }
 
 
-OS_NAME=$(uname)
+OS_NAME=$(uname -s)
 
 # physical location of this script, and the config
 self=$(abspath $0)
@@ -379,8 +379,8 @@ function build_gold() {
 	    run mkdir -p $builddir/bin
 	    run mkdir -p $builddir/lib/bfd-plugins
 
-	    run ln -sf $INSTALL_DIR/lib/LLVMgold.so $builddir/lib/bfd-plugins/
-	    run ln -sf $INSTALL_DIR/lib/libLTO.so   $builddir/lib/bfd-plugins/
+	    run ln -sf $INSTALL_DIR/lib/LLVMgold.$LIBEXT $builddir/lib/bfd-plugins/
+	    run ln -sf $INSTALL_DIR/lib/libLTO.$LIBEXT   $builddir/lib/bfd-plugins/
 	fi
     else
 	run make $MAKE_VERBOSE $install_target
@@ -416,7 +416,7 @@ function build_llvm() {
     done
 
     # install all shared libraries
-    for file in `find $builddir/lib -name "*.so"`; do
+    for file in `find $builddir/lib -name "*.$LIBEXT"`; do
 	install $file $INSTALL_DIR/lib/
     done
     
@@ -429,8 +429,8 @@ function build_llvm() {
 	run mkdir -p $INSTALL_DIR/bin
 	run mkdir -p $INSTALL_DIR/lib/bfd-plugins
 
-	run ln -sf ../LLVMgold.so $INSTALL_DIR/lib/bfd-plugins/
-	run ln -sf ../libLTO.so   $INSTALL_DIR/lib/bfd-plugins/
+	run ln -sf ../LLVMgold.$LIBEXT $INSTALL_DIR/lib/bfd-plugins/
+	run ln -sf ../libLTO.$LIBEXT   $INSTALL_DIR/lib/bfd-plugins/
     fi
 
 }
@@ -506,6 +506,11 @@ shift $((OPTIND-1))
 
 # not config'able
 GITHUB_BASEURL=https://github.com/t-crest
+
+LIBEXT=so
+if [ "$OS_NAME" == "Darwin" ]; then
+    LIBEXT=dylib
+fi
 
 if [ "$GOLD_TARGET_ARCH" == "auto" ]; then
     if [ "$OS_NAME" != "Linux" ]; then
