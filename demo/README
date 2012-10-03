@@ -1,0 +1,7 @@
+
+The demo script prints and executes the instructions needed to produced the
+files as described.
+
+It is assumed that the binaries are located in the PATH,
+or PATMOS_INSTALL points to the directory.
+
