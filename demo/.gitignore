@@ -1,0 +1,6 @@
+hello
+*.s
+*.ll
+*.bc
+*.o
+*.out
