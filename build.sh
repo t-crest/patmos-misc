@@ -111,9 +111,9 @@ NEWLIB_CFLAGS=
 NEWLIB_TARGET_CFLAGS=
 
 # Use the following FLAGS to link runtime libraries as binaries
-NEWLIB_TARGET_CFLAGS="-fpatmos-emit-obj"
-COMPILER_RT_CFLAGS="-fpatmos-emit-obj"
-BENCH_LDFLAGS="-fpatmos-lto-defaultlibs"
+#NEWLIB_TARGET_CFLAGS="-fpatmos-emit-obj"
+#COMPILER_RT_CFLAGS="-fpatmos-emit-obj"
+#BENCH_LDFLAGS="-fpatmos-lto-defaultlibs"
 
 # Commandline option to pass to make for parallel builds
 MAKEJ=-j2
