@@ -5,8 +5,8 @@ ALLTARGETS="gold llvm newlib compiler-rt pasim bench"
 # Root directory for all repositories
 ROOT_DIR=$(pwd)
 
-# Set to 'short' for llvm|clang|... directory names, 'long' for
-# patmos-llvm|patmos-clang|.. or 'prefix' to use $(REPO_PREFIX)llvm|..
+# Set to 'short' for llvm/clang/... directory names, 'long' for
+# patmos-llvm/patmos-clang/.. or 'prefix' to use $(REPO_PREFIX)llvm/..
 REPO_NAMES=short
 REPO_PREFIX=
 
@@ -17,7 +17,7 @@ BUILDDIR_SUFFIX="/build"
 
 # Targets to support with patmos-clang
 #LLVM_TARGETS=all
-#LLVM_TARGETS="ARM;Mips;X86;Patmos"
+#LLVM_TARGETS="ARM;Mips;Patmos;X86"
 LLVM_TARGETS=Patmos
 ECLIPSE_LLVM_TARGETS=Patmos
 
@@ -27,10 +27,6 @@ LLVM_USE_CONFIGURE=false
 LLVM_BUILD_SHARED=true
 # skip checking out clang
 LLVM_OMIT_CLANG=false
-
-# URL for the repository containing the benchmarks
-#BENCH_REPO_URL="ssh+git://tipca.imm.dtu.dk/home/fbrandne/repos/patmos-benchmarks"
-BENCH_REPO_URL=
 
 # Set to the name of the clang binary to use for compiling LLVM itself.
 # Leave empty to use cmake defaults
@@ -46,6 +42,10 @@ BUILD_SOFTFLOAT=true
 # (llvm, clang, gold)
 INSTALL_SYMLINKS=false
 
+# URL for the repository containing the benchmarks
+#BENCH_REPO_URL="ssh+git://tipca.imm.dtu.dk/home/fbrandne/repos/patmos-benchmarks"
+BENCH_REPO_URL=
+
 # Set the target architecture for gold
 # auto      use HOST on Linux, 'patmos-unknown-elf' otherwise
 # none      do not set --target
@@ -58,9 +58,21 @@ LLVM_CONFIGURE_ARGS=
 GOLD_ARGS=
 NEWLIB_ARGS=
 
+# Additional CFLAGS, LDFLAGS 
 GOLD_CFLAGS=
 GOLD_CXXFLAGS=
+COMPILER_RT_CFLAGS=
+BENCH_LDFLAGS=
+
+# CFLAGS for host compiler
 NEWLIB_CFLAGS=
+# CFLAGS for target compiler (patmos-clang)
+NEWLIB_TARGET_CFLAGS=
+
+# Use the following FLAGS to link runtime libraries as binaries
+NEWLIB_TARGET_CFLAGS="-fpatmos-emit-obj"
+COMPILER_RT_CFLAGS="-fpatmos-emit-obj"
+BENCH_LDFLAGS="-fpatmos-lto-defaultlibs"
 
 # Commandline option to pass to make for parallel builds
 MAKEJ=-j2

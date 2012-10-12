@@ -38,12 +38,12 @@ OS_NAME=$(uname -s)
 self=$(abspath $0)
 CFGFILE=$(dirname $self)/build.cfg
 
-########### user configs, overwrite in build.cfg ##############
+########### Start of user configs, overwrite in build.cfg ##############
 
+# List of targets to build by default
 ALLTARGETS="gold llvm newlib compiler-rt pasim bench"
 
-#local_dir=`dirname $0`
-#ROOT_DIR=`readlink -f $local_dir`
+# Root directory for all repositories
 ROOT_DIR=$(pwd)
 
 # Set to 'short' for llvm/clang/... directory names, 'long' for
@@ -51,9 +51,12 @@ ROOT_DIR=$(pwd)
 REPO_NAMES=short
 REPO_PREFIX=
 
+# Installation directory prefix
 INSTALL_DIR="$ROOT_DIR/local"
+# Directory suffix for directory containing generated files
 BUILDDIR_SUFFIX="/build"
 
+# Targets to support with patmos-clang
 #LLVM_TARGETS=all
 #LLVM_TARGETS="ARM;Mips;Patmos;X86"
 LLVM_TARGETS=Patmos
@@ -96,11 +99,26 @@ LLVM_CONFIGURE_ARGS=
 GOLD_ARGS=
 NEWLIB_ARGS=
 
+# Additional CFLAGS, LDFLAGS 
 GOLD_CFLAGS=
 GOLD_CXXFLAGS=
-NEWLIB_CFLAGS=
+COMPILER_RT_CFLAGS=
+BENCH_LDFLAGS=
 
-MAKEJ=
+# CFLAGS for host compiler
+NEWLIB_CFLAGS=
+# CFLAGS for target compiler (patmos-clang)
+NEWLIB_TARGET_CFLAGS=
+
+# Use the following FLAGS to link runtime libraries as binaries
+NEWLIB_TARGET_CFLAGS="-fpatmos-emit-obj"
+COMPILER_RT_CFLAGS="-fpatmos-emit-obj"
+BENCH_LDFLAGS="-fpatmos-lto-defaultlibs"
+
+# Commandline option to pass to make for parallel builds
+MAKEJ=-j2
+
+#################### End of user configs #####################
 
 # Internal options, set by command line
 MAKE_VERBOSE=
@@ -110,8 +128,6 @@ DO_SHOW_CONFIGURE=false
 DO_RUN_TESTS=false
 DRYRUN=false
 VERBOSE=false
-
-#################### End of user configs #####################
 
 # user config
 if [ -f $CFGFILE ]; then
@@ -253,15 +269,19 @@ function build_flags() {
     local cflagsname=$(echo "${repo}_CFLAGS" | tr '[a-z-/]' '[A-Z__]')
     local cppflagsname=$(echo "${repo}_CPPFLAGS" | tr '[a-z-/]' '[A-Z__]')
     local cxxflagsname=$(echo "${repo}_CXXFLAGS" | tr '[a-z-/]' '[A-Z__]')
+    local ldflagsname=$(echo "${repo}_LDFLAGS" | tr '[a-z-/]' '[A-Z__]')
 
     if [ ! -z "${!cflagsname}$CFLAGS" ]; then
 	echo -n "CFLAGS='${!cflagsname} $CFLAGS'"
     fi
     if [ ! -z "${!cppflagsname}$CPPFLAGS" ]; then
-	echo -n " CPPFLAGS='${!cflagsname} $CPPFLAGS'"
+	echo -n " CPPFLAGS='${!cppflagsname} $CPPFLAGS'"
     fi
     if [ ! -z "${!cxxflagsname}$CXXFLAGS" ]; then
-	echo -n " CXXFLAGS='${!cflagsname} $CXXFLAGS'"
+	echo -n " CXXFLAGS='${!cxxflagsname} $CXXFLAGS'"
+    fi
+    if [ ! -z "${!ldflagsname}$LDFLAGS" ]; then
+	echo -n " LDFLAGS='${!ldflagsname} $LDFLAGS'"
     fi
 }
 
@@ -274,10 +294,11 @@ function build_cmake() {
     shift 3
 
     # TODO pass build_flags result to cmake 
+    local flags=$(build_flags $repo)
 
     if [ "$DO_SHOW_CONFIGURE" == "true" ]; then
 	echo cd $builddir
-	echo cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
+	echo "$flags" cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
 	return
     fi
     if [ -e $builddir -a ! -e $builddir/Makefile ]; then
@@ -288,7 +309,7 @@ function build_cmake() {
         run rm -rf $builddir
         run mkdir -p $builddir
         run pushd $builddir ">/dev/null"
-        run cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
+        run "$flags" cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
     else
         run pushd $builddir ">/dev/null"
     fi
@@ -474,7 +495,7 @@ function run_llvm_build() {
 
 
 # one-shot config
-while getopts ":chi:j:pudsvxVt" opt; do
+while getopts ":chi:j:pudsvxVte" opt; do
   case $opt in
     c) DO_CLEAN=true ;;
     h) usage; exit 0 ;;
@@ -488,6 +509,10 @@ while getopts ":chi:j:pudsvxVt" opt; do
     V) MAKE_VERBOSE="VERBOSE=1" ;;
     t) DO_RUN_TESTS=true ;;
     x) set -x ;;
+    e) # recreate build.cfg.dist
+       cat build.sh | sed -n '/##* Start of user configs/,/##* End of user configs/p' | sed "$ d" | sed "/Start of user configs/d" > build.cfg.dist 
+       exit
+       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       usage >&2
@@ -571,7 +596,7 @@ for target in $TARGETS; do
     clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib)
     build_autoconf newlib build_default $(get_build_dir newlib) --target=patmos-unknown-elf AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
         RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
-        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-ccc-host-triple patmos-unknown-elf -O2'" "$NEWLIB_ARGS"
+        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-ccc-host-triple patmos-unknown-elf -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
     ;;
   'compiler-rt')
     clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $(get_repo_dir compiler-rt)
