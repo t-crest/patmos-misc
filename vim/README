@@ -7,3 +7,4 @@ Reference:     http://www.vim.org/scripts/script.php?script_id=3302
 Latest source: http://github.com/Rip-Rip/clang_complete
 
 Copy clang_complete.<proj> to <proj>/.clang_complete
+(pasim goes to patmos/simulator/)
