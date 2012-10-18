@@ -559,7 +559,7 @@ fi
 
 if [ ! -z "$CLANG_COMPILER" ]; then
     clang=$(which $CLANG_COMPILER 2>/dev/null || echo -n "")
-    if [ -x "$clang" ]; then
+    if [ -x "$clang" ] && ( $clang -v 2>&1 | grep 'clang version 3.1' > /dev/null ); then
 	LLVM_CMAKE_ARGS="$LLVM_CMAKE_ARGS -DCMAKE_C_COMPILER=$CLANG_COMPILER -DCMAKE_CXX_COMPILER=$CLANG_COMPILER++"
     fi
 fi
