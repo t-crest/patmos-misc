@@ -115,8 +115,12 @@ NEWLIB_TARGET_CFLAGS=
 #COMPILER_RT_CFLAGS="-fpatmos-emit-obj"
 #BENCH_LDFLAGS="-fpatmos-lto-defaultlibs"
 
-# Commandline option to pass to make for parallel builds
+# Commandline option to pass to make/ctest for parallel builds
 MAKEJ=-j2
+
+# Arguments to pass to ctest
+# Use "-jN" to enable parallel benchmark testing 
+CTEST_ARGS=
 
 #################### End of user configs #####################
 
@@ -467,7 +471,7 @@ function build_bench() {
     run make $MAKEJ $MAKE_VERBOSE all
 
     if [ "$DO_RUN_TESTS" == "true" ]; then
-        run make test
+        run make test "ARGS='${CTEST_ARGS}'"
     fi
 }
 

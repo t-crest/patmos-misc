@@ -74,6 +74,10 @@ NEWLIB_TARGET_CFLAGS=
 #COMPILER_RT_CFLAGS="-fpatmos-emit-obj"
 #BENCH_LDFLAGS="-fpatmos-lto-defaultlibs"
 
-# Commandline option to pass to make for parallel builds
+# Commandline option to pass to make/ctest for parallel builds
 MAKEJ=-j2
+
+# Arguments to pass to ctest
+# Use "-jN" to enable parallel benchmark testing 
+CTEST_ARGS=
 
