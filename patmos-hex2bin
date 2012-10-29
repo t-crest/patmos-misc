@@ -69,7 +69,7 @@ $data = array();
 
 foreach ($lines as $line) {
     $rs = array();
-    if ( preg_match('/# encoding: \[( ?([0-9a-fx,A]*) *(\| [01x ]*)?)\]/', $line, &$rs) ) {
+    if ( preg_match('/# encoding: \[( ?([0-9a-fx,A]*) *(\| [01x ]*)?)\]/', $line, $rs) ) {
 	$hex = $rs[2];
 	$vals = explode(",", $hex);
 	
