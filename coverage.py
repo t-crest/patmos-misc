@@ -11,6 +11,7 @@
 
 import os, os.path
 import re, string
+import hashlib
 from subprocess import Popen, PIPE
 from cPickle import dump, load
 
@@ -38,21 +39,33 @@ def trace(binary):
 def disassemble(binary):
   objdump_cmd = ['patmos-llvm-objdump', '-d', binary]
   objdump = Popen(objdump_cmd, stdout=PIPE)
-  ro = re.compile(r'^\s*0*([{0}]+):'.format(string.hexdigits)) # regex object
+  # regex object
+  ro = re.compile((r'^\s*0*(?P<addr>[{0}]+):\s*'\
+                   r'(?P<mem>(?:[{0}]{{2}} ?){{4,8}})'\
+                   r'\s*(?P<inst>.*)$').format(string.hexdigits))
   try:
     for line in objdump.stdout:
-      mo = ro.match(line) # matcher object
+      mo = ro.match(line.expandtabs()) # matcher object
       # return: (address, line without \n)
       if mo:
-        line = line.expandtabs()
-        cpos = line.find(':')+1
-        yield mo.group(1), line[0:cpos] + '  ' + \
-                line[cpos:-1].lstrip()[0:25] + line[62:-1]
+        grp = mo.groupdict()
+        # space for default guard
+        if not grp['inst'].startswith('('):
+          grp['inst'] = ' '*7+grp['inst']
+        yield grp['addr'], grp
       else:
         yield None, line[0:-1]
     objdump.wait()
-  except:
+  except:# Exception as e:
     objdump.kill()
+    #raise e
+
+def checksum(fn):
+  """Compute the SHA1 sum of a file"""
+  sha1 = hashlib.sha1()
+  with open(fn) as f:
+    sha1.update(f.read())
+  return sha1.hexdigest()
 
 
 class Stats:
@@ -62,6 +75,8 @@ class Stats:
     self.Hist = dict() # addresses
     self.total = 0
     self.maxcnt = 0
+    self.maxaddrlen = 0
+    self.checksum = checksum(binary)
     for addr in trace(self.binary):
       self._put(addr)
 
@@ -69,43 +84,48 @@ class Stats:
     cnt = 1 if addr not in self.Hist else self.Hist[addr]+1
     self.Hist[addr] = cnt
     self.maxcnt = max(cnt, self.maxcnt)
+    self.maxaddrlen = max(len(addr), self.maxaddrlen)
     self.total = self.total + 1
 
-  def printCoverage(self):
+  def objdump(self):
     # colors = range(40,48) # all colors
     colors = [44, 46, 42, 43, 41] # heat scale
     # print scale
     segwidth = 80/len(colors) - 1
-    seg = lambda col: '\033[{:d}m{}\033[0m'.format(col, ''.center(segwidth))
-    scale = ' '.join( [seg(col) for col in colors])
-    print scale, ''
+    seg = lambda col: '\033[{:d}m{:^{segwidth}}\033[0m' \
+                      .format(col, '~', segwidth=segwidth)
+    print ' '.join( [seg(col) for col in colors])
 
-    # print dasm
-    maxwidth = len(str(self.maxcnt))
+    # prepare template
+    tpl = '{{cnt:>{0}}}  {{addr:>{1}}}: {{mem:24}}  {{inst}}'\
+            .format( len(str(self.maxcnt)), self.maxaddrlen )
+    assert( None not in self.Hist )
     for addr, line in disassemble(self.binary):
-      if addr:
-        # it's an instruction
-        if addr in self.Hist:
-          cnt = self.Hist[addr]
-          heat = len(colors)*cnt / (self.maxcnt+1)
-          print '\033[{:d}m {} {}\033[0m'.format(colors[heat],
-                  str(cnt).rjust(maxwidth), line.ljust(77-maxwidth))
-        else: print ' {} {}'.format(' '*maxwidth, line)
-      else: print line
+      if not addr: print line; continue
+      # it's an instruction
+      if addr in self.Hist:
+        cnt = self.Hist[addr]
+        heat = len(colors)*cnt / (self.maxcnt+1)
+        print '\033[{:d}m'.format(colors[heat])+\
+              tpl.format(cnt=str(cnt), **line).ljust(79)+\
+              '\033[0m'
+      else:
+        print tpl.format(cnt='', **line)
 
 
 
 def createStats(binary):
   """Stats factory - create or load stats"""
-  # FIXME pickle hash
   cache = binary+'.trace'
   if os.path.isfile(cache):
     with open(cache) as cf:
       S = load(cf)
-  else:
-    S = Stats(binary)
-    with open(cache, 'w') as cf:
-      dump(S, cf)
+      if S.checksum == checksum(binary):
+        return S
+  # slow path
+  S = Stats(binary)
+  with open(cache, 'w') as cf:
+    dump(S, cf)
   return S
 
 
@@ -128,7 +148,7 @@ if __name__=='__main__':
 
   try:
     S = createStats(sys.argv[1])
-    S.printCoverage()
+    S.objdump()
   except SimError as e:
     print e
     exit(1)
