@@ -47,7 +47,7 @@ def disassemble(binary):
         line = line.expandtabs()
         cpos = line.find(':')+1
         yield mo.group(1), line[0:cpos] + '  ' + \
-                            line[cpos:cpos+32].lstrip() + line[62:-1]
+                line[cpos:-1].lstrip()[0:25] + line[62:-1]
       else:
         yield None, line[0:-1]
     objdump.wait()
@@ -62,17 +62,8 @@ class Stats:
     self.Hist = dict() # addresses
     self.total = 0
     self.maxcnt = 0
-
-    # FIXME pickle hash
-    cache = binary+'.trace'
-    if os.path.isfile(cache):
-      with open(cache) as cf:
-        (self.Hist, self.total, self.maxcnt) = load(cf)
-    else:
-      for addr in trace(self.binary):
-        self._put(addr)
-      with open(cache, 'w') as cf:
-        dump((self.Hist, self.total, self.maxcnt), cf)
+    for addr in trace(self.binary):
+      self._put(addr)
 
   def _put(self, addr):
     cnt = 1 if addr not in self.Hist else self.Hist[addr]+1
@@ -98,9 +89,25 @@ class Stats:
           cnt = self.Hist[addr]
           heat = len(colors)*cnt / (self.maxcnt+1)
           print '\033[{:d}m {} {}\033[0m'.format(colors[heat],
-                  str(cnt).rjust(maxwidth), line)
+                  str(cnt).rjust(maxwidth), line.ljust(77-maxwidth))
         else: print ' {} {}'.format(' '*maxwidth, line)
       else: print line
+
+
+
+def createStats(binary):
+  """Stats factory - create or load stats"""
+  # FIXME pickle hash
+  cache = binary+'.trace'
+  if os.path.isfile(cache):
+    with open(cache) as cf:
+      S = load(cf)
+  else:
+    S = Stats(binary)
+    with open(cache, 'w') as cf:
+      dump(S, cf)
+  return S
+
 
 
 # main entry point
@@ -120,7 +127,7 @@ if __name__=='__main__':
   if len(sys.argv) < 2: usage()
 
   try:
-    S = Stats(sys.argv[1])
+    S = createStats(sys.argv[1])
     S.printCoverage()
   except SimError as e:
     print e
