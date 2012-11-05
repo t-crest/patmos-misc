@@ -62,17 +62,24 @@ def disassemble(binary):
                    r'(?P<mem>(?:[{0}]{{2}} ?){{4,8}})'\
                    r'\s*(?P<inst>.*)$').format(string.hexdigits))
   try:
-    func_list = sorted(funcs.items(), key=lambda (a,f): (len(a),a),reverse=True)
-    next_func = func_list.pop()
+    # list of function starts, pointing to the address of the size (base-4);
+    # reversed, to pop items off as they match
+    func_preview = sorted(
+      [ (int(k,16)-4, v) for (k,v) in funcs.items()], reverse=True)
+    next_func = func_preview.pop()
     for line in objdump.stdout:
       mo = ro.match(line.expandtabs()) # matcher object
       # return: (address, line without \n)
       if mo:
         grp = mo.groupdict()
-        #iaddr = int(grp['addr'],16)
-        if grp['addr'] == next_func[0]:
-          yield None, '\n{}:'.format(next_func[1])
-          if len(func_list)>0: next_func = func_list.pop()
+        iaddr = int(grp['addr'],16)
+        # check for function start
+        if iaddr == next_func[0]:
+          yield None, '\n{}:\t(size={})'.format(next_func[1],
+                                               grp['mem'].replace(' ',''))
+          if len(func_preview)>0: next_func = func_preview.pop()
+          continue
+        # normal instruction:
         # space for default guard
         if not grp['inst'].startswith('('):
           grp['inst'] = ' '*7+grp['inst']
