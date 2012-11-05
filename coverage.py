@@ -12,6 +12,7 @@
 import os, os.path
 import re, string
 import hashlib
+import math
 from subprocess import Popen, PIPE
 from cPickle import dump, load
 
@@ -36,7 +37,25 @@ def trace(binary):
     if ret: raise SimError(ret)
 
 
+def func_addresses(binary):
+  """Dictionary of addr-funcstart pairs."""
+  symtab_cmd = ['patmos-llvm-objdump', '-t', binary]
+  symtab = Popen(symtab_cmd, stdout=PIPE)
+  # regex object
+  #0000e2c8 g     F .text  000008d4 __adddf3
+  ro = re.compile((r'^\s*0*([{0}]+)\s+(g|l)\s+F [.]text\s+[{0}]{{8}}\s+(.*)\s*$').format(string.hexdigits))
+  funcs = []
+  for line in symtab.stdout:
+    mo = ro.match(line) # matcher object
+    if mo: funcs.append(mo.group(1,3))
+  funcs.sort(key=lambda (a,f): (len(a),a),reverse=True)
+  symtab.wait()
+  return funcs
+
+
 def disassemble(binary):
+  """Generator for objdump disassembly"""
+  funcs = func_addresses(binary)
   objdump_cmd = ['patmos-llvm-objdump', '-d', binary]
   objdump = Popen(objdump_cmd, stdout=PIPE)
   # regex object
@@ -44,21 +63,26 @@ def disassemble(binary):
                    r'(?P<mem>(?:[{0}]{{2}} ?){{4,8}})'\
                    r'\s*(?P<inst>.*)$').format(string.hexdigits))
   try:
+    next_func = funcs.pop()
     for line in objdump.stdout:
       mo = ro.match(line.expandtabs()) # matcher object
       # return: (address, line without \n)
       if mo:
         grp = mo.groupdict()
+        if grp['addr'] == next_func[0]:
+          yield None, '\n{}:'.format(next_func[1])
+          if len(funcs)>0: next_func = funcs.pop()
         # space for default guard
         if not grp['inst'].startswith('('):
           grp['inst'] = ' '*7+grp['inst']
         yield grp['addr'], grp
       else:
-        yield None, line[0:-1]
+        yield None, line.rstrip()
     objdump.wait()
   except:# Exception as e:
     objdump.kill()
     #raise e
+
 
 def checksum(fn):
   """Compute the SHA1 sum of a file"""
@@ -66,6 +90,15 @@ def checksum(fn):
   with open(fn) as f:
     sha1.update(f.read())
   return sha1.hexdigest()
+
+
+def maxidxlt(ranges, cnt):
+  """Compute the largest index i in ranges such that cnt<=ranges[i]"""
+  chk = [ r<=cnt for r in ranges ]
+  return -1 if all(chk) else chk.index(False)-1
+
+
+
 
 
 class Stats:
@@ -84,17 +117,31 @@ class Stats:
     cnt = 1 if addr not in self.Hist else self.Hist[addr]+1
     self.Hist[addr] = cnt
     self.maxcnt = max(cnt, self.maxcnt)
+    # NB: following does not account for addr of unexecuted instructions
     self.maxaddrlen = max(len(addr), self.maxaddrlen)
     self.total = self.total + 1
+
+  def _qranges(self, quantiles):
+    ol = sorted(self.Hist.values())
+    return [ ol[int(math.ceil(q*len(ol)))-1] for q in quantiles ]
 
   def objdump(self):
     # colors = range(40,48) # all colors
     colors = [44, 46, 42, 43, 41] # heat scale
+    quantiles = [ 0.25, 0.5, 0.75, 0.9, 1.00]
+    assert( len(colors) == len(quantiles) )
+    ranges = self._qranges(quantiles)
+    #print ranges
+
+    #TODO plot?
+    #L = self.Hist.values()
+    #print [ (s, L.count(s)/float(self.total)) for s in set(L)]
+
     # print scale
     segwidth = 80/len(colors) - 1
-    seg = lambda col: '\033[{:d}m{:^{segwidth}}\033[0m' \
-                      .format(col, '~', segwidth=segwidth)
-    print ' '.join( [seg(col) for col in colors])
+    seg = lambda col,q: '\033[{:d}m{:^{segwidth}}\033[0m' \
+                      .format(col, 'p<{:0.2f}'.format(q), segwidth=segwidth)
+    print ' '.join( [seg(x,y) for x,y in zip(colors,quantiles)])
 
     # prepare template
     tpl = '{{cnt:>{0}}}  {{addr:>{1}}}: {{mem:24}}  {{inst}}'\
@@ -105,7 +152,8 @@ class Stats:
       # it's an instruction
       if addr in self.Hist:
         cnt = self.Hist[addr]
-        heat = len(colors)*cnt / (self.maxcnt+1)
+        #heat = len(colors)*cnt / (self.maxcnt+1)
+        heat = maxidxlt(ranges, cnt)
         print '\033[{:d}m'.format(colors[heat])+\
               tpl.format(cnt=str(cnt), **line).ljust(79)+\
               '\033[0m'
