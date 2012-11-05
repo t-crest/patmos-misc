@@ -42,36 +42,37 @@ def func_addresses(binary):
   symtab_cmd = ['patmos-llvm-objdump', '-t', binary]
   symtab = Popen(symtab_cmd, stdout=PIPE)
   # regex object
-  #0000e2c8 g     F .text  000008d4 __adddf3
-  ro = re.compile((r'^\s*0*([{0}]+)\s+(g|l)\s+F [.]text\s+[{0}]{{8}}\s+(.*)\s*$').format(string.hexdigits))
-  funcs = []
-  for line in symtab.stdout:
-    mo = ro.match(line) # matcher object
-    if mo: funcs.append(mo.group(1,3))
-  funcs.sort(key=lambda (a,f): (len(a),a),reverse=True)
+  ro = re.compile(
+    (r'^\s*0*([{0}]+)\s+(g|l)\s+F [.]text\s+[{0}]{{8}}\s+(.*)\s*$')
+    .format(string.hexdigits))
+  funcs = dict()
+  mos = [ ro.match(line) for line in symtab.stdout ]
   symtab.wait()
-  return funcs
+  return dict([ mo.group(1,3) for mo in mos if mo ])
 
 
 def disassemble(binary):
   """Generator for objdump disassembly"""
   funcs = func_addresses(binary)
-  objdump_cmd = ['patmos-llvm-objdump', '-d', binary]
+  objdump_cmd = ['patmos-llvm-objdump', '-d',
+                  '-fpatmos-print-bytes=call', binary]
   objdump = Popen(objdump_cmd, stdout=PIPE)
   # regex object
   ro = re.compile((r'^\s*0*(?P<addr>[{0}]+):\s*'\
                    r'(?P<mem>(?:[{0}]{{2}} ?){{4,8}})'\
                    r'\s*(?P<inst>.*)$').format(string.hexdigits))
   try:
-    next_func = funcs.pop()
+    func_list = sorted(funcs.items(), key=lambda (a,f): (len(a),a),reverse=True)
+    next_func = func_list.pop()
     for line in objdump.stdout:
       mo = ro.match(line.expandtabs()) # matcher object
       # return: (address, line without \n)
       if mo:
         grp = mo.groupdict()
+        #iaddr = int(grp['addr'],16)
         if grp['addr'] == next_func[0]:
           yield None, '\n{}:'.format(next_func[1])
-          if len(funcs)>0: next_func = funcs.pop()
+          if len(func_list)>0: next_func = func_list.pop()
         # space for default guard
         if not grp['inst'].startswith('('):
           grp['inst'] = ' '*7+grp['inst']
@@ -140,7 +141,7 @@ class Stats:
     # print scale
     segwidth = 80/len(colors) - 1
     seg = lambda col,q: '\033[{:d}m{:^{segwidth}}\033[0m' \
-                      .format(col, 'p<{:0.2f}'.format(q), segwidth=segwidth)
+                      .format(col, 'p<={:0.2f}'.format(q), segwidth=segwidth)
     print ' '.join( [seg(x,y) for x,y in zip(colors,quantiles)])
 
     # prepare template
