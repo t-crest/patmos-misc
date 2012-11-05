@@ -61,33 +61,52 @@ def disassemble(binary):
   ro = re.compile((r'^\s*0*(?P<addr>[{0}]+):\s*'\
                    r'(?P<mem>(?:[{0}]{{2}} ?){{4,8}})'\
                    r'\s*(?P<inst>.*)$').format(string.hexdigits))
+  # some helpers:
+  def padGuard(d): # space for default guard
+    if not d['inst'].startswith('('):
+      d['inst'] = ' '*7+d['inst']
+
+  call_ro = re.compile(r'call\s+(0x[{}]+)'.format(string.hexdigits))
+  def patchCallTarget(d): # patch immediate call target
+    call_mo = call_ro.match(d['inst'],7)
+    if call_mo:
+      target = call_mo.group(1)
+      lbl = funcs.get(target[2:], target+' ???')
+      d['inst'] = d['inst'].replace(target, lbl)
+  # list of function starts, pointing to the address of the size (base-4);
+  # reversed, to pop items off as they match
+  func_preview = sorted(
+    [ (int(k,16)-4, v) for (k,v) in funcs.items()], reverse=True)
+  def checkFuncStart(d,func): # check if d is at the start of a new function
+    if int(d['addr'],16)!=func[0]: return None
+    size = d['mem'].replace(' ','')
+    words = int(size,16) / 4
+    return '\n{}:\t(size=0x{}, {:d} words)'.format(func[1], size, words)
+
+  # main loop
   try:
-    # list of function starts, pointing to the address of the size (base-4);
-    # reversed, to pop items off as they match
-    func_preview = sorted(
-      [ (int(k,16)-4, v) for (k,v) in funcs.items()], reverse=True)
     next_func = func_preview.pop()
     for line in objdump.stdout:
       mo = ro.match(line.expandtabs()) # matcher object
       # return: (address, line without \n)
       if mo:
         grp = mo.groupdict()
-        iaddr = int(grp['addr'],16)
         # check for function start
-        if iaddr == next_func[0]:
-          yield None, '\n{}:\t(size={})'.format(next_func[1],
-                                               grp['mem'].replace(' ',''))
+        func_start = checkFuncStart(grp, next_func)
+        if func_start:
+          yield None, func_start
           if len(func_preview)>0: next_func = func_preview.pop()
           continue
         # normal instruction:
-        # space for default guard
-        if not grp['inst'].startswith('('):
-          grp['inst'] = ' '*7+grp['inst']
+        padGuard(grp)
+        patchCallTarget(grp)
+        # yield info
         yield grp['addr'], grp
       else:
         yield None, line.rstrip()
     objdump.wait()
   except:# Exception as e:
+    # we ignore broken pipe errors
     objdump.kill()
     #raise e
 
@@ -102,8 +121,7 @@ def checksum(fn):
 
 def maxidxlt(ranges, cnt):
   """Compute the largest index i in ranges such that cnt<=ranges[i]"""
-  chk = [ r<=cnt for r in ranges ]
-  return -1 if all(chk) else chk.index(False)-1
+  return max([i for i,r in enumerate(ranges) if r<=cnt])
 
 
 
@@ -139,7 +157,6 @@ class Stats:
     quantiles = [ 0.25, 0.5, 0.75, 0.9, 1.00]
     assert( len(colors) == len(quantiles) )
     ranges = self._qranges(quantiles)
-    #print ranges
 
     #TODO plot?
     #L = self.Hist.values()
