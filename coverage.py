@@ -54,8 +54,7 @@ def func_addresses(binary):
 def disassemble(binary):
   """Generator for objdump disassembly"""
   funcs = func_addresses(binary)
-  objdump_cmd = ['patmos-llvm-objdump', '-d',
-                  '-fpatmos-print-bytes=call', binary]
+  objdump_cmd = ['patmos-llvm-objdump', '-d', binary]
   objdump = Popen(objdump_cmd, stdout=PIPE)
   # regex object
   ro = re.compile((r'^\s*0*(?P<addr>[{0}]+):\s*'\
@@ -66,13 +65,14 @@ def disassemble(binary):
     if not d['inst'].startswith('('):
       d['inst'] = ' '*7+d['inst']
 
-  call_ro = re.compile(r'call\s+(0x[{}]+)'.format(string.hexdigits))
+  call_ro = re.compile(r'call\s+([0-9]+)')
   def patchCallTarget(d): # patch immediate call target
     call_mo = call_ro.match(d['inst'],7)
     if call_mo:
-      target = call_mo.group(1)
-      lbl = funcs.get(target[2:], target+' ???')
-      d['inst'] = d['inst'].replace(target, lbl)
+      tgt_wd = call_mo.group(1)
+      tgt_addr = 4*int(tgt_wd)
+      tgt_lbl = funcs.get(hex(tgt_addr)[2:], tgt_wd+' ???')
+      d['inst'] = d['inst'].replace(tgt_wd, tgt_lbl)
   # list of function starts, pointing to the address of the size (base-4);
   # reversed, to pop items off as they match
   func_preview = sorted(
