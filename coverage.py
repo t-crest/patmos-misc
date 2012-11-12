@@ -22,6 +22,7 @@ class SimError(Exception):
   def __str__(self):
     return "pasim terminated exceptionally: {}".format(self.exitcode)
 
+###############################################################################
 def trace(binary):
   """Generator for execution trace (instr addresses)"""
   pasim_cmd = ['pasim', '--debug=1', '--debug-fmt=default', binary]
@@ -36,6 +37,7 @@ def trace(binary):
     ret = pasim.wait()
     if ret: raise SimError(ret)
 
+###############################################################################
 
 def func_addresses(binary):
   """Dictionary of addr-funcstart pairs."""
@@ -50,6 +52,7 @@ def func_addresses(binary):
   symtab.wait()
   return dict([ mo.group(1,3) for mo in mos if mo ])
 
+###############################################################################
 
 def disassemble(binary):
   """Generator for objdump disassembly"""
@@ -77,11 +80,6 @@ def disassemble(binary):
   # reversed, to pop items off as they match
   func_preview = sorted(
     [ (int(k,16)-4, v) for (k,v) in funcs.items()], reverse=True)
-  def checkFuncStart(d,func): # check if d is at the start of a new function
-    if int(d['addr'],16)!=func[0]: return None
-    size = d['mem'].replace(' ','')
-    words = int(size,16) / 4
-    return '\n{}:\t(size=0x{}, {:d} words)'.format(func[1], size, words)
 
   # main loop
   try:
@@ -91,11 +89,9 @@ def disassemble(binary):
       # return: (address, line without \n)
       if mo:
         grp = mo.groupdict()
-        # check for function start
-        func_start = checkFuncStart(grp, next_func)
-        if func_start:
-          yield None, func_start
-          if len(func_preview)>0: next_func = func_preview.pop()
+        # check for size before function start
+        if int(grp['addr'],16)==next_func[0]:
+          func_size = int(grp['mem'].replace(' ',''),16)
           continue
         # normal instruction:
         padGuard(grp)
@@ -103,6 +99,12 @@ def disassemble(binary):
         # yield info
         yield grp['addr'], grp
       else:
+        # check function label
+        if line.startswith(next_func[1]+':'):
+          yield None, '\n{}\n{}:\t(size={:#x}, {:d} words)\n'\
+                        .format('-'*80, next_func[1], func_size, func_size/4)
+          if len(func_preview)>0: next_func = func_preview.pop()
+          continue
         yield None, line.rstrip()
     objdump.wait()
   except:# Exception as e:
@@ -110,6 +112,7 @@ def disassemble(binary):
     objdump.kill()
     #raise e
 
+###############################################################################
 
 def checksum(fn):
   """Compute the SHA1 sum of a file"""
@@ -125,6 +128,7 @@ def maxidxlt(ranges, cnt):
 
 
 
+###############################################################################
 
 
 class Stats:
@@ -186,6 +190,7 @@ class Stats:
         print tpl.format(cnt='', **line)
 
 
+###############################################################################
 
 def createStats(binary):
   """Stats factory - create or load stats"""
@@ -202,6 +207,7 @@ def createStats(binary):
   return S
 
 
+###############################################################################
 
 # main entry point
 if __name__=='__main__':
