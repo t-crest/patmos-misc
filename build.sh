@@ -99,6 +99,13 @@ LLVM_CONFIGURE_ARGS=
 GOLD_ARGS=
 NEWLIB_ARGS=
 
+# Build simulator in Release mode
+#PASIM_ARGS="-DCMAKE_BUILD_TYPE=Release"
+
+# Overwrite default options for pasim for make test
+#BENCH_ARGS="-DPASIM_OPTIONS='-M fifo -m 4k'"
+
+
 # Additional CFLAGS, LDFLAGS 
 GOLD_CFLAGS=
 GOLD_CXXFLAGS=
@@ -359,7 +366,7 @@ function usage() {
   Usage: $0 [-c] [-j<n>] [-p] [-i <install_dir>] [-h] [<targets>]
 
     -c		Cleanup builds and rerun configure
-    -j<n> 	Pass -j<n> to make
+    -j <n> 	Pass -j<n> to make
     -i <dir>	Set the install dir
     -h		Show this help
     -p		Create builddirs outside the source dirs
@@ -609,7 +616,7 @@ for target in $TARGETS; do
     ;;
   'patmos'|'pasim')
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
-    build_cmake patmos/simulator build_default $(get_build_dir patmos)
+    build_cmake patmos/simulator build_default $(get_build_dir patmos) "$PASIM_ARGS"
     ;;
   'bench')
     if [ -z "$BENCH_REPO_URL" ]; then
@@ -617,7 +624,7 @@ for target in $TARGETS; do
     else
       clone_update $BENCH_REPO_URL $(get_repo_dir bench)
       repo=$(get_repo_dir bench)
-      build_cmake bench build_bench $(get_build_dir bench) "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
+      build_cmake bench build_bench $(get_build_dir bench) "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin" "$BENCH_ARGS"
     fi
     ;;
   *) echo "Don't know about $target." ;;
