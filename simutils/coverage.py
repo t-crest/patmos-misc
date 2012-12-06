@@ -9,108 +9,14 @@
 #
 ###############################################################################
 
-import os, os.path
+import os.path
 import re, string
 import hashlib
 import math
-from subprocess import Popen, PIPE
 from cPickle import dump, load
 
-class SimError(Exception):
-  def __init__(self,code):
-    self.exitcode=code
-  def __str__(self):
-    return "pasim terminated exceptionally: {}".format(self.exitcode)
-
-###############################################################################
-def trace(binary):
-  """Generator for execution trace (instr addresses)"""
-  pasim_cmd = ['pasim', '--debug=1', '--debug-fmt=default', binary]
-  # send stdout to /dev/null
-  with open(os.devnull, 'w') as fnull:
-    pasim = Popen(pasim_cmd, stderr=PIPE, stdout=fnull)
-    ro = re.compile(r'^.*PC : 0*([0-9a-fA-F]{1,8})') # regex object
-    for line in pasim.stderr:
-      mo = ro.match(line) # matcher object
-      if mo: yield mo.group(1)
-    # processed each line, now wait
-    ret = pasim.wait()
-    if ret: raise SimError(ret)
-
-###############################################################################
-
-def func_addresses(binary):
-  """Dictionary of addr-funcstart pairs."""
-  symtab_cmd = ['patmos-llvm-objdump', '-t', binary]
-  symtab = Popen(symtab_cmd, stdout=PIPE)
-  # regex object
-  ro = re.compile(
-    (r'^\s*0*([{0}]+)\s+(g|l)\s+F [.]text\s+[{0}]{{8}}\s+(.*)\s*$')
-    .format(string.hexdigits))
-  funcs = dict()
-  mos = [ ro.match(line) for line in symtab.stdout ]
-  symtab.wait()
-  return dict([ mo.group(1,3) for mo in mos if mo ])
-
-###############################################################################
-
-def disassemble(binary):
-  """Generator for objdump disassembly"""
-  funcs = func_addresses(binary)
-  objdump_cmd = ['patmos-llvm-objdump', '-d', binary]
-  objdump = Popen(objdump_cmd, stdout=PIPE)
-  # regex object
-  ro = re.compile((r'^\s*0*(?P<addr>[{0}]+):\s*'\
-                   r'(?P<mem>(?:[{0}]{{2}} ?){{4,8}})'\
-                   r'\s*(?P<inst>.*)$').format(string.hexdigits))
-  # some helpers:
-  def padGuard(d): # space for default guard
-    if not d['inst'].startswith('('):
-      d['inst'] = ' '*7+d['inst']
-
-  call_ro = re.compile(r'call\s+([0-9]+)')
-  def patchCallTarget(d): # patch immediate call target
-    call_mo = call_ro.match(d['inst'],7)
-    if call_mo:
-      tgt_wd = call_mo.group(1)
-      tgt_addr = 4*int(tgt_wd)
-      tgt_lbl = funcs.get(hex(tgt_addr)[2:], tgt_wd+' ???')
-      d['inst'] = d['inst'].replace(tgt_wd, tgt_lbl)
-  # list of function starts, pointing to the address of the size (base-4);
-  # reversed, to pop items off as they match
-  func_preview = sorted(
-    [ (int(k,16)-4, v) for (k,v) in funcs.items()], reverse=True)
-
-  # main loop
-  try:
-    next_func = func_preview.pop()
-    for line in objdump.stdout:
-      mo = ro.match(line.expandtabs()) # matcher object
-      # return: (address, line without \n)
-      if mo:
-        grp = mo.groupdict()
-        # check for size before function start
-        if int(grp['addr'],16)==next_func[0]:
-          func_size = int(grp['mem'].replace(' ',''),16)
-          continue
-        # normal instruction:
-        padGuard(grp)
-        patchCallTarget(grp)
-        # yield info
-        yield grp['addr'], grp
-      else:
-        # check function label
-        if line.startswith(next_func[1]+':'):
-          yield None, '\n{}\n{}:\t(size={:#x}, {:d} words)\n'\
-                        .format('-'*80, next_func[1], func_size, func_size/4)
-          if len(func_preview)>0: next_func = func_preview.pop()
-          continue
-        yield None, line.rstrip()
-    objdump.wait()
-  except:# Exception as e:
-    # we ignore broken pipe errors
-    objdump.kill()
-    #raise e
+import dasmutil
+import simutil
 
 ###############################################################################
 
@@ -140,7 +46,7 @@ class Stats:
     self.maxcnt = 0
     self.maxaddrlen = 0
     self.checksum = checksum(binary)
-    for addr in trace(self.binary):
+    for addr in simutil.trace(self.binary):
       self._put(addr)
 
   def _put(self, addr):
@@ -176,7 +82,7 @@ class Stats:
     tpl = '{{cnt:>{0}}}  {{addr:>{1}}}: {{mem:24}}  {{inst}}'\
             .format( len(str(self.maxcnt)), self.maxaddrlen )
     assert( None not in self.Hist )
-    for addr, line in disassemble(self.binary):
+    for addr, line in dasmutil.disasm_enhance(self.binary):
       if not addr: print line; continue
       # it's an instruction
       if addr in self.Hist:
@@ -228,7 +134,7 @@ if __name__=='__main__':
   try:
     S = createStats(sys.argv[1])
     S.objdump()
-  except SimError as e:
+  except simutil.SimError as e:
     print e
     exit(1)
   except IOError:
