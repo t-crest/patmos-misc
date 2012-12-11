@@ -30,7 +30,7 @@ def checksum(fn):
 
 def maxidxlt(ranges, cnt):
   """Compute the largest index i in ranges such that cnt<=ranges[i]"""
-  return max([i for i,r in enumerate(ranges) if r<=cnt])
+  return max(i for i,r in enumerate(ranges) if r<=cnt)
 
 
 
@@ -76,24 +76,24 @@ class Stats:
     segwidth = 80/len(colors) - 1
     seg = lambda col,q: '\033[{:d}m{:^{segwidth}}\033[0m' \
                       .format(col, 'p<={:0.2f}'.format(q), segwidth=segwidth)
-    print ' '.join( [seg(x,y) for x,y in zip(colors,quantiles)])
+    print ' '.join(seg(x,y) for x,y in zip(colors,quantiles))
 
     # prepare template
     tpl = '{{cnt:>{0}}}  {{addr:>{1}}}: {{mem:24}}  {{inst}}'\
             .format( len(str(self.maxcnt)), self.maxaddrlen )
     assert( None not in self.Hist )
-    for addr, line in dasmutil.disasm_enhance(self.binary):
-      if not addr: print line; continue
+    for line, inst in dasmutil.DisAsm(self.binary):
+      if not inst: print line, ; continue
       # it's an instruction
-      if addr in self.Hist:
-        cnt = self.Hist[addr]
+      if inst['addr'] in self.Hist:
+        cnt = self.Hist[inst['addr']]
         #heat = len(colors)*cnt / (self.maxcnt+1)
         heat = maxidxlt(ranges, cnt)
         print '\033[{:d}m'.format(colors[heat])+\
-              tpl.format(cnt=str(cnt), **line).ljust(79)+\
+              tpl.format(cnt=str(cnt), **inst).ljust(79)+\
               '\033[0m'
       else:
-        print tpl.format(cnt='', **line)
+        print tpl.format(cnt='', **inst)
 
 
 ###############################################################################

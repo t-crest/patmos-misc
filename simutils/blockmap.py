@@ -30,10 +30,10 @@ def find_le(a, x):
 # TODO (re)use the dasm enhance generator
 def dasm_bblabels(binary, observe):
   ro = re.compile(r'^\s*0*(?P<addr>[{}]+):'.format(string.hexdigits))
-  funcs = dasmutil.func_addresses(binary)
-  bbs = dasmutil.bb_addresses(binary)
+  funcs = { t[0]:t[2] for t in dasmutil.func_addresses(binary) }
+  bbs = { t[0]:tuple(t[1:]) for t in dasmutil.bb_addresses(binary, True) }
   capture = False
-  func_sizes = set([ hex(int(k,16)-4)[2:] for k in funcs ])
+  func_sizes = set( hex(int(k,16)-4)[2:] for k in funcs )
   with open(binary+'.dis','w') as f:
     for line in dasmutil.disassemble(binary):
       mo = ro.match(line)
@@ -84,10 +84,10 @@ if __name__=='__main__':
   # format:
   #  addr: (func, bbname, number, size)
   # addr and size are of type int, in bytes
-  bbs_a = dict([ (int(k,16),tuple(v[1][1:].split('#')+[int(v[0],16)]))
-                    for k,v in dasmutil.bb_addresses(binary).items() ])
+  bbs_a = { int(tup[0],16) : tuple(tup[2][1:].split('#')+[int(tup[1],16)])
+                    for tup in dasmutil.bb_addresses(binary, True) }
   bbs_lst = sorted(bbs_a.keys())
-  funcs_a = dasmutil.func_addresses(binary)
+  funcs_a = { t[0]:t[2] for t in dasmutil.func_addresses(binary) }
 
   def update_edge(A, prev, cur):
     if prev not in A: A[prev] = dict()
