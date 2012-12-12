@@ -134,7 +134,7 @@ def ret_points(binary):
   for line, inst in dasm:
     if inst:
       if cnt==0: yield inst['addr']
-      if 'call' in inst:
+      if 'call' in inst['inst']:
         cnt = -2
         continue
       cnt = cnt + 1
