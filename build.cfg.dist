@@ -64,6 +64,8 @@ NEWLIB_ARGS=
 # Overwrite default options for pasim for make test
 #BENCH_ARGS="-DPASIM_OPTIONS='-M fifo -m 4k'"
 
+# Set path to a3, or set to empty string to disable a3
+#BENCH_ARGS="${BENCH_ARGS} -DA3_EXECUTABLE="
 
 # Additional CFLAGS, LDFLAGS 
 GOLD_CFLAGS=
