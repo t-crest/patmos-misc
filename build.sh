@@ -609,7 +609,7 @@ for target in $TARGETS; do
     clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib)
     build_autoconf newlib build_default $(get_build_dir newlib) --target=patmos-unknown-elf AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
         RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
-        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-ccc-host-triple patmos-unknown-elf -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
+        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target patmos-unknown-elf -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
     ;;
   'compiler-rt')
     clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $(get_repo_dir compiler-rt)
