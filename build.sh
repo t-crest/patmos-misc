@@ -191,8 +191,11 @@ function install() {
 	# TODO option to use hardlinking instead
 	# Maybe, if $src is a directory, make sure we remove any trash in $dst (use rsync??) .. should be optional, off by default!
 	if [ "$OS_NAME" == "Linux" ]; then
-	    run cp -fau $src $dst
+	    run cp -fauT $src $dst
 	else 
+	    if [ -e $dst ]; then
+		run rm -rf $dst
+	    fi
 	    run cp -fR $src $dst
 	fi
     fi
