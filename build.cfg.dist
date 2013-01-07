@@ -47,7 +47,7 @@ INSTALL_SYMLINKS=false
 BENCH_REPO_URL=
 
 # Set the target architecture for gold
-# auto      use HOST on Linux, 'patmos-unknown-elf' otherwise
+# auto      use HOST on Linux, 'patmos-unknown-unknown-elf' otherwise
 # none      do not set --target
 # <target>  use <target> as target architecture
 GOLD_TARGET_ARCH=auto
