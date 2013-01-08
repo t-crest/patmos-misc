@@ -127,17 +127,16 @@ class DisAsm(object):
 
 ###############################################################################
 
+def find_inst_addr(binary, which, cyc_offset=0):
+  """Get a list of addresses of certain instructions, with given offset"""
+  dasm = DisAsm(binary)
+  allinst = [ inst for line, inst in dasm if inst ]
+  match = [ x+' ' in inst['inst'] for x in which for inst in allinst ]
+  return [ x['addr'] for i,x in enumerate(allinst) if match[i-cyc_offset] ]
+
 
 def ret_points(binary):
-  dasm = DisAsm(binary)
-  cnt = 1
-  for line, inst in dasm:
-    if inst:
-      if cnt==0: yield inst['addr']
-      if 'call' in inst['inst']:
-        cnt = -2
-        continue
-      cnt = cnt + 1
+  return find_inst_addr(binary, ['call'], 3)
 
 
 ###############################################################################

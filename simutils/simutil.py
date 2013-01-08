@@ -47,7 +47,7 @@ def trace_ex(binary):
   with open(os.devnull, 'w') as fnull:
     pasim = Popen(pasim_cmd, stderr=PIPE, stdout=fnull)
     ro = re.compile(r'^.*PRR: ([0-9]{8}) .* PC : 0*([0-9a-fA-F]{1,8})') # regex object
-    pipeline = [None, None] # initial pipline fill
+    pipeline = [None, None] # initial pipeline fill
     cyc = 0
     for line in pasim.stderr:
       mo = ro.match(line) # matcher object
