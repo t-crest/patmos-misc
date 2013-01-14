@@ -6,3 +6,7 @@ jumptable/jumptable
 *.o
 *.out
 *.pml
+*.ais
+*.apx
+*.log
+*.xml
