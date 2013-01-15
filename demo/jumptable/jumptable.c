@@ -15,7 +15,7 @@ int measure(int n, int i, int j) {
 	case 1: i = 20; j = 10; break;
 	case 2: i = 30; j = 40; break;
 	case 3: i = 10; break;
-	case 4: i = 60; j = 15; break;
+	case 4: i = 30; j = 12; break;
 	case 5: i = 50; break;
 	case 6: i = 40; break;
     }
@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 
     int rs = measure(n, i, j);
 
-    printf("Result (should be 75): %d\n", rs);
+    printf("Result (should be 42): %d\n", rs);
 
     return i+j;
 }
