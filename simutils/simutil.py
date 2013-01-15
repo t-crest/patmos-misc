@@ -26,39 +26,37 @@ class SimError(Exception):
 
 def trace(binary):
   """Generator for execution trace (instr addresses)"""
-  pasim_cmd = ['pasim', '--debug=0', '--debug-fmt=default', binary]
+  pasim_cmd = ['pasim', '--debug=0', '--debug-fmt=trace', binary]
   # send stdout to /dev/null
   with open(os.devnull, 'w') as fnull:
     pasim = Popen(pasim_cmd, stderr=PIPE, stdout=fnull)
-    ro = re.compile(r'^.*PC : 0*([0-9a-fA-F]{1,8})') # regex object
     for line in pasim.stderr:
-      mo = ro.match(line) # matcher object
-      if mo: yield mo.group(1)
+      pc_cyc = line.rstrip().split()
+      yield (int(pc_cyc[0],16), int(pc_cyc[1]))
     # processed each line, now wait
     ret = pasim.wait()
     if ret: raise SimError(ret)
 
+
 ###############################################################################
 
 def trace_ex(binary):
-  """Generator for extended execution trace in EX stage (cyc, instr addresses + PRR before)"""
+  """Generator for extended execution trace in EX stage (instr addresses + PRR before)"""
   pasim_cmd = ['pasim', '--debug=0', '--debug-fmt=default', binary]
   # send stdout to /dev/null
   with open(os.devnull, 'w') as fnull:
     pasim = Popen(pasim_cmd, stderr=PIPE, stdout=fnull)
     ro = re.compile(r'^.*PRR: ([0-9]{8}) .* PC : 0*([0-9a-fA-F]{1,8})') # regex object
     pipeline = [None, None] # initial pipeline fill
-    cyc = 0
     for line in pasim.stderr:
       mo = ro.match(line) # matcher object
       if mo:
         (prr, inst) = mo.groups()
         pipeline.append(inst)
-        yield cyc, prr, pipeline.pop(0)
-        cyc = cyc + 1
+        yield prr, pipeline.pop(0)
     # drain pipelne
-    yield cyc,   prr, pipeline.pop(0)
-    yield cyc+1, prr, pipeline.pop(0)
+    yield prr, pipeline.pop(0)
+    yield prr, pipeline.pop(0)
     # processed each line, now wait
     ret = pasim.wait()
     if ret: raise SimError(ret)

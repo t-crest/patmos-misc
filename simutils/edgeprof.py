@@ -107,7 +107,7 @@ class EdgeProf:
           cur_bb = iaddr
           # function call?
           # - no need to check if last inst was a call point:
-          #   loops don't target function entries (epilogue)
+          #   loops don't target function entries (prologue)
           if iaddr in funcs_a:
             callstack.append( (last_func, last_bb) )
             cur_func = iaddr
