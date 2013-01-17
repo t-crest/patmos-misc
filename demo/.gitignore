@@ -1,6 +1,12 @@
-hello
+hello/hello
+jumptable/jumptable
 *.s
 *.ll
 *.bc
 *.o
 *.out
+*.pml
+*.ais
+*.apx
+*.log
+*.xml
