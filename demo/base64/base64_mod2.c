@@ -9,7 +9,9 @@
 #define BUF_SIZE      256
 
 static const char Base64[] =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz"
+        "0123456789+/";
 static const char Pad64 = '=';
 
 __attribute__ ((noinline))
@@ -105,6 +107,8 @@ int b64_pton(char const *src, char *target, size_t targsize)
         tarindex++;
         state = 0;
         break;
+      default:
+        __builtin_unreachable();
     }
   }
   return (tarindex);

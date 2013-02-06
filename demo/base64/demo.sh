@@ -12,8 +12,8 @@ GRAPHDIR="./graphs"
 
 mkdir -p $BINDIR $OUTDIR $GRAPHDIR
 
-patmos-clang -O0 -Wl,-mem2reg -o "${BINDIR}/${DEMO}.elf" -mpatmos-serialize="${BINDIR}/${DEMO}.pml" "${SRC}"
 #patmos-clang -Wl,-disable-inlining -o "${BINDIR}/${DEMO}.elf" -mpatmos-serialize="${BINDIR}/${DEMO}.pml" "${SRC}"
+patmos-clang -O0 -Wl,-disable-inlining -o "${BINDIR}/${DEMO}.elf" -mpatmos-serialize="${BINDIR}/${DEMO}.pml" "${SRC}"
 
 # analyze
 psk bench "${BINDIR}/${DEMO}.pml" \
