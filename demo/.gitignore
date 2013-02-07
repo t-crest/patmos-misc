@@ -4,6 +4,7 @@ jumptable/jumptable
 *.ll
 *.bc
 *.o
+*.i
 *.out
 *.pml
 *.ais

@@ -88,7 +88,7 @@ INSTALL_SYMLINKS=false
 BENCH_REPO_URL=
 
 # Set the target architecture for gold
-# auto      use HOST on Linux, 'patmos-unknown-elf' otherwise
+# auto      use HOST on Linux, 'patmos-unknown-unknown-elf' otherwise
 # none      do not set --target
 # <target>  use <target> as target architecture
 GOLD_TARGET_ARCH=auto
@@ -100,7 +100,7 @@ GOLD_ARGS=
 NEWLIB_ARGS=
 
 # Build simulator in Release mode
-#PASIM_ARGS="-DCMAKE_BUILD_TYPE=Release"
+#PASIM_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
 
 # Overwrite default options for pasim for make test
 #BENCH_ARGS="-DPASIM_OPTIONS='-M fifo -m 4k'"
@@ -191,8 +191,11 @@ function install() {
 	# TODO option to use hardlinking instead
 	# Maybe, if $src is a directory, make sure we remove any trash in $dst (use rsync??) .. should be optional, off by default!
 	if [ "$OS_NAME" == "Linux" ]; then
-	    run cp -fau $src $dst
+	    run cp -fauT $src $dst
 	else 
+	    if [ -e $dst ]; then
+		run rm -rf $dst
+	    fi
 	    run cp -fR $src $dst
 	fi
     fi
@@ -552,7 +555,7 @@ fi
 
 if [ "$GOLD_TARGET_ARCH" == "auto" ]; then
     if [ "$OS_NAME" != "Linux" ]; then
-	GOLD_ARGS="$GOLD_ARGS --target=patmos-unknown-elf"
+	GOLD_ARGS="$GOLD_ARGS --target=patmos-unknown-unknown-elf"
     fi
 elif [ "$GOLD_TARGET_ARCH" != "none" ]; then
     GOLD_ARGS="$GOLD_ARGS --target='$GOLD_TARGET_ARCH'"
@@ -613,9 +616,9 @@ for target in $TARGETS; do
     ;;
   'newlib')
     clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib)
-    build_autoconf newlib build_default $(get_build_dir newlib) --target=patmos-unknown-elf AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
+    build_autoconf newlib build_default $(get_build_dir newlib) --target=patmos-unknown-unknown-elf AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
         RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
-        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target patmos-unknown-elf -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
+        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target patmos-unknown-unknown-elf -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
     ;;
   'compiler-rt')
     clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $(get_repo_dir compiler-rt)

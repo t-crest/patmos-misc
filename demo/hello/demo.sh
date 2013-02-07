@@ -60,11 +60,11 @@ cmd vim hello.c
 
 
 info "Translate C to LLVM bitcode"
-cmd patmos-clang -target patmos-unknown-elf -o hello.ll -S hello.c
+cmd patmos-clang -target patmos-unknown-unknown-elf -o hello.ll -S hello.c
 cmd vim hello.ll
 
 info "Translate C to Patmos machine code"
-cmd patmos-clang -target patmos-unknown-elf -o hello.s -fpatmos-emit-asm -S hello.c
+cmd patmos-clang -target patmos-unknown-unknown-elf -o hello.s -fpatmos-emit-asm -S hello.c
 #cmd patmos-llc -march=patmos -o hello.s  hello.ll
 cmd vim hello.s
 
