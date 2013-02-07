@@ -100,7 +100,7 @@ GOLD_ARGS=
 NEWLIB_ARGS=
 
 # Build simulator in Release mode
-#PASIM_ARGS="-DCMAKE_BUILD_TYPE=Release"
+#PASIM_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
 
 # Overwrite default options for pasim for make test
 #BENCH_ARGS="-DPASIM_OPTIONS='-M fifo -m 4k'"
