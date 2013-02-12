@@ -5,6 +5,10 @@
 # Author: Stefan Hepp <hepp@complang.tuwien.ac.at>
 #
 
+# Martin: Quite a useful script. However, why isn't it based relative
+# to the root folder, instead of coding your directory tree configuration
+# into it?
+
 BASE=$HOME/tcrest/
 GITBASE=$BASE/git
 
