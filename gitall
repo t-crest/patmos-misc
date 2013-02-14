@@ -5,24 +5,40 @@
 # Author: Stefan Hepp <hepp@complang.tuwien.ac.at>
 #
 
-# Martin: Quite a useful script. However, why isn't it based relative
-# to the root folder, instead of coding your directory tree configuration
-# into it?
-
-BASE=$HOME/tcrest/
-GITBASE=$BASE/git
-
-GITREPOS="patmos benchmarks newlib compiler-rt gold clang llvm misc"
-
+# TODO alternatively check home for devup.cfg?
 self=`readlink -f $0`
 cfgfile=`dirname $self`/devup.cfg
+base=`dirname $self`/..
+
+
+##### Configuration starts here. Overwrite defaults in ./devup.cfg #####
+
+#
+# This script shares the configuration file with the devup script.
+# It uses the GITREPOS and GITBASE config options.
+#
+# By default assume that all other repositories are checked out into the parent
+# directory of this folder. Set repository names and the git base dir 
+# in 'devup.cfg' in the same folder as this script to your setup if you have a 
+# different directory layout.
+#
+
+# Base directory of git checkouts
+GITBASE=$base
+
+# Names of git subdirectories in $GITBASE
+GITREPOS="patmos benchmarks newlib compiler-rt gold clang llvm misc"
+
+# Color codes
+RED="\033[31m"
+NOCOLOR="\033[0m"
+
+##### Configuration ends here #####
+
 
 if [ -f $cfgfile ]; then
     . $cfgfile
 fi
-
-RED="\033[31m"
-NOCOLOR="\033[0m"
 
 function usage() {
     echo "Usage: $0 <git command>"
