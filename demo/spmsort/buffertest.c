@@ -4,6 +4,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include <machine/patmos.h>
 #include <machine/spm.h>
 
 #include "buffer.h"
@@ -62,7 +63,7 @@ int main(void)
         }
         spm_bte_finish(&bte);
 
-        //invalidate_data_cache();
+        invalidate_data_cache();
 
         printf("%u checking test pattern, element size %u\n", cycle, esize);
 

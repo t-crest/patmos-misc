@@ -48,12 +48,12 @@ void spmsort2(void * const pbase, size_t total_elems)
         }
         assert(n);
 
-        spm_copy_from_ext(data_spm, &src[off], n * sizeof(Element));
+        //spm_copy_from_ext(data_spm, &src[off], n * sizeof(Element));
         spm_wait();
 
         schmidt(data_spm, n);
 
-        spm_copy_to_ext(&dest[off], data_spm, n * sizeof(Element));
+        //spm_copy_to_ext(&dest[off], data_spm, n * sizeof(Element));
         spm_wait();
     }
 

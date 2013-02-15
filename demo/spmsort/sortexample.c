@@ -3,12 +3,17 @@
 #include <assert.h>
 #include <time.h>
 
+#include <machine/patmos.h>
 #include <machine/spm.h>
 
 #include "sortexample.h"
 
-unsigned *data_spm = SPM_BASE;
-unsigned sort_this[];
+
+Element elements[MAX_ELEMENTS];
+Element alternate_storage[MAX_ELEMENTS];
+
+char *data_spm = SPM_BASE;
+char *sort_this = (char*) elements;
 
 
 static void check_sorted(unsigned size);
@@ -48,7 +53,7 @@ static void run_sorts(unsigned size)
     init_memory(size);
     start = clock();
     spmsort(sort_this, size);
-    printf("%14u %7u\n", clock() - start, size);
+    printf("%14llu %7u\n", clock() - start, size);
     check_sorted(size);
 
     printf("sorting with spmsort 16 word         ");
@@ -56,7 +61,7 @@ static void run_sorts(unsigned size)
     init_memory(size);
     start = clock();
     spmsort(sort_this, size);
-    printf("%14u %7u\n", clock() - start, size);
+    printf("%14llu %7u\n", clock() - start, size);
     check_sorted(size);
 
     printf("sorting with spmsort 4 word          ");
@@ -64,56 +69,56 @@ static void run_sorts(unsigned size)
     init_memory(size);
     start = clock();
     spmsort(sort_this, size);
-    printf("%14u %7u\n", clock() - start, size);
+    printf("%14llu %7u\n", clock() - start, size);
     check_sorted(size);
 
     printf("sorting with Schmidt qsort           ");
     init_memory(size);
     start = clock();
     schmidt(sort_this, size);
-    printf("%14u %7u\n", clock() - start, size);
+    printf("%14llu %7u\n", clock() - start, size);
     check_sorted(size);
 
     printf("sorting with Xilinx libc qsort       ");
     init_memory(size);
     start = clock();
     qsort(sort_this, size, sizeof(Element), sort_comparator);
-    printf("%14u %7u\n", clock() - start, size);
+    printf("%14llu %7u\n", clock() - start, size);
     check_sorted(size);
 
     printf("sorting with Bentley & McIlroy qsort ");
     init_memory(size);
     start = clock();
     bentley(sort_this, size);
-    printf("%14u %7u\n", clock() - start, size);
+    printf("%14llu %7u\n", clock() - start, size);
     check_sorted(size);
 
     printf("sorting with BSD heapsort            ");
     init_memory(size);
     start = clock();
     heapsort(sort_this, size);
-    printf("%14u %7u\n", clock() - start, size);
+    printf("%14llu %7u\n", clock() - start, size);
     check_sorted(size);
 
     printf("sorting with uclibc Shell sort       ");
     init_memory(size);
     start = clock();
     shellsort(sort_this, size);
-    printf("%14u %7u\n", clock() - start, size);
+    printf("%14llu %7u\n", clock() - start, size);
     check_sorted(size);
 
     printf("sorting with Glibc2 mergesort        ");
     init_memory(size);
     start = clock();
     haertel(sort_this, size);
-    printf("%14u %7u\n", clock() - start, size);
+    printf("%14llu %7u\n", clock() - start, size);
     check_sorted(size);
 
     printf("sorting with C++ STL introsort       ");
     init_memory(size);
     start = clock();
     introsort(sort_this, size);
-    printf("%14u %7u\n", clock() - start, size);
+    printf("%14llu %7u\n", clock() - start, size);
     check_sorted(size);
 
     printf("sorting with spmsort2 64 word        ");
@@ -121,7 +126,7 @@ static void run_sorts(unsigned size)
     init_memory(size);
     start = clock();
     spmsort2(sort_this, size);
-    printf("%14u %7u\n", clock() - start, size);
+    printf("%14llu %7u\n", clock() - start, size);
     check_sorted(size);
 
 
