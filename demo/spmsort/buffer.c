@@ -52,11 +52,11 @@ void spm_bfe_init(SPM_BFE_Buffer * bfe,
     assert(spm_is_aligned(bfe->source_ptr));
 
     /* Create control words for SPM operations */
-    //bfe->control_a = spm_get_control_word(area_a, bfe->fetch_size);
-    //bfe->control_b = spm_get_control_word(area_b, bfe->fetch_size);
+    bfe->control_a = spm_get_control_word(area_a, bfe->fetch_size);
+    bfe->control_b = spm_get_control_word(area_b, bfe->fetch_size);
 
     /* Initial fetch into areas A */
-    //spm_control((void *) bfe->source_ptr, bfe->control_a);
+    spm_control((void *) bfe->source_ptr, bfe->control_a);
 
     /* First consumer (in area A) is alignment-dependent so that the source pointer
      * does not need to be correctly aligned. Fetch B as soon as the first element 
@@ -81,11 +81,11 @@ void spm_bfe_trigger(SPM_BFE_Buffer * bfe)
     if (bfe->trigger < bfe->fetch_size) {
         /* Consuming area A - Fetch area B */
         bfe->trigger = bfe->fetch_size;
-        //spm_control((void *) bfe->source_ptr, bfe->control_b);
+        spm_control((void *) bfe->source_ptr, bfe->control_b);
     } else {
         /* Consuming area B - Fetch area A */
         bfe->trigger = 0;
-        //spm_control((void *) bfe->source_ptr, bfe->control_a);
+        spm_control((void *) bfe->source_ptr, bfe->control_a);
     }
     bfe->source_ptr += bfe->fetch_size;
 }
@@ -141,8 +141,8 @@ void * spm_bte_init(SPM_BTE_Buffer * bte,
     assert(spm_is_aligned(target));
 
     /* Create control words for SPM operations */
-    //bte->control_a = spm_get_control_word(area_a, bte->send_size) | FLAG_COPY_TO;
-    //bte->control_b = spm_get_control_word(area_b, bte->send_size) | FLAG_COPY_TO;
+    bte->control_a = spm_get_control_word(area_a, bte->send_size) | FLAG_COPY_TO;
+    bte->control_b = spm_get_control_word(area_b, bte->send_size) | FLAG_COPY_TO;
 
     /* Initially producing element 0 (area A). Send area A once complete */
     bte->producer = 0;
@@ -157,11 +157,11 @@ void spm_bte_trigger(SPM_BTE_Buffer * bte)
     if (bte->trigger < bte->send_size) {
         /* Data produced in area B. Send area B. */
         bte->trigger = bte->send_size;
-        //spm_control((void *) bte->target_ptr, bte->control_b);
+        spm_control((void *) bte->target_ptr, bte->control_b);
     } else {
         /* Data produced in area A. Send area A. */
         bte->trigger = 0;
-        //spm_control((void *) bte->target_ptr, bte->control_a);
+        spm_control((void *) bte->target_ptr, bte->control_a);
     }
     bte->target_ptr += bte->send_size;
 }

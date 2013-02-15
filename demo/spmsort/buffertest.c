@@ -24,7 +24,7 @@ static void multibuf(unsigned spm_usage_per_job, unsigned num_tasks);
 Element elements[MAX_ELEMENTS];
 
 unsigned *sort_this = (unsigned*)elements;
-unsigned *data_spm = SPM_BASE;
+unsigned *data_spm;
 
 
 int main(void)
@@ -35,6 +35,8 @@ int main(void)
 
     /* Always call spm_init as a first step */
     spm_init();
+    
+    data_spm = (unsigned*)malloc(SPM_SIZE);
 
     printf("basic tests\n");
     tester(0, 1024, 4, 1024);

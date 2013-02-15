@@ -4,12 +4,13 @@
 
 #include <machine/spm.h>
 
+#include "sortexample.h"
 
 
 typedef struct SPM_BFE_Buffer_struct {
             unsigned short  element_size, consumer;
             unsigned short  space_mask, trigger, fetch_size;
-            unsigned        control_a, control_b;
+            control_t       control_a, control_b;
             unsigned char * base;
             const unsigned char * source_ptr;
         } SPM_BFE_Buffer;
@@ -17,7 +18,7 @@ typedef struct SPM_BFE_Buffer_struct {
 typedef struct SPM_BTE_Buffer_struct {
             unsigned short  element_size, producer;
             unsigned short  space_mask, trigger, send_size;
-            unsigned        control_a, control_b;
+            control_t       control_a, control_b;
             unsigned char * base;
             unsigned char * target_ptr;
         } SPM_BTE_Buffer;

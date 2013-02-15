@@ -48,11 +48,13 @@ void spmsort(void * const pbase, size_t total_elems)
         assert(n);
 
         //spm_copy_from_ext(data_spm, &src[off], n * sizeof(Element));
+        memcpy(data_spm, &src[off], n * sizeof(Element));
         spm_wait();
 
         schmidt(data_spm, n);
 
         //spm_copy_to_ext(&dest[off], data_spm, n * sizeof(Element));
+        memcpy(&dest[off], data_spm, n * sizeof(Element));
         spm_wait();
     }
 
@@ -123,6 +125,7 @@ static void merge(Element * dest, Element * src,
             if ((index_A == IN_A_ELEMS) && (src_A < end_A)) {
                 //spm_copy_from_ext(spm_A, src_A, 
                 //        IN_A_ELEMS * sizeof(Element));
+                memcpy(spm_A, src_A, IN_A_ELEMS * sizeof(Element));
                 src_A += IN_A_ELEMS;
                 index_A = 0;
                 spm_wait();
@@ -130,6 +133,7 @@ static void merge(Element * dest, Element * src,
             if ((index_B == in_B_elems) && (src_B < end_B)) {
                 //spm_copy_from_ext(spm_B, src_B, 
                 //        in_B_elems * sizeof(Element));
+                memcpy(spm_B, src_B, in_B_elems * sizeof(Element));
                 src_B += in_B_elems;
                 index_B = 0;
                 if (src_B > end_B) {
@@ -166,6 +170,7 @@ static void merge(Element * dest, Element * src,
             if (index_out == OUT_ELEMS) {
                 /* Write out merged data */
                 //spm_copy_to_ext(dest, spm_out, OUT_ELEMS * sizeof(Element));
+                memcpy(dest, spm_out, OUT_ELEMS * sizeof(Element));
                 dest += OUT_ELEMS;
                 index_out = 0;
                 spm_wait();

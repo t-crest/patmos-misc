@@ -1,6 +1,8 @@
 #ifndef SORTEXAMPLE_H
 #define SORTEXAMPLE_H
 
+#include <string.h>
+
 typedef struct Element_struct {
             int         key;
             int         payload;
@@ -33,6 +35,36 @@ extern void shellsort(void *base, size_t nmemb);
 extern void bentley(void *base, size_t nmemb);
 extern void spmsort(void *base, size_t nmemb);
 extern void spmsort2(void *base, size_t nmemb);
+
+
+
+#define FLAG_COPY_TO (1<<30)
+
+typedef long long unsigned control_t;
+
+static inline control_t spm_get_control_word(const void * spm_ptr, unsigned size)
+{
+    unsigned d = (unsigned) spm_ptr;
+
+#ifdef CHECK_SPM
+    assert(spm_is_aligned(spm_ptr));
+    assert(spm_is_aligned((void *) size));
+    assert(DATA_SPM_BASE <= (unsigned) spm_ptr);
+    assert((unsigned) spm_ptr <= DATA_SPM_HIGH);
+#endif
+    return ((control_t)d << 32) | (size);
+}
+
+static inline void spm_control(void * src, control_t ctrl)
+{
+    void *dst =  (void*) (ctrl >> 32);
+    size_t n  = (size_t) (ctrl & 0x0FFFFFFF);
+    //if (ctrl && FLAG_COPY_TO) {
+    //} else {
+    //}
+    memcpy(dst, src, n);
+}
+
 
 static inline int sort_comparator(const void *elem1, const void *elem2)
 {
