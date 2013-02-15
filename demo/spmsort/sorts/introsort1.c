@@ -300,7 +300,7 @@ llvm_cbe_bb4:
 llvm_cbe__ZSt13__adjust_heapIP14Element_structiS0_EvT_T0_S3_T1__2e_exit:
   *((&llvm_cbe___first[((signed int )llvm_cbe___holeIndex_addr_2e_0_2e_i_2e_i)].field0)) = llvm_cbe_tmp__6;
   *((&llvm_cbe___first[((signed int )llvm_cbe___holeIndex_addr_2e_0_2e_i_2e_i)].field1)) = llvm_cbe_tmp__7;
-  if ((llvm_cbe_tmp__5 == llvm_cbe_indvar)) {
+  if (llvm_cbe_tmp__5 == llvm_cbe_indvar) {
     goto llvm_cbe_return;
   } else {
     goto llvm_cbe_bb4;
@@ -338,7 +338,7 @@ llvm_cbe_bb4_2e_i:
   llvm_cbe___secondChild_2e_1_2e_lcssa_2e_i = llvm_cbe___secondChild_2e_1_2e_lcssa_2e_i__PHI_TEMPORARY;
   llvm_cbe___secondChild_2e_1_2e_in_2e_lcssa_2e_i = llvm_cbe___secondChild_2e_1_2e_in_2e_lcssa_2e_i__PHI_TEMPORARY;
   llvm_cbe___holeIndex_addr_2e_0_2e_lcssa_2e_i = llvm_cbe___holeIndex_addr_2e_0_2e_lcssa_2e_i__PHI_TEMPORARY;
-  if ((llvm_cbe___secondChild_2e_1_2e_lcssa_2e_i == llvm_cbe_tmp__4)) {
+  if (llvm_cbe___secondChild_2e_1_2e_lcssa_2e_i == llvm_cbe_tmp__4) {
     goto llvm_cbe_bb5_2e_i;
   } else {
     llvm_cbe___parent_2e_0_2e_in_2e_in_2e_i_2e_i__PHI_TEMPORARY = llvm_cbe___holeIndex_addr_2e_0_2e_lcssa_2e_i;   /* for PHI node */
@@ -478,7 +478,7 @@ llvm_cbe_bb4_2e_i:
   llvm_cbe___secondChild_2e_1_2e_lcssa_2e_i = llvm_cbe___secondChild_2e_1_2e_lcssa_2e_i__PHI_TEMPORARY;
   llvm_cbe___secondChild_2e_1_2e_in_2e_lcssa_2e_i = llvm_cbe___secondChild_2e_1_2e_in_2e_lcssa_2e_i__PHI_TEMPORARY;
   llvm_cbe___holeIndex_addr_2e_0_2e_lcssa_2e_i = llvm_cbe___holeIndex_addr_2e_0_2e_lcssa_2e_i__PHI_TEMPORARY;
-  if ((llvm_cbe___secondChild_2e_1_2e_lcssa_2e_i == llvm_cbe_tmp__20)) {
+  if (llvm_cbe___secondChild_2e_1_2e_lcssa_2e_i == llvm_cbe_tmp__20) {
     goto llvm_cbe_bb5_2e_i;
   } else {
     llvm_cbe___parent_2e_0_2e_in_2e_in_2e_i_2e_i__PHI_TEMPORARY = llvm_cbe___holeIndex_addr_2e_0_2e_lcssa_2e_i;   /* for PHI node */
@@ -738,7 +738,7 @@ llvm_cbe_bb2:
   }
 
 llvm_cbe_bb:
-  if ((llvm_cbe_indvar == llvm_cbe___depth_limit)) {
+  if (llvm_cbe_indvar == llvm_cbe___depth_limit) {
     goto llvm_cbe__ZSt13__heap_selectIP14Element_structEvT_S2_S2__2e_exit_2e_i;
   } else {
     goto llvm_cbe_bb2;
@@ -801,7 +801,7 @@ void _ZSt16__insertion_sortIP14Element_structEvT_S2_(struct l_struct_2E_Element 
   struct l_struct_2E_Element *llvm_cbe___last_addr_2e_0_2e_lcssa_2e_i;
   struct l_struct_2E_Element *llvm_cbe___last_addr_2e_0_2e_lcssa_2e_i__PHI_TEMPORARY;
 
-  if ((llvm_cbe___first == llvm_cbe___last)) {
+  if (llvm_cbe___first == llvm_cbe___last) {
     goto llvm_cbe_return;
   } else {
     goto llvm_cbe_bb7_2e_preheader;
@@ -838,7 +838,7 @@ llvm_cbe_bb1:
   }
 
 llvm_cbe_bb7_2e_backedge:
-  if ((llvm_cbe___i_2e_0 == llvm_cbe___last)) {
+  if (llvm_cbe___i_2e_0 == llvm_cbe___last) {
     goto llvm_cbe_return;
   } else {
     llvm_cbe_tmp__56__PHI_TEMPORARY = llvm_cbe_tmp22;   /* for PHI node */
@@ -869,7 +869,7 @@ llvm_cbe_bb_2e_i_2e_i_2e_i_2e_i:
   *((&llvm_cbe___first[((signed int )llvm_cbe_tmp23)].field0)) = llvm_cbe_tmp__61;
   *((&llvm_cbe___first[((signed int )llvm_cbe_tmp23)].field1)) = llvm_cbe_tmp__62;
   llvm_cbe_indvar_2e_next_2e_i_2e_i_2e_i_2e_i = ((unsigned int )(((unsigned int )llvm_cbe_indvar_2e_i_2e_i_2e_i_2e_i) + ((unsigned int )1u)));
-  if ((llvm_cbe_indvar_2e_next_2e_i_2e_i_2e_i_2e_i == llvm_cbe_tmp__60)) {
+  if (llvm_cbe_indvar_2e_next_2e_i_2e_i_2e_i_2e_i == llvm_cbe_tmp__60) {
     goto llvm_cbe__ZSt13copy_backwardIP14Element_structS1_ET0_T_S3_S2__2e_exit;
   } else {
     llvm_cbe_indvar_2e_i_2e_i_2e_i_2e_i__PHI_TEMPORARY = llvm_cbe_indvar_2e_next_2e_i_2e_i_2e_i_2e_i;   /* for PHI node */
@@ -952,7 +952,7 @@ void _ZSt22__final_insertion_sortIP14Element_structEvT_S2_(struct l_struct_2E_El
 llvm_cbe_bb:
   llvm_cbe_tmp__67 = (&llvm_cbe___first[((signed int )16u)]);
    /*tail*/ _ZSt16__insertion_sortIP14Element_structEvT_S2_(llvm_cbe___first, llvm_cbe_tmp__67);
-  if ((llvm_cbe_tmp__67 == llvm_cbe___last)) {
+  if (llvm_cbe_tmp__67 == llvm_cbe___last) {
     goto llvm_cbe__ZSt26__unguarded_insertion_sortIP14Element_structEvT_S2__2e_exit;
   } else {
     llvm_cbe_tmp__68__PHI_TEMPORARY = 0u;   /* for PHI node */
@@ -983,7 +983,7 @@ llvm_cbe__ZSt25__unguarded_linear_insertIP14Element_structS0_EvT_T0__2e_exit_2e_
   llvm_cbe__2e_sum7 = ((unsigned int )(((unsigned int )llvm_cbe__2e_pn_2e_i) + ((unsigned int )16u)));
   *((&llvm_cbe___first[((signed int )llvm_cbe__2e_sum7)].field0)) = llvm_cbe_tmp__69;
   *((&llvm_cbe___first[((signed int )llvm_cbe__2e_sum7)].field1)) = llvm_cbe_tmp__70;
-  if ((llvm_cbe_scevgep26_2e_i == llvm_cbe___last)) {
+  if (llvm_cbe_scevgep26_2e_i == llvm_cbe___last) {
     goto llvm_cbe__ZSt26__unguarded_insertion_sortIP14Element_structEvT_S2__2e_exit;
   } else {
     llvm_cbe_tmp__68__PHI_TEMPORARY = (((unsigned int )(((unsigned int )llvm_cbe_tmp__68) + ((unsigned int )1u))));   /* for PHI node */
@@ -1032,7 +1032,7 @@ void introsort(struct l_struct_2E_Element *llvm_cbe_bot, unsigned int llvm_cbe_t
   unsigned int llvm_cbe___k_2e_0_2e_lcssa_2e_i_2e_i__PHI_TEMPORARY;
 
   llvm_cbe_tmp__75 = (&llvm_cbe_bot[((signed int )llvm_cbe_total_elems)]);
-  if ((llvm_cbe_total_elems == 0u)) {
+  if (llvm_cbe_total_elems == 0u) {
     goto llvm_cbe__ZSt4sortIP14Element_structEvT_S2__2e_exit;
   } else {
     goto llvm_cbe_bb_2e_i;
@@ -1040,7 +1040,7 @@ void introsort(struct l_struct_2E_Element *llvm_cbe_bot, unsigned int llvm_cbe_t
 
 llvm_cbe_bb_2e_i:
   llvm_cbe_tmp__76 = ((signed int )(((signed int )(((unsigned int )(((unsigned int )(((unsigned int )(unsigned long)llvm_cbe_tmp__75))) - ((unsigned int )(((unsigned int )(unsigned long)llvm_cbe_bot))))))) >> ((signed int )3u)));
-  if ((llvm_cbe_tmp__76 == 1u)) {
+  if (llvm_cbe_tmp__76 == 1u) {
     llvm_cbe___k_2e_0_2e_lcssa_2e_i_2e_i__PHI_TEMPORARY = 0u;   /* for PHI node */
     goto llvm_cbe__ZSt4__lgIiET_S0__2e_exit_2e_i;
   } else {
@@ -1054,7 +1054,7 @@ llvm_cbe_bb_2e_i_2e_i:
   llvm_cbe___n_addr_2e_05_2e_i_2e_i = llvm_cbe___n_addr_2e_05_2e_i_2e_i__PHI_TEMPORARY;
   llvm_cbe_tmp__77 = llvm_cbe_tmp__77__PHI_TEMPORARY;
   llvm_cbe_tmp__78 = ((signed int )(((signed int )llvm_cbe___n_addr_2e_05_2e_i_2e_i) >> ((signed int )1u)));
-  if ((llvm_cbe_tmp__78 == 1u)) {
+  if (llvm_cbe_tmp__78 == 1u) {
     goto llvm_cbe__ZSt4__lgIiET_S0__2e_exit_2e_loopexit_2e_i;
   } else {
     llvm_cbe___n_addr_2e_05_2e_i_2e_i__PHI_TEMPORARY = llvm_cbe_tmp__78;   /* for PHI node */

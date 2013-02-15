@@ -19,8 +19,8 @@ typedef struct Element_struct {
 
 #define MAX_ELEMENTS    (MAX_SORT_SIZE / sizeof(Element))
 
-extern char *data_spm;
-extern char *sort_this;
+extern unsigned *data_spm;
+extern unsigned *sort_this;
 
 extern Element elements[];
 extern Element alternate_storage[];

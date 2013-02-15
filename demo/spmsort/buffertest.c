@@ -7,6 +7,7 @@
 #include <machine/patmos.h>
 #include <machine/spm.h>
 
+#include "sortexample.h"
 #include "buffer.h"
 
 #define MAX_ITEMS       (1024*128)
@@ -20,7 +21,9 @@ static void tester(unsigned offset,
 static void multibuf(unsigned spm_usage_per_job, unsigned num_tasks);
 
 
-unsigned sort_this[];
+Element elements[MAX_ELEMENTS];
+
+unsigned *sort_this = (unsigned*)elements;
 unsigned *data_spm = SPM_BASE;
 
 

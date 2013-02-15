@@ -12,8 +12,8 @@
 Element elements[MAX_ELEMENTS];
 Element alternate_storage[MAX_ELEMENTS];
 
-char *data_spm = SPM_BASE;
-char *sort_this = (char*) elements;
+unsigned *data_spm = SPM_BASE;
+unsigned *sort_this = (unsigned*) elements;
 
 
 static void check_sorted(unsigned size);
