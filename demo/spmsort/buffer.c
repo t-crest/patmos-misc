@@ -5,10 +5,6 @@
 #include "buffer.h"
 
 
-// Just to get it to compile..
-#define FLAG_COPY_TO 0
-
-
 
 /* Create buffer from external memory (i.e. software is consumer) */
 void spm_bfe_init(SPM_BFE_Buffer * bfe,
