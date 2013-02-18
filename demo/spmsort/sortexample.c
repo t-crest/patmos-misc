@@ -12,8 +12,8 @@
 Element elements[MAX_ELEMENTS];
 Element alternate_storage[MAX_ELEMENTS];
 
-unsigned *data_spm = SPM_BASE;
-unsigned *sort_this = (unsigned*) elements;
+unsigned _SPM *data_spm = SPM_BASE;
+unsigned      *sort_this = (unsigned*) elements;
 
 
 static void check_sorted(unsigned size);
@@ -29,7 +29,7 @@ int main(void)
 
     /* Use largest SPM block size for best performance */
     spm_set_block_size(BLOCK_SIZE_64_WORDS);
-    assert(spm_is_aligned(sort_this));
+    assert(spm_data_is_aligned(sort_this));
 
     /* L1 data cache and SPM are the same size */
     printf("sortexample.c; SPM/cache size %u\n", SPM_SIZE);

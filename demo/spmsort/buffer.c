@@ -9,14 +9,14 @@
 /* Create buffer from external memory (i.e. software is consumer) */
 void spm_bfe_init(SPM_BFE_Buffer * bfe,
                         const void * source,
-                        void * spm_area,
+                        _SPM void * spm_area,
                         unsigned short spm_area_size,
                         unsigned short element_size)
 {
     unsigned spm_area_size_is_power_of_two = 0;
     unsigned i;
-    unsigned char * area_a;
-    unsigned char * area_b;
+    _SPM unsigned char * area_a;
+    _SPM unsigned char * area_b;
 
     memset(bfe, 0, sizeof(SPM_BFE_Buffer));
     assert(spm_area_size);
@@ -30,26 +30,26 @@ void spm_bfe_init(SPM_BFE_Buffer * bfe,
         }
     }
     assert(spm_area_size_is_power_of_two);
-    assert(spm_is_aligned((void *)(spm_area_size / 2)));
+    assert(spm_is_aligned((_SPM void *)(spm_area_size / 2)));
 
     /* Rule 2: (spm_area_size/2) must be divisible by element_size */
     assert(((spm_area_size / 2) % element_size) == 0);
 
     /* Placements of buffers in SPM */
-    area_a = (unsigned char *) spm_area;
+    area_a = (_SPM unsigned char *) spm_area;
     area_b = &area_a[spm_area_size / 2];
 
     /* Ready to initialise the structure now */
     bfe->element_size = element_size;
     bfe->space_mask = spm_area_size - 1;
     bfe->fetch_size = spm_area_size / 2;
-    bfe->source_ptr = (const unsigned char *) spm_align_floor((void *) source);
+    bfe->source_ptr = (const unsigned char *) spm_data_align_floor((void *) source);
     bfe->base = area_a;
    
     /* Align check */
     assert(spm_is_aligned(area_a));
     assert(spm_is_aligned(area_b));
-    assert(spm_is_aligned(bfe->source_ptr));
+    assert(spm_data_is_aligned(bfe->source_ptr));
 
     /* Create control words for SPM operations */
     bfe->control_a = spm_get_control_word(area_a, bfe->fetch_size);
@@ -65,7 +65,7 @@ void spm_bfe_init(SPM_BFE_Buffer * bfe,
             ((unsigned char *) source - (unsigned char *) bfe->source_ptr);
 
     bfe->source_ptr += bfe->fetch_size;
-    assert(spm_is_aligned(bfe->source_ptr));
+    assert(spm_data_is_aligned(bfe->source_ptr));
     assert(bfe->consumer < bfe->fetch_size);
 
     /* The source pointer cannot point to the middle of an element */
@@ -96,16 +96,16 @@ void spm_bfe_finish(SPM_BFE_Buffer * bte)
 }
 
 /* Create buffer to external memory (i.e. software is producer) */
-void * spm_bte_init(SPM_BTE_Buffer * bte,
+_SPM void * spm_bte_init(SPM_BTE_Buffer * bte,
                         void * target,
-                        void * spm_area,
+                        _SPM void * spm_area,
                         unsigned short spm_area_size,
                         unsigned short element_size)
 {
     unsigned spm_area_size_is_power_of_two = 0;
     unsigned i;
-    unsigned char * area_a;
-    unsigned char * area_b;
+    _SPM unsigned char * area_a;
+    _SPM unsigned char * area_b;
 
     memset(bte, 0, sizeof(SPM_BTE_Buffer));
     assert(spm_area_size);
@@ -119,13 +119,13 @@ void * spm_bte_init(SPM_BTE_Buffer * bte,
         }
     }
     assert(spm_area_size_is_power_of_two);
-    assert(spm_is_aligned((void *)(spm_area_size / 2)));
+    assert(spm_is_aligned((_SPM void *)(spm_area_size / 2)));
 
     /* Rule 2: (spm_area_size/2) must be divisible by element_size */
     assert(((spm_area_size / 2) % element_size) == 0);
 
     /* Placements of buffers in SPM */
-    area_a = (unsigned char *) spm_area;
+    area_a = (_SPM unsigned char *) spm_area;
     area_b = &area_a[spm_area_size / 2];
 
     /* Ready to initialise the structure now */
@@ -138,7 +138,7 @@ void * spm_bte_init(SPM_BTE_Buffer * bte,
     /* Align check - stricter for producers than for consumers */
     assert(spm_is_aligned(area_a));
     assert(spm_is_aligned(area_b));
-    assert(spm_is_aligned(target));
+    assert(spm_data_is_aligned(target));
 
     /* Create control words for SPM operations */
     bte->control_a = spm_get_control_word(area_a, bte->send_size) | FLAG_COPY_TO;

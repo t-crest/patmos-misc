@@ -12,7 +12,7 @@
 
 #define PHASE_1_ELEMS       (SPM_SIZE / sizeof(Element))
 
-extern void schmidt(void *const pbase, size_t total_elems);
+extern void spm_schmidt(_SPM void *const pbase, size_t total_elems);
 
 static void merge(Element * dest, Element * src, 
                     unsigned total_elems, unsigned n);
@@ -47,14 +47,12 @@ void spmsort(void * const pbase, size_t total_elems)
         }
         assert(n);
 
-        //spm_copy_from_ext(data_spm, &src[off], n * sizeof(Element));
-        memcpy(data_spm, &src[off], n * sizeof(Element));
+        spm_copy_from_ext(data_spm, &src[off], n * sizeof(Element));
         spm_wait();
 
-        schmidt(data_spm, n);
+        spm_schmidt(data_spm, n);
 
-        //spm_copy_to_ext(&dest[off], data_spm, n * sizeof(Element));
-        memcpy(&dest[off], data_spm, n * sizeof(Element));
+        spm_copy_to_ext(&dest[off], data_spm, n * sizeof(Element));
         spm_wait();
     }
 
@@ -85,10 +83,10 @@ static void merge(Element * dest, Element * src,
                     unsigned total_elems, unsigned n)
 {
     unsigned off, i;
-    Element * spm_A = (Element *) &data_spm[0];
-    Element * spm_B = (Element *) &data_spm[SPM_WORDS / 4];
-    Element * spm_out = (Element *) &data_spm[SPM_WORDS / 2];
-    Element * end_all = (Element *) &src[total_elems];
+    _SPM Element * spm_A = (_SPM Element *) &data_spm[0];
+    _SPM Element * spm_B = (_SPM Element *) &data_spm[SPM_WORDS / 4];
+    _SPM Element * spm_out = (_SPM Element *) &data_spm[SPM_WORDS / 2];
+         Element * end_all = (     Element *) &src[total_elems];
     unsigned n2 = n * 2;
 
     assert((n % IN_B_ELEMS) == 0);
@@ -123,17 +121,15 @@ static void merge(Element * dest, Element * src,
         /* Main merging code */
         for (i = 0; i < n2; i++) {
             if ((index_A == IN_A_ELEMS) && (src_A < end_A)) {
-                //spm_copy_from_ext(spm_A, src_A, 
-                //        IN_A_ELEMS * sizeof(Element));
-                memcpy(spm_A, src_A, IN_A_ELEMS * sizeof(Element));
+                spm_copy_from_ext(spm_A, src_A, 
+                        IN_A_ELEMS * sizeof(Element));
                 src_A += IN_A_ELEMS;
                 index_A = 0;
                 spm_wait();
             }
             if ((index_B == in_B_elems) && (src_B < end_B)) {
-                //spm_copy_from_ext(spm_B, src_B, 
-                //        in_B_elems * sizeof(Element));
-                memcpy(spm_B, src_B, in_B_elems * sizeof(Element));
+                spm_copy_from_ext(spm_B, src_B, 
+                        in_B_elems * sizeof(Element));
                 src_B += in_B_elems;
                 index_B = 0;
                 if (src_B > end_B) {
@@ -156,7 +152,7 @@ static void merge(Element * dest, Element * src,
                 spm_out[index_out] = spm_A[index_A];
                 index_A++; index_out++;
 
-            } else if (sort_comparator(
+            } else if (spm_sort_comparator(
                     &spm_A[index_A], &spm_B[index_B]) < 0) {
                 /* select A */
                 spm_out[index_out] = spm_A[index_A];
@@ -169,8 +165,7 @@ static void merge(Element * dest, Element * src,
             }
             if (index_out == OUT_ELEMS) {
                 /* Write out merged data */
-                //spm_copy_to_ext(dest, spm_out, OUT_ELEMS * sizeof(Element));
-                memcpy(dest, spm_out, OUT_ELEMS * sizeof(Element));
+                spm_copy_to_ext(dest, spm_out, OUT_ELEMS * sizeof(Element));
                 dest += OUT_ELEMS;
                 index_out = 0;
                 spm_wait();

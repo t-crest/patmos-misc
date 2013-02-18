@@ -20,24 +20,23 @@ static void tester(unsigned offset,
                 unsigned spm_usage);
 static void multibuf(unsigned spm_usage_per_job, unsigned num_tasks);
 
-
 Element elements[MAX_ELEMENTS];
 
-unsigned *sort_this;
-unsigned *data_spm;
+     unsigned *sort_this;
+_SPM unsigned *data_spm;
 
 
 int main(void)
 {
     unsigned i, j, esize, cycle, x = 0;
-    unsigned * elem;
+    _SPM unsigned * elem;
     SPM_BTE_Buffer bte;
 
     /* Always call spm_init as a first step */
     spm_init();
     
     sort_this = (unsigned*)elements;
-    data_spm  = (unsigned*)malloc(SPM_SIZE);
+    data_spm  = SPM_BASE;
 
     printf("basic tests\n");
     tester(0, 1024, 4, 1024);
@@ -57,8 +56,6 @@ int main(void)
         for (i = MAX_ITEMS; i < (MAX_ITEMS + (SPM_WORDS * 2)); i++) {
             sort_this[i] = 0;
         }
-
-	printf("data_spm %p sort %p\n", data_spm, sort_this);
 
         elem = spm_bte_init(&bte, sort_this, 
                     data_spm, SPM_SIZE, esize * 4);
@@ -146,10 +143,10 @@ static void tester(unsigned offset,
     spm_bfe_init(&buf1, &sort_this[offset], data_spm, spm_usage, elem_size);
 
     for (i = offset; i < total; i += elem_words) {
-        unsigned * cp = spm_bfe_consume(&buf1);
+        _SPM unsigned * cp = spm_bfe_consume(&buf1);
 
         assert((unsigned) cp >= SPM_BASE);
-	///assert((unsigned) (&cp[elem_words]) <= (SPM_BASE + spm_usage));
+	assert((unsigned) (&cp[elem_words]) <= (SPM_BASE + spm_usage));
 
         for (j = 0; j < elem_words; j++) {
             assert(cp[j] == sort_this[i + j]);
@@ -188,7 +185,7 @@ static void multibuf(unsigned spm_usage_per_job, unsigned num_tasks)
         if (j >= num_tasks) continue;
 
         if (tasks[j].remaining) {
-            unsigned * test = spm_bfe_consume(&tasks[j].buf);
+            _SPM unsigned * test = spm_bfe_consume(&tasks[j].buf);
             assert(test[0] == tasks[j].ptr[0]);
             tasks[j].ptr++;
             tasks[j].remaining--;
@@ -201,7 +198,7 @@ static void multibuf(unsigned spm_usage_per_job, unsigned num_tasks)
 
             serial++;
             spm_bfe_init(&tasks[j].buf, tasks[j].ptr,
-                    ((unsigned char *) data_spm) + (spm_usage_per_job * j),
+                    ((_SPM unsigned char *) data_spm) + (spm_usage_per_job * j),
                     spm_usage_per_job, 4);
         }
     }

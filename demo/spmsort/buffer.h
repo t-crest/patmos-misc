@@ -11,7 +11,7 @@ typedef struct SPM_BFE_Buffer_struct {
             unsigned short  element_size, consumer;
             unsigned short  space_mask, trigger, fetch_size;
             control_t       control_a, control_b;
-            unsigned char * base;
+            _SPM  unsigned char * base;
             const unsigned char * source_ptr;
         } SPM_BFE_Buffer;
 
@@ -19,14 +19,14 @@ typedef struct SPM_BTE_Buffer_struct {
             unsigned short  element_size, producer;
             unsigned short  space_mask, trigger, send_size;
             control_t       control_a, control_b;
-            unsigned char * base;
+            _SPM unsigned char * base;
             unsigned char * target_ptr;
         } SPM_BTE_Buffer;
 
 /* BFE = Buffer From External Memory (Consumer) */
 void spm_bfe_init(SPM_BFE_Buffer * bfe,
                         const void * source,
-                        void * spm_area,
+                        _SPM void * spm_area,
                         unsigned short spm_area_size,
                         unsigned short element_size);
 
@@ -34,9 +34,9 @@ void spm_bfe_init(SPM_BFE_Buffer * bfe,
 void spm_bfe_finish(SPM_BFE_Buffer * bfe);
 
 /* BTE = Buffer To External Memory (Producer) */
-void * spm_bte_init(SPM_BTE_Buffer * bte,
+_SPM void * spm_bte_init(SPM_BTE_Buffer * bte,
                         void * target,
-                        void * spm_area,
+                        _SPM void * spm_area,
                         unsigned short spm_area_size,
                         unsigned short element_size);
 
@@ -49,10 +49,10 @@ void spm_bte_trigger(SPM_BTE_Buffer * bfe);
 
 /* Return a pointer to the next available element.
  * Element is guaranteed to be in SPM and ready for use. */
-static inline void * spm_bfe_consume(SPM_BFE_Buffer * bfe)
+static inline _SPM void * spm_bfe_consume(SPM_BFE_Buffer * bfe)
 {
     unsigned c = bfe->consumer;
-    void * ptr = &bfe->base[c];
+    _SPM void * ptr = &bfe->base[c];
 
     if (c == bfe->trigger) {
         /* Time to start another fetch (and wait for the current one
@@ -64,7 +64,7 @@ static inline void * spm_bfe_consume(SPM_BFE_Buffer * bfe)
 }
 
 /* Element is finished; return a pointer for the next element */
-static inline void * spm_bte_produce(SPM_BTE_Buffer * bte)
+static inline _SPM void * spm_bte_produce(SPM_BTE_Buffer * bte)
 {
     unsigned p = bte->producer;
 
