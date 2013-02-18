@@ -10,7 +10,7 @@
 #include "sortexample.h"
 #include "buffer.h"
 
-#define MAX_ITEMS       (1024*128)
+#define MAX_ITEMS       (1024*4)
 #define MAX_PTR         (MAX_ITEMS - 1000)
 
 
@@ -23,7 +23,7 @@ static void multibuf(unsigned spm_usage_per_job, unsigned num_tasks);
 
 Element elements[MAX_ELEMENTS];
 
-unsigned *sort_this = (unsigned*)elements;
+unsigned *sort_this;
 unsigned *data_spm;
 
 
@@ -36,7 +36,8 @@ int main(void)
     /* Always call spm_init as a first step */
     spm_init();
     
-    data_spm = (unsigned*)malloc(SPM_SIZE);
+    sort_this = (unsigned*)elements;
+    data_spm  = (unsigned*)malloc(SPM_SIZE);
 
     printf("basic tests\n");
     tester(0, 1024, 4, 1024);
@@ -56,6 +57,8 @@ int main(void)
         for (i = MAX_ITEMS; i < (MAX_ITEMS + (SPM_WORDS * 2)); i++) {
             sort_this[i] = 0;
         }
+
+	printf("data_spm %p sort %p\n", data_spm, sort_this);
 
         elem = spm_bte_init(&bte, sort_this, 
                     data_spm, SPM_SIZE, esize * 4);
@@ -146,7 +149,7 @@ static void tester(unsigned offset,
         unsigned * cp = spm_bfe_consume(&buf1);
 
         assert((unsigned) cp >= SPM_BASE);
-        assert((unsigned) (&cp[elem_words]) <= (SPM_BASE + spm_usage));
+	///assert((unsigned) (&cp[elem_words]) <= (SPM_BASE + spm_usage));
 
         for (j = 0; j < elem_words; j++) {
             assert(cp[j] == sort_this[i + j]);
@@ -180,7 +183,7 @@ static void multibuf(unsigned spm_usage_per_job, unsigned num_tasks)
         job_mask |= job_mask >> 1;
     }
 
-    for (i = j = 0; i < 1000000; i++) {
+    for (i = j = 0; i < 100000; i++) {
         j = sort_this[i] & job_mask;
         if (j >= num_tasks) continue;
 

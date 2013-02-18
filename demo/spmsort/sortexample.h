@@ -1,6 +1,7 @@
 #ifndef SORTEXAMPLE_H
 #define SORTEXAMPLE_H
 
+#include <stdio.h>
 #include <string.h>
 
 typedef struct Element_struct {
@@ -8,16 +9,13 @@ typedef struct Element_struct {
             int         payload;
         } Element;
 
-#define BLOCK_SIZE_4_WORDS  0x20000
-#define BLOCK_SIZE_8_WORDS  0x30000
-#define BLOCK_SIZE_16_WORDS 0x40000 
-#define BLOCK_SIZE_32_WORDS 0x50000 
-#define BLOCK_SIZE_64_WORDS 0x60000 
+#define BLOCK_SIZE_4_WORDS  0x200
+#define BLOCK_SIZE_8_WORDS  0x300
+#define BLOCK_SIZE_16_WORDS 0x400 
+#define BLOCK_SIZE_32_WORDS 0x500 
+#define BLOCK_SIZE_64_WORDS 0x600 
 
-#define SORT_BASE           0x98000000
-#define ALT_STORE_BASE      0x9c000000
-
-#define MAX_SORT_SIZE       (ALT_STORE_BASE - SORT_BASE)
+#define MAX_SORT_SIZE       0x80000
 
 #define MAX_ELEMENTS    (MAX_SORT_SIZE / sizeof(Element))
 
@@ -59,10 +57,11 @@ static inline void spm_control(void * src, control_t ctrl)
 {
     void *dst =  (void*) (ctrl >> 32);
     size_t n  = (size_t) (ctrl & 0x0FFFFFFF);
-    //if (ctrl && FLAG_COPY_TO) {
-    //} else {
-    //}
-    memcpy(dst, src, n);
+    if (ctrl & FLAG_COPY_TO) {
+	memcpy(src, dst, n);
+    } else {
+	memcpy(dst, src, n);
+    }
 }
 
 
