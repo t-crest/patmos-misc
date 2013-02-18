@@ -122,10 +122,10 @@ void spm_schmidt_qsort(_SPM void *const pbase, size_t total_elems,
 	     that this algorithm runs much faster than others. */
 	  do
 	    {
-	      while (sort_comparator((void *) left_ptr, (void *) mid) < 0)
+	      while (spm_sort_comparator(left_ptr, mid) < 0)
 		left_ptr += size;
 
-	      while (sort_comparator((void *) mid, (void *) right_ptr) < 0)
+	      while (spm_sort_comparator(mid, right_ptr) < 0)
 		right_ptr -= size;
 
 	      if (left_ptr < right_ptr)
