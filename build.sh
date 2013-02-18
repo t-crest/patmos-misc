@@ -177,14 +177,16 @@ function install() {
 	dst=$dst/$(basename $src)
     fi
 
-    echo "Installing $src -> $dst"
-
     if [ "$INSTALL_SYMLINKS" == "true" ]; then
+	echo "Symlinking $src -> $dst"
+
 	if [ -d $src ]; then
 	    run rm -rf $dst
 	fi
 	run ln -sf $src $dst
     else
+	echo "Installing $src -> $dst"
+
 	if [ -L $dst ]; then
 	    rm -f $dst
 	fi
