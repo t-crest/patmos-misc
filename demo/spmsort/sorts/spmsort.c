@@ -110,16 +110,19 @@ static void merge(Element * dest, Element * src,
 
         } else if (end_A >= end_all) {
             /* No B area to sort here */
+	    i = n;
             end_B = src_B;
-
         } else if (end_B > end_all) {
             /* B area is incomplete */
+            i = end_B - end_all;
             end_B = end_all;
-            i = end_all - src_B;
-        }
+        } else {
+	    /* A and B areas are complete */
+	    i = 0;
+	}
 
         /* Main merging code */
-        for (i = 0; i < n2; i++) {
+        for (; i < n2; i++) {
             if ((index_A == IN_A_ELEMS) && (src_A < end_A)) {
                 spm_copy_from_ext(spm_A, src_A, 
                         IN_A_ELEMS * sizeof(Element));
