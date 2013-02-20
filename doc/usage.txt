@@ -1,0 +1,30 @@
+Various options
+===============
+
+TODO: merge this with usage.tex, make all of this a .tex file (or a .txt/.rst file?)
+
+o) Keep relocation infos in executable for objdump (does not work with patmos-clang -g !)
+
+patmos-clang -Xgold -q -o <binary> ....
+patmos-llvm-objdump -r -d <binary> | less
+
+
+Debugging
+=========
+
+Some useful commands for debugging:
+
+# print out executed instructions and the values of their operands 
+# starting from some cycle 
+pasim -q --debug=<cycle-to-start-printing> --debug-fmt=instr <binary>
+
+# show disassembly of binary
+patmos-llvm-objdump -r -d <binary> | less
+
+# compile with debug infos, show source line numbers
+patmos-clang -g -o <binary> ...
+readelf --debug-dump=decodedline <binary>
+
+Note that the PC usually comes from the Fetch stage in the simulator, i.e., 
+it is a few cycles ahead of the actual output.
+
