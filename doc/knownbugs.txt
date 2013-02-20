@@ -1,0 +1,11 @@
+Known Bugs and Common Problems
+==============================
+
+o) Compiling patmos-gold with GCC 4.7.0 aborts with an error about narrowing conversion
+
+Workaround: use CXXFLAGS=-Wno-narrowing for configure, upgrade to a newer GCC version or 
+use clang to compile the toolchain. 
+
+If you are using the build.sh script, set GOLD_CXXFLAGS="-Wno-narrowing" in build.cfg.
+
+

@@ -111,6 +111,9 @@ NEWLIB_ARGS=
 # Additional CFLAGS, LDFLAGS 
 GOLD_CFLAGS=
 GOLD_CXXFLAGS=
+# Enable this if gcc throws errors about narrowing conversions
+#GOLD_CXXFLAGS="-Wno-narrowing"
+
 COMPILER_RT_CFLAGS=
 BENCH_LDFLAGS=
 
