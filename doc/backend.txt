@@ -94,7 +94,7 @@ two operations, the operations must be separated by a single semi-colon or a sin
 followed by either a newline or a comment. Note that since newline is an instruction separator, the
 operation separator must always appear on the same line as the operation for the first slot. 
 
-o) Function Relative Addressing, Function Block Start Markers and Subfunction Calls
+o) Function Block Start Markers and Subfunction Calls
 
 TODO!
 
