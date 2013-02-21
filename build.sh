@@ -475,6 +475,10 @@ function build_llvm() {
 	run ln -sf ../libLTO.$LIBEXT   $INSTALL_DIR/lib/bfd-plugins/
     fi
 
+    if [ "$DO_RUN_TESTS" == "true" ]; then
+	echo "Running tests.."
+        run make check-all
+    fi
 }
 
 function build_default() {
