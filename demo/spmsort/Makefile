@@ -2,7 +2,7 @@
 SORTS=$(wildcard sorts/*.c)
 SOURCES=$(wildcard *.c) $(wildcard *.h) $(SORTS)
 
-CFLAGS=-g -Xllc -disable-lsr -Xlinker -disable-lsr
+CFLAGS=-g -Xllc -disable-lsr -Xlinker -disable-lsr -DPATMOS
 
 all: buffertest sortexample
 

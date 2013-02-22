@@ -1,0 +1,457 @@
+Captured from buffertest.c running on Microblaze:
+
+hex
+MSG Booting 00000000
+init_spm()
+SPM location 0x10000000
+Expected SPM size: 512 words, 2048 bytes
+SPM size is actually 512 words
+basic tests
+tester(0, 1024, 4, 1024) ok
+tester(0, 1, 4, 1024) ok
+tester(1, 1024, 4, 1024) ok
+tester(0, 1, 8, 512) ok
+0 writing test pattern, element size 1
+0 checking test pattern, element size 1
+producer overshot by 1023 (1024)
+0 single buffer tests
+tester(179, 2403, 4, 1024) ok
+tester(68, 2949, 32, 1024) ok
+tester(182, 2968, 16, 2048) ok
+0 multi-buffer tests
+8 tasks at once: 992 words checked
+2 tasks at once: 998 words checked
+3 tasks at once: 747 words checked
+4 tasks at once: 995 words checked
+5 tasks at once: 620 words checked
+6 tasks at once: 744 words checked
+7 tasks at once: 868 words checked
+8 tasks at once: 992 words checked
+9 tasks at once: 557 words checked
+10 tasks at once: 617 words checked
+11 tasks at once: 678 words checked
+12 tasks at once: 739 words checked
+13 tasks at once: 801 words checked
+14 tasks at once: 861 words checked
+15 tasks at once: 922 words checked
+16 tasks at once: 983 words checked
+9 tasks at once: 556 words checked
+2 tasks at once: 998 words checked
+3 tasks at once: 746 words checked
+4 tasks at once: 995 words checked
+5 tasks at once: 618 words checked
+6 tasks at once: 744 words checked
+7 tasks at once: 867 words checked
+8 tasks at once: 991 words checked
+1 writing test pattern, element size 8
+1 checking test pattern, element size 8
+producer overshot by 1023 (1024)
+1 single buffer tests
+tester(161, 1234, 8, 512) ok
+tester(13, 2710, 32, 512) ok
+tester(92, 3981, 16, 1024) ok
+tester(50, 1687, 8, 2048) ok
+1 multi-buffer tests
+6 tasks at once: 7465 words checked
+2 tasks at once: 9985 words checked
+3 tasks at once: 7520 words checked
+4 tasks at once: 9992 words checked
+5 tasks at once: 6239 words checked
+6 tasks at once: 7464 words checked
+7 tasks at once: 8740 words checked
+8 tasks at once: 9981 words checked
+9 tasks at once: 5605 words checked
+10 tasks at once: 6234 words checked
+11 tasks at once: 6870 words checked
+12 tasks at once: 7487 words checked
+13 tasks at once: 8091 words checked
+14 tasks at once: 8701 words checked
+15 tasks at once: 9349 words checked
+16 tasks at once: 9977 words checked
+10 tasks at once: 6236 words checked
+2 tasks at once: 9989 words checked
+3 tasks at once: 7523 words checked
+4 tasks at once: 9988 words checked
+5 tasks at once: 6233 words checked
+6 tasks at once: 7464 words checked
+7 tasks at once: 8739 words checked
+8 tasks at once: 9987 words checked
+2 writing test pattern, element size 1
+2 checking test pattern, element size 1
+producer overshot by 1023 (1024)
+2 single buffer tests
+tester(1, 65, 16, 2048) ok
+tester(59, 2471, 32, 256) ok
+tester(21, 897, 16, 512) ok
+tester(205, 1268, 4, 1024) ok
+tester(25, 142, 16, 256) ok
+2 multi-buffer tests
+12 tasks at once: 74958 words checked
+2 tasks at once: 99917 words checked
+3 tasks at once: 74913 words checked
+4 tasks at once: 99918 words checked
+5 tasks at once: 62430 words checked
+6 tasks at once: 74908 words checked
+7 tasks at once: 87423 words checked
+8 tasks at once: 99913 words checked
+9 tasks at once: 56200 words checked
+10 tasks at once: 62441 words checked
+11 tasks at once: 68691 words checked
+12 tasks at once: 74957 words checked
+13 tasks at once: 81199 words checked
+14 tasks at once: 87434 words checked
+15 tasks at once: 93647 words checked
+16 tasks at once: 99911 words checked
+2 tasks at once: 99921 words checked
+2 tasks at once: 99909 words checked
+3 tasks at once: 74926 words checked
+4 tasks at once: 99915 words checked
+5 tasks at once: 62424 words checked
+6 tasks at once: 74899 words checked
+7 tasks at once: 87425 words checked
+8 tasks at once: 99910 words checked
+3 writing test pattern, element size 128
+3 checking test pattern, element size 128
+producer overshot by 1023 (1024)
+3 single buffer tests
+tester(160, 2993, 32, 1024) ok
+tester(108, 2233, 32, 2048) ok
+tester(11, 1910, 32, 2048) ok
+tester(118, 849, 16, 512) ok
+tester(23, 2216, 16, 1024) ok
+tester(106, 1222, 32, 256) ok
+3 multi-buffer tests
+10 tasks at once: 737238 words checked
+2 tasks at once: 999176 words checked
+3 tasks at once: 758376 words checked
+4 tasks at once: 999197 words checked
+5 tasks at once: 738155 words checked
+6 tasks at once: 759134 words checked
+7 tasks at once: 778953 words checked
+8 tasks at once: 999228 words checked
+9 tasks at once: 728769 words checked
+10 tasks at once: 737192 words checked
+11 tasks at once: 745840 words checked
+12 tasks at once: 757827 words checked
+13 tasks at once: 766408 words checked
+14 tasks at once: 778764 words checked
+15 tasks at once: 789922 words checked
+16 tasks at once: 999217 words checked
+14 tasks at once: 778768 words checked
+2 tasks at once: 999229 words checked
+3 tasks at once: 758362 words checked
+4 tasks at once: 999246 words checked
+5 tasks at once: 738142 words checked
+6 tasks at once: 759115 words checked
+7 tasks at once: 778967 words checked
+8 tasks at once: 999201 words checked
+4 writing test pattern, element size 4
+4 checking test pattern, element size 4
+producer overshot by 1023 (1024)
+4 single buffer tests
+tester(12, 1824, 4, 256) ok
+tester(69, 1994, 32, 512) ok
+tester(242, 2923, 32, 1024) ok
+tester(28, 430, 8, 256) ok
+tester(144, 194, 16, 256) ok
+tester(223, 3709, 32, 1024) ok
+tester(135, 1852, 16, 256) ok
+4 multi-buffer tests
+16 tasks at once: 8382066 words checked
+2 tasks at once: 8382072 words checked
+3 tasks at once: 4265041 words checked
+4 tasks at once: 8382100 words checked
+5 tasks at once: 4207481 words checked
+6 tasks at once: 4253516 words checked
+7 tasks at once: 4313962 words checked
+8 tasks at once: 8381969 words checked
+9 tasks at once: 4217079 words checked
+10 tasks at once: 4225942 words checked
+11 tasks at once: 4235230 words checked
+12 tasks at once: 4274398 words checked
+13 tasks at once: 4283990 words checked
+14 tasks at once: 4320825 words checked
+15 tasks at once: 4371915 words checked
+16 tasks at once: 8381997 words checked
+11 tasks at once: 4235197 words checked
+2 tasks at once: 8382095 words checked
+3 tasks at once: 4264954 words checked
+4 tasks at once: 8381929 words checked
+5 tasks at once: 4207549 words checked
+6 tasks at once: 4253565 words checked
+7 tasks at once: 4313921 words checked
+8 tasks at once: 8381974 words checked
+5 writing test pattern, element size 32
+5 checking test pattern, element size 32
+producer overshot by 1023 (1024)
+5 single buffer tests
+tester(62, 655, 8, 2048) ok
+tester(219, 1755, 32, 256) ok
+tester(176, 3936, 32, 256) ok
+tester(5, 10, 4, 2048) ok
+tester(201, 2268, 32, 2048) ok
+tester(234, 2100, 32, 512) ok
+tester(10, 3535, 32, 2048) ok
+tester(53, 916, 8, 256) ok
+5 multi-buffer tests
+14 tasks at once: 4320865 words checked
+2 tasks at once: 8382077 words checked
+3 tasks at once: 4265017 words checked
+4 tasks at once: 8382018 words checked
+5 tasks at once: 4207437 words checked
+6 tasks at once: 4253498 words checked
+7 tasks at once: 4313990 words checked
+8 tasks at once: 8382104 words checked
+9 tasks at once: 4217132 words checked
+10 tasks at once: 4225908 words checked
+11 tasks at once: 4235164 words checked
+12 tasks at once: 4274414 words checked
+13 tasks at once: 4284012 words checked
+14 tasks at once: 4320894 words checked
+15 tasks at once: 4371872 words checked
+16 tasks at once: 8382039 words checked
+9 tasks at once: 4217097 words checked
+2 tasks at once: 8382020 words checked
+3 tasks at once: 4265044 words checked
+4 tasks at once: 8382051 words checked
+5 tasks at once: 4207432 words checked
+6 tasks at once: 4253473 words checked
+7 tasks at once: 4313993 words checked
+8 tasks at once: 8382008 words checked
+6 writing test pattern, element size 16
+6 checking test pattern, element size 16
+producer overshot by 1023 (1024)
+6 single buffer tests
+tester(47, 3582, 16, 512) ok
+tester(18, 1517, 32, 2048) ok
+tester(114, 853, 4, 2048) ok
+tester(251, 3687, 16, 512) ok
+tester(2, 246, 32, 512) ok
+tester(207, 491, 16, 2048) ok
+tester(16, 1121, 32, 512) ok
+tester(105, 3943, 4, 512) ok
+tester(206, 1348, 4, 512) ok
+6 multi-buffer tests
+5 tasks at once: 4207489 words checked
+2 tasks at once: 8381936 words checked
+3 tasks at once: 4264980 words checked
+4 tasks at once: 8382026 words checked
+5 tasks at once: 4207449 words checked
+6 tasks at once: 4253547 words checked
+7 tasks at once: 4313905 words checked
+8 tasks at once: 8381923 words checked
+9 tasks at once: 4217198 words checked
+10 tasks at once: 4225985 words checked
+11 tasks at once: 4235246 words checked
+12 tasks at once: 4274409 words checked
+13 tasks at once: 4283993 words checked
+14 tasks at once: 4320820 words checked
+15 tasks at once: 4371893 words checked
+16 tasks at once: 8381952 words checked
+9 tasks at once: 4217156 words checked
+2 tasks at once: 8382064 words checked
+3 tasks at once: 4265105 words checked
+4 tasks at once: 8382050 words checked
+5 tasks at once: 4207386 words checked
+6 tasks at once: 4253546 words checked
+7 tasks at once: 4313910 words checked
+8 tasks at once: 8381947 words checked
+7 writing test pattern, element size 4
+7 checking test pattern, element size 4
+producer overshot by 1023 (1024)
+7 single buffer tests
+tester(19, 2414, 32, 2048) ok
+tester(62, 1278, 32, 1024) ok
+tester(58, 1866, 4, 1024) ok
+tester(75, 3268, 8, 256) ok
+tester(91, 2320, 32, 2048) ok
+tester(150, 2977, 16, 1024) ok
+tester(171, 2804, 32, 2048) ok
+tester(183, 2875, 16, 2048) ok
+tester(150, 3433, 32, 2048) ok
+tester(244, 1716, 32, 2048) ok
+7 multi-buffer tests
+3 tasks at once: 4264943 words checked
+2 tasks at once: 8381990 words checked
+3 tasks at once: 4265005 words checked
+4 tasks at once: 8382059 words checked
+5 tasks at once: 4207447 words checked
+6 tasks at once: 4253428 words checked
+7 tasks at once: 4313867 words checked
+8 tasks at once: 8382051 words checked
+9 tasks at once: 4217124 words checked
+10 tasks at once: 4225906 words checked
+11 tasks at once: 4235253 words checked
+12 tasks at once: 4274443 words checked
+13 tasks at once: 4283975 words checked
+14 tasks at once: 4320754 words checked
+15 tasks at once: 4371837 words checked
+16 tasks at once: 8382042 words checked
+11 tasks at once: 4235242 words checked
+2 tasks at once: 8382056 words checked
+3 tasks at once: 4264959 words checked
+4 tasks at once: 8381988 words checked
+5 tasks at once: 4207458 words checked
+6 tasks at once: 4253493 words checked
+7 tasks at once: 4313941 words checked
+8 tasks at once: 8382014 words checked
+8 writing test pattern, element size 32
+8 checking test pattern, element size 32
+producer overshot by 1023 (1024)
+8 single buffer tests
+tester(90, 1245, 4, 1024) ok
+tester(109, 1040, 32, 512) ok
+tester(111, 2879, 4, 256) ok
+tester(55, 2849, 4, 2048) ok
+tester(14, 298, 32, 512) ok
+tester(247, 1368, 16, 512) ok
+tester(145, 390, 4, 1024) ok
+tester(47, 1807, 8, 256) ok
+tester(111, 1421, 16, 1024) ok
+tester(27, 123, 4, 512) ok
+tester(237, 3240, 32, 1024) ok
+8 multi-buffer tests
+16 tasks at once: 8382021 words checked
+2 tasks at once: 8382051 words checked
+3 tasks at once: 4265060 words checked
+4 tasks at once: 8382038 words checked
+5 tasks at once: 4207516 words checked
+6 tasks at once: 4253564 words checked
+7 tasks at once: 4313942 words checked
+8 tasks at once: 8381997 words checked
+9 tasks at once: 4217093 words checked
+10 tasks at once: 4225892 words checked
+11 tasks at once: 4235232 words checked
+12 tasks at once: 4274340 words checked
+13 tasks at once: 4283987 words checked
+14 tasks at once: 4320829 words checked
+15 tasks at once: 4371935 words checked
+16 tasks at once: 8381959 words checked
+14 tasks at once: 4320845 words checked
+2 tasks at once: 8382115 words checked
+3 tasks at once: 4265008 words checked
+4 tasks at once: 8382030 words checked
+5 tasks at once: 4207479 words checked
+6 tasks at once: 4253532 words checked
+7 tasks at once: 4313986 words checked
+8 tasks at once: 8381969 words checked
+9 writing test pattern, element size 16
+9 checking test pattern, element size 16
+producer overshot by 1023 (1024)
+9 single buffer tests
+tester(34, 76, 8, 256) ok
+tester(126, 801, 32, 256) ok
+tester(20, 3891, 8, 2048) ok
+tester(197, 2429, 16, 1024) ok
+tester(133, 2372, 32, 2048) ok
+tester(206, 3855, 16, 2048) ok
+tester(115, 2072, 4, 256) ok
+tester(47, 739, 32, 512) ok
+tester(214, 3506, 8, 256) ok
+tester(58, 2627, 8, 256) ok
+tester(99, 1017, 16, 1024) ok
+tester(245, 3325, 32, 2048) ok
+9 multi-buffer tests
+7 tasks at once: 4313947 words checked
+2 tasks at once: 8381997 words checked
+3 tasks at once: 4264939 words checked
+4 tasks at once: 8382000 words checked
+5 tasks at once: 4207382 words checked
+6 tasks at once: 4253520 words checked
+7 tasks at once: 4314011 words checked
+8 tasks at once: 8381923 words checked
+9 tasks at once: 4217153 words checked
+10 tasks at once: 4226001 words checked
+11 tasks at once: 4235310 words checked
+12 tasks at once: 4274424 words checked
+13 tasks at once: 4283884 words checked
+14 tasks at once: 4320905 words checked
+15 tasks at once: 4371979 words checked
+16 tasks at once: 8382007 words checked
+3 tasks at once: 4264962 words checked
+2 tasks at once: 8381953 words checked
+3 tasks at once: 4264969 words checked
+4 tasks at once: 8381999 words checked
+5 tasks at once: 4207436 words checked
+6 tasks at once: 4253558 words checked
+7 tasks at once: 4313959 words checked
+8 tasks at once: 8381914 words checked
+10 writing test pattern, element size 16
+10 checking test pattern, element size 16
+producer overshot by 1023 (1024)
+10 single buffer tests
+tester(58, 3004, 16, 2048) ok
+tester(232, 562, 32, 2048) ok
+tester(66, 808, 8, 512) ok
+tester(35, 2010, 8, 256) ok
+tester(4, 350, 4, 1024) ok
+tester(211, 2246, 16, 1024) ok
+tester(100, 3755, 4, 2048) ok
+tester(0, 3766, 16, 2048) ok
+tester(227, 1495, 4, 1024) ok
+tester(239, 1034, 16, 1024) ok
+tester(68, 2889, 16, 512) ok
+tester(146, 2292, 4, 2048) ok
+tester(175, 1753, 16, 512) ok
+10 multi-buffer tests
+5 tasks at once: 4207468 words checked
+2 tasks at once: 8382030 words checked
+3 tasks at once: 4264996 words checked
+4 tasks at once: 8382043 words checked
+5 tasks at once: 4207442 words checked
+6 tasks at once: 4253565 words checked
+7 tasks at once: 4313891 words checked
+8 tasks at once: 8382067 words checked
+9 tasks at once: 4217111 words checked
+10 tasks at once: 4225904 words checked
+11 tasks at once: 4235192 words checked
+12 tasks at once: 4274400 words checked
+13 tasks at once: 4284032 words checked
+14 tasks at once: 4320869 words checked
+15 tasks at once: 4371908 words checked
+16 tasks at once: 8382038 words checked
+4 tasks at once: 8382072 words checked
+2 tasks at once: 8381929 words checked
+3 tasks at once: 4264996 words checked
+4 tasks at once: 8382080 words checked
+5 tasks at once: 4207548 words checked
+6 tasks at once: 4253558 words checked
+7 tasks at once: 4313849 words checked
+8 tasks at once: 8382060 words checked
+11 writing test pattern, element size 64
+11 checking test pattern, element size 64
+producer overshot by 1023 (1024)
+11 single buffer tests
+tester(245, 1835, 32, 512) ok
+tester(113, 324, 32, 512) ok
+tester(44, 1821, 8, 256) ok
+tester(12, 1591, 4, 2048) ok
+tester(223, 2424, 4, 256) ok
+tester(40, 636, 8, 256) ok
+tester(19, 1341, 8, 512) ok
+tester(241, 2698, 4, 256) ok
+tester(214, 3579, 32, 256) ok
+tester(196, 3538, 32, 256) ok
+tester(109, 666, 8, 256) ok
+tester(35, 1258, 4, 2048) ok
+tester(237, 2521, 8, 1024) ok
+tester(202, 3985, 32, 256) ok
+11 multi-buffer tests
+11 tasks at once: 4235152 words checked
+2 tasks at once: 8382014 words checked
+3 tasks at once: 4265076 words checked
+4 tasks at once: 8382030 words checked
+5 tasks at once: 4207436 words checked
+6 tasks at once: 4253477 words checked
+7 tasks at once: 4313953 words checked
+8 tasks at once: 8382064 words checked
+9 tasks at once: 4217112 words checked
+10 tasks at once: 4225947 words checked
+11 tasks at once: 4235195 words checked
+12 tasks at once: 4274341 words checked
+13 tasks at once: 4283981 words checked
+14 tasks at once: 4320773 words checked
+15 tasks at once: 4371833 words checked
+16 tasks at once: 8382022 words checked
+11 tasks at once: 4235258 words checked
+2 tasks at once: 8382040 words checked
