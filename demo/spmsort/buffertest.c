@@ -12,8 +12,8 @@
 #include "sortexample.h"
 #include "buffer.h"
 
-#define MAX_ITEMS       (1024*4)
-#define MAX_PTR         (MAX_ITEMS - 1000)
+#define MAX_TEST_SIZE   5000000
+#define MAX_ITEMS       10000
 #define MAX_TASKS       16
 
 
@@ -30,14 +30,14 @@ static unsigned myrand(void);
 
 
 #ifdef PATMOS
-Element elements[MAX_ELEMENTS];
-unsigned *sort_this;
 _SPM unsigned *data_spm;
+unsigned off_chip[MAX_TEST_SIZE];
 #define DATA_SPM_BASE SPM_BASE
 #define DATA_SPM_SIZE SPM_SIZE
 #define DATA_SPM_WORDS SPM_WORDS
 #else
 #define _SPM
+#define off_chip  ((unsigned *) sort_this)
 #endif
 
 
@@ -53,13 +53,14 @@ int main(void)
 
 #ifdef PATMOS
     data_spm = SPM_BASE;
-    sort_this = (unsigned *) elements;
 #endif
 
     /* Always call spm_init as a first step */
     spm_init();
 
     printf("SPM location 0x%x\n", (unsigned) DATA_SPM_BASE);
+    printf("off_chip location 0x%x size %u words\n", 
+                (unsigned) off_chip, MAX_TEST_SIZE);
     printf("Expected SPM size: %u words, %u bytes\n", 
                 DATA_SPM_WORDS, DATA_SPM_SIZE);
     spm_size_test();
@@ -80,10 +81,10 @@ int main(void)
         printf("%u writing test pattern, element size %u\n", cycle, esize);
 
         for (i = MAX_ITEMS; i < (MAX_ITEMS + (DATA_SPM_WORDS * 2)); i++) {
-            sort_this[i] = check | i;
+            off_chip[i] = check | i;
         }
 
-        elem = spm_bte_init(&bte, sort_this, 
+        elem = spm_bte_init(&bte, off_chip, 
                     data_spm, DATA_SPM_SIZE, esize * 4);
         mysrand(cycle + 1);
         for (i = 0; i < MAX_ITEMS; ) {
@@ -102,9 +103,9 @@ int main(void)
         x = 0;
         for (i = 0; i < MAX_ITEMS; i++) {
             j = (cycle == 0) ? i : (myrand() + 1);
-            if (sort_this[i] != j) {
-                printf("sort_this[%08x] = %08x should be %08x\n",
-                        i, sort_this[i], j);
+            if (off_chip[i] != j) {
+                printf("off_chip[%08x] = %08x should be %08x\n",
+                        i, off_chip[i], j);
                 x++;
                 assert(x < 10);
             }
@@ -113,7 +114,7 @@ int main(void)
 
         x = 0;
         for (i = 0; i < (DATA_SPM_WORDS * 2); i++) {
-            if (sort_this[i + MAX_ITEMS] != (check | i)) {
+            if (off_chip[i + MAX_ITEMS] != (check | i)) {
                 x = i;
             }
         }
@@ -135,8 +136,9 @@ int main(void)
                     spm_elems * elem_size);
         }
 
-        printf("%u multi-buffer tests\n", cycle);
         mysrand(cycle + 0x1000);
+        printf("%u multi-buffer tests, myrand %04x\n", 
+                        cycle, myrand() & 0xffff);
         multibuf(myrand(), 2 + (myrand() % 15), run_limit);
         for (i = 2; i <= 16; i++) {
             multibuf(1024, i, run_limit);
@@ -147,8 +149,8 @@ int main(void)
             multibuf(2048, i, run_limit);
         }
         run_limit *= 10;
-        if (run_limit > MAX_ELEMENTS) {
-            run_limit = MAX_ELEMENTS;
+        if (run_limit > MAX_TEST_SIZE) {
+            run_limit = MAX_TEST_SIZE;
         }
     }
     return 0;
@@ -175,7 +177,7 @@ static void tester(unsigned offset,
 
     offset /= elem_words;
     offset *= elem_words;
-    spm_bfe_init(&buf1, &sort_this[offset], data_spm, spm_usage, elem_size);
+    spm_bfe_init(&buf1, &off_chip[offset], data_spm, spm_usage, elem_size);
 
     for (i = offset; i < total; i += elem_words) {
         _SPM unsigned * cp = spm_bfe_consume(&buf1);
@@ -184,7 +186,7 @@ static void tester(unsigned offset,
         assert((unsigned) (&cp[elem_words]) <= (DATA_SPM_BASE + spm_usage));
 
         for (j = 0; j < elem_words; j++) {
-            assert(cp[j] == sort_this[i + j]);
+            assert(cp[j] == off_chip[i + j]);
         }
     }
     spm_wait();
@@ -196,7 +198,6 @@ static void tester(unsigned offset,
 typedef struct Task_struct {
             unsigned *      ptr;
             unsigned        remaining;
-            unsigned        serial;
             SPM_BFE_Buffer  buf;
         } Task;
 
@@ -207,8 +208,7 @@ static void multibuf(unsigned max_spm_usage_per_job,
 {
     //Task *      tasks = alloca(num_tasks * sizeof(Task));
     Task        tasks[MAX_TASKS];
-    unsigned    i, j, serial = 0;
-    unsigned    check = 0;
+    unsigned    i, j, fetches = 0;
     unsigned    job_mask;
     unsigned    spm_usage_per_job;
 
@@ -240,29 +240,32 @@ static void multibuf(unsigned max_spm_usage_per_job,
     }
 
     for (i = j = 0; i < run_limit; i++) {
-        j = sort_this[i] & job_mask;
-        if (j >= num_tasks) continue;
+        _SPM unsigned * test;
 
-        if (tasks[j].remaining) {
-            _SPM unsigned * test = spm_bfe_consume(&tasks[j].buf);
-            assert(test[0] == tasks[j].ptr[0]);
-            tasks[j].ptr++;
-            tasks[j].remaining--;
-            check++;
-        } else {
-            tasks[j].ptr = (unsigned *) &sort_this[myrand() % MAX_PTR];
+        do {
+            j = myrand() & job_mask;
+        } while (j >= num_tasks);
+
+        if (!tasks[j].remaining) {
+            tasks[j].ptr = (unsigned *) &off_chip[myrand() % 
+                            (MAX_TEST_SIZE - (DATA_SPM_WORDS * 2))];
             tasks[j].remaining = myrand() % (
-                    &sort_this[MAX_ITEMS] - tasks[j].ptr);
-            tasks[j].serial = serial;
+                    &off_chip[MAX_TEST_SIZE] - tasks[j].ptr);
 
-            serial++;
+            fetches++;
             spm_bfe_init(&tasks[j].buf, tasks[j].ptr,
                     ((_SPM unsigned char *) data_spm) + (spm_usage_per_job * j),
                     spm_usage_per_job, 4);
         }
+        test = spm_bfe_consume(&tasks[j].buf);
+        assert(test[0] == tasks[j].ptr[0]);
+        tasks[j].ptr++;
+        tasks[j].remaining--;
     }
     spm_wait();
-    printf("%u tasks at once: %u words checked\n", num_tasks, check);
+    printf("%u tasks at once, %u fetches, %u reads, %u per job, myrand %04x\n", 
+                num_tasks, fetches, run_limit, 
+                spm_usage_per_job, myrand() & 0xffff);
 }
 
 static void spm_size_test(void)
