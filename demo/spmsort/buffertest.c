@@ -206,8 +206,8 @@ typedef struct Task_struct {
 static void multibuf(unsigned max_spm_usage_per_job, 
                 unsigned num_tasks, unsigned run_limit)
 {
-    //Task *      tasks = alloca(num_tasks * sizeof(Task));
-    Task        tasks[MAX_TASKS];
+    Task *      tasks = alloca(num_tasks * sizeof(Task));
+    //Task        tasks[MAX_TASKS];
     unsigned    i, j, fetches = 0;
     unsigned    job_mask;
     unsigned    spm_usage_per_job;
