@@ -5,8 +5,9 @@
 This file contains documentation about the LLVM Patmos backend:
 
 - ELF File Format
+- LLVM Backend Internals
 - Assember Syntax
-- Inline Assembler
+- Address Spaces
 
 
 ELF File Format
@@ -98,25 +99,6 @@ o) Function Block Start Markers and Subfunction Calls
 
 TODO!
 
-
-
-Inline Assembler
-----------------
-
-Inline assembly syntax is similar to GCC inline assembly. It uses %0, %1, ... as placeholders for
-operands. Accepted register constraints are: r or R for any general purpose register,
-{<registername>} to use a specific register, i for immediates, or the index of an output register to
-assign an input register the same register as the output register.
-
--- Example --
-    int i, j, k;
-    asm("mov  $r31 = %1 ; # copy i into r31\n\t"
-        "add  %0 = $r5, %2\n\t"
-	"bs %3\n\t"	     // call myfunction
-	"nop 0 ;; nop 0\n\t" // delay slots
-        : "=r" (j)
-        : "0" (i), "{r10}" (k), "i" (&myfunction));
--- End --
 
 
 Address Spaces

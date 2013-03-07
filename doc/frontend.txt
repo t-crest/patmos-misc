@@ -1,0 +1,83 @@
+===---------------------------------------------------------------------===
+ Patmos C Frontend.
+===---------------------------------------------------------------------===
+
+This file contains documentation about the LLVM Clang C Frontend for Patmos:
+
+- Target Triples and Target Identification
+- Inline Assembler
+- Scratchpad Memory and Cache Bypass
+- Source Flow Annotations
+
+
+Target Triples and Target Identification
+----------------------------------------
+
+The Patmos tool-chain supports to following target triples:
+
+    patmos-unknown-unknown-elf	    Do not use an OS, start with main()
+    patmos-unknown-rtems	    Compile and link for RTEMS
+
+The C frontend defines the following macros for Patmos targets
+
+    __PATMOS__
+    __patmos__
+
+For RTEMS, the following macros are also defined:
+
+    __rtems__
+
+Use the following command to get a list of all defines for a target (do not omit -triple):
+
+    patmos-clang -cc1 -triple patmos-unknown-unknown-elf -E -dM </dev/null
+
+The default target triple for patmos-clang (without -cc1!) is 'patmos-unknown-unknown-elf',
+if the program is called 'patmos-clang'. Otherwise, if the binary is called 
+'<target>-clang', then '<target>' is used as default target triple.
+
+
+Inline Assembler
+----------------
+
+Inline assembly syntax is similar to GCC inline assembly. It uses %0, %1, ... as placeholders for
+operands. Accepted register constraints are: r or R for any general purpose register,
+{<registername>} to use a specific register, i for immediates, or the index of an output register to
+assign an input register the same register as the output register.
+
+-- Example --
+    int i, j, k;
+    asm("mov  $r31 = %1 ; # copy i into r31\n\t"
+        "add  %0 = $r5, %2\n\t"
+	"bs %3\n\t"	     // call myfunction
+	"nop 0 ;; nop 0\n\t" // delay slots
+        : "=r" (j)
+        : "0" (i), "{r10}" (k), "i" (&myfunction));
+-- End --
+
+Please see backend.txt for a description of the Patmos assembler syntax.
+
+
+Scratchpad Memory
+-----------------
+
+Use the following header to get the relevant functions and macros:
+
+#include <machine/spm.h>
+
+The _SPM macro must be used for all pointers that point into the SPM.
+
+_SPM unsigned int *spm_data = (_SPM unsigned int*) 0x1234;
+
+You can use the spm_copy_from_ext and spm_copy_to_ext functions
+to copy data from global memory to SPM and back. Use spm_wait() to
+wait for the copy transaction to complete.
+
+
+TODO more on SPM, refer to examples
+
+
+Source Flow Annotations
+-----------------------
+
+TODO currently not implemented
+
