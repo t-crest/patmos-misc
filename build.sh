@@ -93,6 +93,11 @@ BENCH_REPO_URL=
 # <target>  use <target> as target architecture
 GOLD_TARGET_ARCH=auto
 
+# Target triple for Patmos libraries and benchmarks:
+# patmos-unknown-unknown-elf	Default
+# patmos-unknown-rtems		Used with RTEMS
+TARGET="patmos-unknown-unknown-elf"
+
 # Additional arguments for cmake / configure
 LLVM_CMAKE_ARGS=
 LLVM_CONFIGURE_ARGS=
@@ -564,6 +569,7 @@ fi
 
 if [ "$GOLD_TARGET_ARCH" == "auto" ]; then
     if [ "$OS_NAME" != "Linux" ]; then
+	# TODO should we use $TARGET instead here? Precise target should not matter though, as long as it is patmos.
 	GOLD_ARGS="$GOLD_ARGS --target=patmos-unknown-unknown-elf"
     fi
 elif [ "$GOLD_TARGET_ARCH" != "none" ]; then
@@ -625,14 +631,14 @@ for target in $TARGETS; do
     ;;
   'newlib')
     clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib)
-    build_autoconf newlib build_default $(get_build_dir newlib) --target=patmos-unknown-unknown-elf AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
+    build_autoconf newlib build_default $(get_build_dir newlib) --target=$TARGET AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
         RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
-        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target patmos-unknown-unknown-elf -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
+        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target ${TARGET} -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
     ;;
   'compiler-rt')
     clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $(get_repo_dir compiler-rt)
     repo=$(get_repo_dir compiler-rt)
-    build_cmake compiler-rt build_default $(get_build_dir compiler-rt) "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
+    build_cmake compiler-rt build_default $(get_build_dir compiler-rt) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
     ;;
   'patmos'|'pasim')
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
@@ -644,7 +650,7 @@ for target in $TARGETS; do
     else
       clone_update $BENCH_REPO_URL $(get_repo_dir bench)
       repo=$(get_repo_dir bench)
-      build_cmake bench build_bench $(get_build_dir bench) "-DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin" "$BENCH_ARGS"
+      build_cmake bench build_bench $(get_build_dir bench) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin" "$BENCH_ARGS"
     fi
     ;;
   *) echo "Don't know about $target." ;;

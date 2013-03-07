@@ -52,6 +52,11 @@ BENCH_REPO_URL=
 # <target>  use <target> as target architecture
 GOLD_TARGET_ARCH=auto
 
+# Target triple for Patmos libraries and benchmarks:
+# patmos-unknown-unknown-elf	Default
+# patmos-unknown-rtems		Used with RTEMS
+TARGET="patmos-unknown-unknown-elf"
+
 # Additional arguments for cmake / configure
 LLVM_CMAKE_ARGS=
 LLVM_CONFIGURE_ARGS=
