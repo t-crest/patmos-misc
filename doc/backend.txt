@@ -97,7 +97,45 @@ operation separator must always appear on the same line as the operation for the
 
 o) Function Block Start Markers and Subfunction Calls
 
-TODO!
+Functions must be prepended by the .fstart directive which emits the function size word and aligns the 
+code. 
+
+    .fstart <label>, <size-in-bytes>, <alignment-in-bytes>
+
+The alignment must be a power of 2. The function size must be the size of the following (sub-)function.
+If a function is split into several subfunctions, the size must be the size of the first sub-function, 
+not the size of the whole function (this differs from the .size directive).
+
+
+    .type   foo,@function
+    .size   foo, .Ltmp2-foo	    # size of foo symbol is the whole function 
+    .fstart foo, .Ltmp0-foo, 4
+foo:				    # start of foo function
+    ....
+    
+    brcf .Ltmp1			    # Fallthrough to different subfunction is not allowed
+    nop
+    nop
+.Ltmp0:				    # end of first subfunction of foo 
+
+    .type   .Ltmp1,@code
+    .size   .Ltmp1, .Ltmp2-.Ltmp1
+    .fstart .Ltmp1, .Ltmp2-.Ltmp1, 4
+.Ltmp1:				    # start of second subfunction of foo
+    ...
+    ret $30, $31		    # returns from foo, not from the subfunction
+    nop
+    nop
+.Ltmp2:				    # end of (second subfunction of) foo
+
+
+To set the address of a function relative to the start of the section, use the .org directive before
+the .fstart directive and allow for the function size word so that .fstart does not emit any padding.
+
+    .org <aligned startaddress>-4
+    .fstart .foo, .Ltmp0-.foo, <alignment>
+foo:
+    ....
 
 
 
