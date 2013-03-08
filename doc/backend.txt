@@ -111,8 +111,8 @@ not the size of the whole function (this differs from the .size directive).
     .size   foo, .Ltmp2-foo	    # size of foo symbol is the whole function 
     .fstart foo, .Ltmp0-foo, 4
 foo:				    # start of foo function
-    ....
-    
+    sres  10
+    ...
     brcf .Ltmp1			    # Fallthrough to different subfunction is not allowed
     nop
     nop
@@ -123,7 +123,7 @@ foo:				    # start of foo function
     .fstart .Ltmp1, .Ltmp2-.Ltmp1, 4
 .Ltmp1:				    # start of second subfunction of foo
     ...
-    ret $30, $31		    # returns from foo, not from the subfunction
+    ret $r30, $r31		    # returns from foo, not from the subfunction
     nop
     nop
 .Ltmp2:				    # end of (second subfunction of) foo
