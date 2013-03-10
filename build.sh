@@ -107,6 +107,9 @@ NEWLIB_ARGS=
 # Build simulator in Release mode
 #PASIM_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
 
+# Patmos C-tools cmake options
+CTOOLS_ARGS=
+
 # Overwrite default options for pasim for make test
 #BENCH_ARGS="-DPASIM_OPTIONS='-M fifo -m 4k'"
 
@@ -239,12 +242,13 @@ function get_repo_dir() {
 function get_build_dir() {
     local repo=$1
     local repodir=$(get_repo_dir $1)
+    local subdir=$2
 
     if [ "$repo" == "patmos" ]; then
 	if [[ "$BUILDDIR_SUFFIX" =~ ^/ ]]; then
-	    builddir=$repodir/simulator$BUILDDIR_SUFFIX
+	    builddir=$repodir/$subdir$BUILDDIR_SUFFIX
 	else
-	    builddir=$repodir$BUILDDIR_SUFFIX/simulator
+	    builddir=$repodir$BUILDDIR_SUFFIX/$subdir
 	fi
     else
 	builddir=$repodir$BUILDDIR_SUFFIX
@@ -480,6 +484,10 @@ function build_llvm() {
 	run ln -sf ../libLTO.$LIBEXT   $INSTALL_DIR/lib/bfd-plugins/
     fi
 
+    # install platin
+    echo "Installing platin toolkit .. "
+    run $rootdir/tools/platin/install.sh $INSTALL_DIR
+
     if [ "$DO_RUN_TESTS" == "true" ]; then
 	echo "Running tests.."
         run make check-all
@@ -642,7 +650,10 @@ for target in $TARGETS; do
     ;;
   'patmos'|'pasim')
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
-    build_cmake patmos/simulator build_default $(get_build_dir patmos) "$PASIM_ARGS"
+    info "Building simulator in patmos .. "
+    build_cmake patmos/simulator build_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
+    info "Building ctools in patmos .. "
+    build_cmake patmos/ctools    build_default $(get_build_dir patmos ctools) "$CTOOLS_ARGS"
     ;;
   'bench')
     if [ -z "$BENCH_REPO_URL" ]; then
