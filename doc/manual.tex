@@ -1,0 +1,123 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This document can be formatted only with pdflatex.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[12pt,twoside,a4paper]{report}
+\usepackage{hyperref}
+
+\usepackage[T1]{fontenc}
+\usepackage{ae}
+\usepackage[pdftex]{graphicx}
+\usepackage[english]{babel}
+\usepackage{latexsym,epsf,epsfig}
+\usepackage{rotating,amsmath,amsfonts,amssymb,subfigure}
+\usepackage{amsthm}
+
+\usepackage{times}
+\usepackage{listings}
+\usepackage{longtable}
+\usepackage{datetime}
+\usepackage{verbatim}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{array}
+
+\usepackage{booktabs}
+\usepackage{dcolumn}
+
+\usepackage{pslatex} % -- times instead of computer modern
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xspace}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{colortbl}
+\usepackage{multicol}
+
+\usepackage{bytefield}
+
+% long immediate in second slot
+\newcommand{\lconst}{\texttt{const}_{32}}
+% short immediate in ALU instruction
+\newcommand{\sconst}{\texttt{Constant}_{12}}
+% constant in Rs2 field
+\newcommand{\rconst}{\texttt{Constant}_{5}}
+
+
+\newcommand{\cc}[1]{\multicolumn{1}{c}{#1}}
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+\newcommand{\code}[1]{{\texttt{#1}}}
+\newcommand{\codefoot}[1]{{\texttt{#1}}}
+\newcommand{\eg}{\emph{e.g.}}
+\newcommand{\ie}{\emph{i.e.}}
+
+\usepackage{listings}
+\lstset{language=C,basicstyle=\footnotesize,captionpos=b}
+%% \renewcommand{\lstlistingname}{\footnotesize Listing}
+
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{criterion}{Criterion}
+\newtheorem{definition}{Definition}
+
+\newcommand{\XOR}{\textasciicircum\xspace}
+\newcommand{\OR}{\textbar\xspace}
+\newcommand{\AND}{\&\xspace}
+\newcommand{\NOT}{\texttildelow}
+\newcommand{\shl}{\textless$\!$\textless\xspace}
+\newcommand{\shr}{\textgreater$\!$\textgreater$\!$\textgreater\xspace}
+\newcommand{\ashr}{\textgreater$\!$\textgreater\xspace}
+
+%
+% allow click-able links
+%
+\usepackage[open]{bookmark}
+\usepackage[all]{hypcap}
+
+% \pdfcatalog{
+%  /UseNone
+% }
+
+\title{The Patmos Tool Chain Manual}
+
+\begin{document}
+
+%\firstpage
+\maketitle
+
+\newpage
+\tableofcontents
+
+\newpage
+
+\cleardoublepage
+%\pagenumbering{arabic}
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+
+\input{content/overview}
+
+\input{content/usage}
+
+
+\chapter*{Appendix}
+
+\appendix
+
+%\input{content/isa}
+
+\input{content/examples}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\cleardoublepage
+
+\nocite{Kirner:RTS2010}
+\nocite{FFY05}
+\nocite{patmos:ppes2011}
+
+\bibliographystyle{plain}
+
+\bibliography{references}
+
+\end{document}

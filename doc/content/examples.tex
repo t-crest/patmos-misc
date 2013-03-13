@@ -1,0 +1,46 @@
+\chapter{Building a Hello World Application}
+
+In this section we show how to compile and simulate a simple Hello World application with the Patmos tool chain, and present the output of the
+various tools.
+
+The program we use in this example is
+\footnotesize
+\begin{verbatim}
+$ cat hello.c
+\end{verbatim}
+\verbatiminput{data/hello.c}
+
+\normalsize
+The following command compiles the file \texttt{hello.c} into bitcode, using a human readable output format.
+Note that the \code{-target} option is optional for the default target triple, if the compiler driver program is called as
+\code{patmos-clang}.
+\footnotesize
+\begin{verbatim}
+$ patmos-clang -target patmos-unknown-unknown-elf -o hello.ll -S hello.c
+$ cat hello.ll
+\end{verbatim}
+\verbatiminput{data/hello.ll}
+
+\normalsize
+The following command compiles the file \texttt{hello.c} into Patmos assembly code:
+\footnotesize
+\begin{verbatim}
+$ patmos-clang -target patmos-unknown-unknown-elf -o hello.s \
+                                -fpatmos-emit-asm -S hello.c
+$ cat hello.s
+\end{verbatim}
+\verbatiminput{data/hello.s}
+
+\normalsize
+We now show how to link the previously generated bitcode file with the standard libraries and start code and compile it to a Patmos ELF
+executable. The \texttt{-target} option can be omitted here since the target information is already stored in the bitcode file. 
+The executable is then simulated using the \texttt{pasim} simulator.
+\footnotesize
+\begin{verbatim}
+$ patmos-clang -o hello hello.ll
+$ pasim -M fifo -m 64k hello
+\end{verbatim}
+\verbatiminput{data/hello.out}
+
+\normalsize
+

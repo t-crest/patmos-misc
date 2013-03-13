@@ -1,0 +1,55 @@
+\begin{tikzpicture}
+  \node (appc)[source                 ]{app.c};
+  \node (libc)[source, right=of appc  ]{libC.c};
+  \node (supc)[source, right=5mm of libc  ]{support.c};
+
+  \node (appc_bc)[source, below=17mm of appc.south , anchor=center]{app.bc};
+  \node (libc_bc)[source, below=17mm of libc.south , anchor=center]{libC.bc};
+  \node (supc_bc)[source, below=17mm of supc.south, anchor=center]{support.bc};
+
+  \node (linked_bc)[source, below=17mm of appc_bc.south  , anchor=center]{linked.bc};
+  \node (relelf)   [source, below=17mm of linked_bc.south, anchor=center]{rel. ELF};
+  \node (elf)      [source, below=17mm of relelf.south   , anchor=center]{ELF};
+
+  \node (ldscript) [source, left=5mm of appc]{Linker~Script};
+
+  \path (appc) -- node (clanga)[tool, pos=0.5, anchor=center]{clang} (appc_bc);
+  \path (libc) -- node (clangl)[tool, pos=0.5, anchor=center]{clang} (libc_bc);
+  \path (supc) -- node (clangs)[tool, pos=0.5, anchor=center]{clang} (supc_bc);
+
+  \path (appc_bc)   -- node (llvmld)[tool, pos=0.5, anchor=center]{llvm-ld} (linked_bc);
+  \path (linked_bc) -- node (llc)   [tool, pos=0.5, anchor=center]{llc}     (relelf);
+  \path (relelf)    -- node (ld)    [tool, pos=0.5, anchor=center]{gold-ld} (elf);
+
+%  \draw [dashed] (llvmld.east) -- +(85mm, 0);
+%  \draw [dashed] (llvmld.west) -- +(-3mm, 0);
+%  \draw [dashed] ($(llvmld.east) + (7mm, 0)$) -- +(0, 40mm);
+
+%  \draw [dashed] (llc.east) -- +(85mm, 0);
+%  \draw [dashed] (llc.west) -- +(-3mm, 0);
+
+  \draw[-triangle 60] (appc) -- (clanga) -- (appc_bc);
+  \draw[-triangle 60] (libc) -- (clangl) -- (libc_bc);
+  \draw[-triangle 60] (supc) -- (clangs) -- (supc_bc);
+
+  \draw[-triangle 60] (appc_bc) -- (llvmld);
+  \draw[-triangle 60, out=270, in=0, distance=6mm] (libc_bc.south) to (llvmld.east);
+  \draw[-           , out=270, in=0, distance=5mm] (supc_bc.south) to (llvmld.east);
+  \draw[-triangle 60] (llvmld)  -- (linked_bc);
+
+  \draw[-triangle 60] (linked_bc) -- (llc);
+  \draw[-triangle 60] (llc)       -- (relelf);
+
+  \draw[-triangle 60] (relelf)   -- (ld);
+  \draw[-triangle 60, out=270, in=180] (ldscript) to (ld);
+  \draw[-triangle 60] (ld)       -- (elf);
+
+  \begin{pgfonlayer}{background}
+    \node [fit=(ldscript) (appc), fill=MyDarkGreen, nearly transparent,
+           rounded corners, label=above:{\scriptsize (a) User supplied code}] {};
+    \node [fit=(libc) (supc_bc) , fill=MyDarkBlue, nearly transparent,
+           rounded corners, label=above:{\scriptsize (b) System libraries}] {};
+    \node [fit=(appc_bc) (elf)  , fill=black, nearly transparent,
+           rounded corners, label=below:{\scriptsize (c) Compilation Steps}] {};
+  \end{pgfonlayer}
+\end{tikzpicture}
