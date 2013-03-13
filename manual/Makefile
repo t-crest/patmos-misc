@@ -9,7 +9,7 @@ manual.pdf: *.tex content/*.tex data/*
 	pdflatex -interaction=nonstopmode manual
 
 clean:
-	rm -f *.aux *.log *.out *.toc content/*.aux 
+	rm -f *.aux *.log *.out *.toc *.bbl *.blg content/*.aux 
 
 distclean: clean
 	rm -f manual.pdf

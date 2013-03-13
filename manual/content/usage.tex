@@ -1,12 +1,12 @@
 
-\chapter{Installation and Usage of the Compiler}
+\section{Installation and Usage of the Compiler}
 \label{sec:using_the_compiler}
 
 This section gives a guide for building and installing the Patmos
 tool chain and describes how to use it to compile applications for Patmos. 
 
 % ------------------------------------------------------------------------------
-\section{Prerequisites}
+\subsection{Prerequisites}
 
 The Patmos compiler tool chain is developed for the Linux platform. 
 In order to build all tools, the following programs and libraries are required:
@@ -53,7 +53,7 @@ sudo apt-get install git cmake make g++ texinfo flex bison \
 \end{verbatim}
 
 % ------------------------------------------------------------------------------
-\section{Retrieving and Building the Source Code}
+\subsection{Retrieving and Building the Source Code}
 
 We provide a build script that retrieves, configures and builds all
 the required packages automatically (cf. Section~\ref{sec:buildscript}).
@@ -74,7 +74,7 @@ Alternatively, \texttt{github.com} provides a link in all of the source reposito
 zip files.
 
 
-%\subsection{Default Directory Structure}
+%\subsubsection{Default Directory Structure}
 
 For the following build instructions we use directory structure presented in Table~\ref{tab:directories}. 
 We use \texttt{\textasciitilde/tcrest/} as root directory and \texttt{\textasciitilde/tcrest/local/}
@@ -253,7 +253,7 @@ that are contained in the source repositories.
 
 
 % ------------------------------------------------------------------------------
-\section{Running the Compiler}
+\subsection{Running the Compiler}
 
 %In this section we assume that the tools have been compiled and installed with the provided build script,
 %i.e., all tools of the Patmos tool chain are prefixed with \texttt{patmos-}.
@@ -372,7 +372,7 @@ Option & Description \\ \hline
 \label{tab:linker_options}
 \end{table}
 
-\subsection{Libraries}
+\subsubsection{Libraries}
 
 The Patmos tool chain supports static libraries. Libraries are archives that contain
 bitcode files. The archives are created by using either the \texttt{ar}
