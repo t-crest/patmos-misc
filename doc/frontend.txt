@@ -4,10 +4,45 @@
 
 This file contains documentation about the LLVM Clang C Frontend for Patmos:
 
+- Inlining, Function Attributes
 - Target Triples and Target Identification
 - Inline Assembler
 - Scratchpad Memory and Cache Bypass
 - Source Flow Annotations
+
+Inlining, Function Attributes
+-----------------------------
+
+o) Inlining functions
+The compiler follows the C99 rules for inlining. See here for an explanation:
+
+http://www.greenend.org.uk/rjk/tech/inline.html
+
+To mark functions as inline functions you can do one of the following:
+
+- If the function is only used within one module, mark it as 'static inline'. 
+  The function will not be visible outside the module, like all static functions.
+
+static inline void foo(int n) { 
+    ...
+}
+
+- If the function should be used in several functions, define it 'inline' everywhere,
+  and add one declaration with 'extern inline'.
+
+extern inline void foo(int n);
+
+inline void foo(int n) {
+    ...
+}
+
+o) Prevent Inlining
+To prevent the compiler from inlining, use the noinline attribute.
+
+void foo(int n) __attribute__((noinline));
+void foo(int n) {
+    ...
+}
 
 
 Target Triples and Target Identification
