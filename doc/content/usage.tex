@@ -11,7 +11,7 @@ tool chain and describes how to use it to compile applications for Patmos.
 The Patmos compiler tool chain is developed for the Linux platform. 
 In order to build all tools, the following programs and libraries are required:
 
-\begin{itemize}
+\begin{description}
 \item[cmake, make] \hfill\\
 The CMake (at least version 2.8) and \texttt{make} build systems are required to build the
 various components of the tool chain, such as the \texttt{clang} compiler or the \texttt{compiler-rt} system library.
@@ -42,7 +42,7 @@ The simulator requires the program-options library from the \texttt{boost} C++ l
 \item[git] \hfill\\
 The version control system \texttt{git} is required 
 to download the latest development versions of the tools. 
-\end{itemize}
+\end{description}
 
 On current Debian based Linux distributions, the following command can be used to install
 all the required packages:
@@ -105,7 +105,7 @@ Directory & Description \\ \hline
                        All binaries in this directory are prefixed 
 		       with \texttt{patmos-} by the build script \\ [\myspace]
 \rootdir{local/lib/} & Install directory for tool chain libraries \\ [\myspace] 
-\rootdir{local/patmos-unknown-elf/} & Install directory for Patmos 
+\rootdir{local/patmos-unknown-unknown-elf/} & Install directory for Patmos 
                                        libraries and headers \\ [\myspace]
 \rootdir{misc/} & Support files (e.g., build script, config files) \\ [\myspace]
 \rootdir{newlib/} & Sources of standard C library for Patmos \\ [\myspace]
@@ -142,7 +142,7 @@ all the required tools and libraries of the tool chain.
 By default, the directory structure created by the build script follows the directory structure presented in Table~\ref{tab:directories}. 
 All necessary compiler tools are installed to 
 \texttt{INSTALL\_DIR/bin}, while Patmos specific libraries such as \texttt{newlib} and 
-\texttt{compiler-rt} are installed under \texttt{INSTALL\_DIR/patmos-unknown-elf/}.
+\texttt{compiler-rt} are installed under \texttt{INSTALL\_DIR/patmos-unknown-unknown-elf/}.
 All executables are prefixed with \texttt{patmos-} to differentiate them from non-Patmos related
 installations, e.g., \texttt{clang} will be installed as \texttt{patmos-clang}.
 
@@ -201,12 +201,12 @@ archives, while \texttt{clang} is used to link files.
 git clone https://github.com/t-crest/patmos-newlib.git newlib
 mkdir newlib/build
 cd newlib/build
-../configure --target=patmos-unknown-elf \
+../configure --target=patmos-unknown-unknown-elf \
     AR_FOR_TARGET=~/tcrest/local/bin/llvm-ar \
     RANLIB_FOR_TARGET=~/tcrest/local/bin/llvm-ranlib \
     LD_FOR_TARGET=~/tcrest/local/bin/clang \
     CC_FOR_TARGET=~/tcrest/local/bin/clang \
-    CFLAGS_FOR_TARGET="-target patmos-unknown-elf -O2" \
+    CFLAGS_FOR_TARGET="-target patmos-unknown-unknown-elf -O2" \
     --prefix=~/tcrest/local
 make all install
 \end{verbatim}
@@ -265,7 +265,7 @@ In order to build an application for Patmos, the target platform triple, the out
 need to be provided to \texttt{patmos-clang}.
 
 \begin{verbatim}
-patmos-clang -target patmos-unknown-elf -o hello main.c hello.c
+patmos-clang -target patmos-unknown-unknown-elf -o hello main.c hello.c
 \end{verbatim}
 
 This will compile the source files to bitcode files, link in \texttt{newlib} and the system libraries,
@@ -283,7 +283,7 @@ pasim hello
 
 The \texttt{patmos-clang} driver can also be used to generate bitcode files, to link bitcode files, or to 
 emit assembler code. The driver supports the following modes of operation (for brevity, we omit the
-\texttt{-target patmos-unknown-elf} argument):
+\texttt{-target patmos-unknown-unknown-elf} argument):
 
 
 \begin{description}
@@ -384,7 +384,7 @@ ar q libtest.a *.bc
 # show the contents of libtest.a
 patmos-llvm-nm libtest.a
 # compile and link with the created library
-patmos-clang -target patmos-unknown-elf -o app main.c -ltest
+patmos-clang -target patmos-unknown-unknown-elf -o app main.c -ltest
 \end{verbatim}
 
 
