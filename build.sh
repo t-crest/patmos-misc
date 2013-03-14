@@ -499,6 +499,15 @@ function build_default() {
     run make $MAKE_VERBOSE install
 }
 
+function build_and_test_default() {
+    run make $MAKEJ $MAKE_VERBOSE all
+    run make $MAKE_VERBOSE install
+
+    if [ "$DO_RUN_TESTS" == "true" ]; then
+        run make test "ARGS='${CTEST_ARGS}'"
+    fi
+}
+
 function build_bench() {
     # TODO if we do not have BUILD_SOFTFLOAT=true, then do not build softfloat benchmarks!
 
@@ -651,7 +660,7 @@ for target in $TARGETS; do
   'patmos'|'pasim')
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
     info "Building simulator in patmos .. "
-    build_cmake patmos/simulator build_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
+    build_cmake patmos/simulator build_and_test_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
     info "Building ctools in patmos .. "
     build_cmake patmos/ctools    build_default $(get_build_dir patmos ctools) "$CTOOLS_ARGS"
     ;;
