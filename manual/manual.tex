@@ -4,10 +4,9 @@
 
 % TODO use the T-CREST template here
 
-\documentclass[11pt,twoside,a4paper]{article}
+\documentclass[11pt,twoside,a4paper]{report}
 \usepackage[margin=1.1in]{geometry}
 
-\usepackage{hyperref}
 \usepackage[T1]{fontenc}
 \usepackage{ae}
 \usepackage[pdftex]{graphicx}
@@ -39,15 +38,10 @@
 
 \usepackage{bytefield}
 
-% TODO move the ISA related stuff into the isa.tex file
+\usepackage{todonotes}
+%\usepackage[disable]{todonotes}
 
-% long immediate in second slot
-\newcommand{\lconst}{\texttt{const}_{32}}
-% short immediate in ALU instruction
-\newcommand{\sconst}{\texttt{Constant}_{12}}
-% constant in Rs2 field
-\newcommand{\rconst}{\texttt{Constant}_{5}}
-
+\newcommand{\note}[2][]{\todo[color=green,inline,#1]{#2}}
 
 \newcommand{\cc}[1]{\multicolumn{1}{c}{#1}}
 \newcolumntype{d}[1]{D{.}{.}{#1}}
@@ -65,6 +59,15 @@
 \newtheorem{criterion}{Criterion}
 \newtheorem{definition}{Definition}
 
+% TODO move the ISA related stuff into the isa.tex file
+
+% long immediate in second slot
+\newcommand{\lconst}{\texttt{const}_{32}}
+% short immediate in ALU instruction
+\newcommand{\sconst}{\texttt{Constant}_{12}}
+% constant in Rs2 field
+\newcommand{\rconst}{\texttt{Constant}_{5}}
+
 \newcommand{\XOR}{\textasciicircum\xspace}
 \newcommand{\OR}{\textbar\xspace}
 \newcommand{\AND}{\&\xspace}
@@ -77,6 +80,9 @@
 % allow click-able links
 %
 \usepackage[open]{bookmark}
+% should be the last package:
+\usepackage{hyperref}
+% fix jumping to caption instead of figure
 \usepackage[all]{hypcap}
 
 % \pdfcatalog{
@@ -101,50 +107,7 @@
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-% TODO needs cleanup, currently not fully up-to-date.
-\input{content/overview}
-
-% TODO organize the structure properly:
-% - Make a report out of this, introduce chapters
-% - Use the following structure (maybe):
-%   - Platform Overview
-%   - Patmos Core
-%	- Architecture
-%	- Simulator
-%	- Synthesizing, booting
-%   - Compiler Tool Chain
-%	- Overview, Components
-%	- Clang Frontend
-%	- LLVM Backend
-%	- ELF Binary
-%   - WCET Analysis and WCET integration
-%	- aiT
-%	- Platin
-%   - Installation and Usage
-%	- Build script
-%	- Compiler Usage
-%   - Appendix
-%	- ISA Reference
-%	- Examples
-%
-% How do we organize this: We have 
-%   - Components: Patmos Core, Simulator, Compiler Tool Chain, WCET Analysis, Platin, NoC, RTEMS, ...
-%   - Common Structure: Overview, Description, Full Reference/Specs, Installation, Tool Usage, Examples, ...
-% Do we top-level-organize by component or by structure??? Better approach is probably by Structure, 
-% since some components share same specs, same build system .. -> Have main chapters for
-%   - Platform Overview (big picture, all the buzzwords)
-%   - More In-depth description of various components (still high-level (no technical stuff), but with all the nasty details, results ..; similar to paper style)
-%   - Specifications (Common: ISA, ABI, ELF format, asm format, IO-ports, Target Triples, ..; plus component-specific: Clang Frontend, Platin
-%     PML, newlib, ..)
-%   - Installation and Usage: Sections for build.sh, platin, aiT, NoC?, RTEMS, Synthesizing and booting Patmos, ..
-%     This should not include stuff that is already in any README.patmos file (configure-strings, list of options, ..) if possible!
-%     Just the big picture, stuff that is too long for the README; the most important stuff can be repeated, plus a reference to the README.
-%   - (Bigger) Usage Examples
-%	- Hello world, ...
-%	- Reference and describe demos in patmos-misc/demo/
-%
-% To conclude
-% - create chapters, clean up main structure
+% TODO
 % - move (inline) asm stuff from patmos_tr here
 % - remove stuff from here that is already in READMEs and should not be repeated here (manual building without build.sh, ..)
 % - move patmos-misc/doc/*.txt stuff into content, convert to tex
@@ -153,23 +116,109 @@
 % - clean up this whole mess, make sure everything is consistent/up-to-date
 
 
-% TODO this is (partially) redundant with the README.patmos files. We should put
-% compile instructions only in README.patmos files and only describe the build.sh 
-% script and some top-level build instructions here.
-\input{content/usage}
+\chapter{Introduction}
+% All the buzzwords and the motivation go here.
 
 
-\section*{Appendix}
+\chapter{Platform Overview}
+% This chapter should give the big picture and some motivation. Maybe call this chapter something else 
+% and create sections 'Time-Predictability', 'Model of Computation', 'Platform Overview', ... 
 
-\appendix
 
-% TODO Ok, now this looks properly horrible without the two-column formatting. Needs cleanup
-% and must be put into a chapter, otherwise it messes up the TOC.
+\chapter{Description of the Platform Components}
+% This should contain a per-component (CPU, Compiler Tool Chain, WCET Analysis + Platin, NoC, ..) 
+% 'in-depth' high-level description (no technical details like ISA, asm format or actual tool usage, but 
+% a more detailed description of the architecture and the inner workings, plus references to the related
+% specification sections/chapters.
+
+% Section: Patmos Processor
+
+% Section: Compiler Tool Chain
+
+% TODO needs cleanup, currently not fully up-to-date.
+\input{content/overview_compiler}
+
+% Section: WCET Analysis and Platin Toolkit
+
+% Section: Operating System
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% Now we have chapters with the main references and specs
+% The specs will be large, so they actually should be chapters, not just sections,
+% so there is no single top-level 'Reference' chapter.
+
+\chapter{Patmos Architecture Reference}
+
+% TODO Ok, now this looks properly horrible without the two-column formatting. Needs cleanup.
 % TODO we also need a good way to keep this in sync with the TR.. maybe split the TR into files 
 % or export the TR as PDF and only link in the PDF here?
-%\input{content/isa}
+\input{content/isa}
+
+% TODO Section: IO Interfaces (UART, ..)
+
+% TODO Section: ELF Format
+
+
+\chapter{Libraries and Operating Systems}
+
+% Section Target Triples, ..
+
+% Section Newlib stuff (SPM, UART, ..)
+
+% Section RTEMS
+
+
+\chapter{Compiler Tool Chain Reference}
+
+% Section: Clang C Frontend
+
+% Section: LLVM Backend
+
+
+\chapter{Platin Toolkit Reference}
+
+% Section: PML format
+
+% Section: Flow Fact Annotations, Tools, ...
+
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\chapter{Installation and Usage}
+% This chapter should contain a high-level view of the installation and usage procedures.
+% The details should go into the README.patmos files and should only be referenced from here,
+% to minimize duplication. E.g, we describe the build.sh script here, the requirements, and some commonly used options,
+% but full configure strings for manual installation and lesser used options should be (together with common options) 
+% in README.patmos.
+
+
+% Section: Compiler Tool Chain Installation and Usage
+
+% TODO clean up, remove manual installation stuff as it is already in README.patmos, just add referene to files.
+\input{content/usage_compiler}
+
+% This section should probably also contain infos about platin installation and usage (?)
+
+
+% Section: Synthesizing and Booting Patmos
+
+
+% Section: RTEMS (?)
+
+
+\chapter{Examples}
+% This chapter is intended for all sorts of longer usage examples, maybe a bigger running example.
 
 \input{content/examples}
+
+
+
+%\chapter*{Appendix}
+%\appendix
+% Changelog, internals, ... 
+
+
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 \cleardoublepage
