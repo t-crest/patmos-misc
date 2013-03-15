@@ -44,6 +44,23 @@ void foo(int n) {
     ...
 }
 
+o) Marking Functions as Used
+To prevent the compiler from removing functions that have no call site in the bitcode
+(either because they are entry functions or because the compiler generates the calls), 
+add the 'used' attribute to the function declaration.
+
+void _start(void) __attribute__((used));
+void _start(void) {
+    ...
+}
+
+Note that if the function is part of a module that is linked in from a bitcode archive,
+the compiler will not link in the module if there is no usage of the function, even if it 
+is marked as used. To force the linker to link in functions from archives, add a declaration 
+for that function in any of your used modules, or link a bitcode module just containing declarations 
+for those functions before linking with the library.
+
+
 
 Target Triples and Target Identification
 ----------------------------------------
