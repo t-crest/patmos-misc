@@ -1,3 +1,5 @@
 *.swp
 build.cfg
 devup.cfg
+.project
+.pydevproject
