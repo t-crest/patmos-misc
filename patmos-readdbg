@@ -1,0 +1,152 @@
+#!/usr/bin/python
+#
+# This tool reads debug infos from an ELF file and prints out various 
+# debug informations.
+#
+# This script uses the pyelftools library and is partially based on
+# the examples provided with pyelftools.   
+# 
+# Author: Stefan Hepp <hepp@complang.tuwien.ac.at>
+#
+
+
+from __future__ import print_function
+import sys
+import os
+import argparse
+import re
+
+# We do not care about closed stdout pipe, just abort 
+import signal
+signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+
+# Import pyelftools stuff
+sys.path.append(os.path.join(os.path.dirname(__file__), 'pyelftools'))
+
+from elftools.common.py3compat import itervalues, maxint, bytes2str
+from elftools.elf.elffile import ELFFile
+from elftools.dwarf.descriptions import (
+    describe_DWARF_expr, set_global_machine_arch)
+
+
+def decode_funcname(dwarfinfo, address):
+    # Go over all DIEs in the DWARF information, looking for a subprogram
+    # entry with an address range that includes the given address. Note that
+    # this simplifies things by disregarding subprograms that may have 
+    # split address ranges.
+    for CU in dwarfinfo.iter_CUs():
+        for DIE in CU.iter_DIEs():
+            try:
+                if DIE.tag == 'DW_TAG_subprogram':
+                    lowpc = DIE.attributes['DW_AT_low_pc'].value
+                    highpc = DIE.attributes['DW_AT_high_pc'].value
+                    if lowpc <= address <= highpc:
+                        return DIE.attributes['DW_AT_name'].value
+            except KeyError:
+                continue
+    return None
+
+
+def decode_file_line(dwarfinfo, address):
+    # Go over all the line programs in the DWARF information, looking for
+    # one that describes the given address.
+    for CU in dwarfinfo.iter_CUs():
+        # First, look at line programs to find the file/line for the address
+        lineprog = dwarfinfo.line_program_for_CU(CU)
+        prevaddr = maxint
+        for entry in lineprog.get_entries():
+            # We're interested in those entries where a new state is assigned
+            state = entry.state
+            if state is not None and not state.end_sequence:
+                if prevaddr <= address <= state.address:
+                    filename = lineprog['file_entry'][state.file - 1].name
+                    line = state.line
+                    return filename, line
+                prevaddr = state.address
+    return None, None
+
+
+lastLineNr = None
+lastFilename = None
+lastFunction = None
+
+def print_srclines(dwarfinfo, input, printAllLines):
+    location_lists = dwarfinfo.location_lists()
+    
+    # try to match first column as hex PC
+    ppc = re.compile("([a-fA-F0-9]+)[ \t\n]")
+    # try to match objdump format
+    opc = re.compile(" +([a-f0-9]+):")
+    
+    for line in input:
+        
+        # Check if we have a PC at the beginning of the line
+        PC = None
+        for r in [ppc, opc]: 
+            m = r.match(line)
+            if (m):
+                PC = int(m.group(1), 16)
+                break
+        if not PC:
+            print(line, end="")                
+            continue
+        
+        funcname = decode_funcname(dwarfinfo, PC)
+        file, line = decode_file_line(dwarfinfo, PC)
+        
+        if (printAllLines or lastFunction != funcname or 
+            lastLineNr != line or lastFilename != file):
+            print('%s:%s %s' % (bytes2str(file), line, bytes2str(funcname)))
+                
+        lastFunction = funcname
+        lastFilename = file
+        lastLineNr = line
+        
+        print(line, end="")
+
+def load_dwarfinfo(filename):
+    elffile = ELFFile(filename)
+    
+    if not elffile.has_dwarf_info():
+        print('ELF file ' + filename + ' has no DWARF info!')
+        sys.exit(1)
+    
+    # get_dwarf_info returns a DWARFInfo context object, which is the
+    # starting point for all DWARF-based processing in pyelftools.
+    dwarfinfo = elffile.get_dwarf_info()
+    
+    # This is required for the descriptions module to correctly decode
+    # register names contained in DWARF expressions.
+    set_global_machine_arch(elffile.get_machine_arch())
+    
+    return dwarfinfo
+
+
+parser = argparse.ArgumentParser(description='Display ELF debug infos.')
+parser.add_argument('elffile', type=file, help='ELF file containing debug infos')
+parser.add_argument('-a', '--all', action='store_true', help='Print line numbers for all found PCs, not only when it changes')
+parser.add_argument('-l', '--lines', help='Display line numbers for the given input file')
+
+args = parser.parse_args()
+
+dwarfinfo = load_dwarfinfo(args.elffile)
+
+if args.lines: 
+    input = None
+    if args.lines == "-":
+        input = sys.stdin
+    else:
+        try:
+            input = open(args.lines, 'r')
+        except:
+            print("Could not open input file " + args.lines + ": " + e)
+            sys.exit(1)
+    
+    print_srclines(dwarfinfo, input, args.all)
+    
+    if args.lines != "-":
+        input.close()
+    
+else:
+    # For now, just default to "-l -" if no other action is given
+    print_srclines(dwarfinfo, sys.stdin, args.all)

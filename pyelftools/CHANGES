@@ -1,0 +1,20 @@
+Changelog
+=========
+
++ Version 0.21 (??)
+
+  - Added new example: dwarf_decode_address - decode function name and
+    file & line information from an address.
+  - Issue #7: parsing incorrect DWARF was made a bit more forgiving for cases
+    where serialized DIE trees have extra NULLs at the end.
+  - Pull request 6: very initial support for ARM ELF files.
+
++ Version 0.20 (27.01.2012)
+
+  - Python 3 support
+  - Fixed some problems with running tests
+  - Issue #2: made all examples run (and test/run_examples_test.py pass)
+    on Windows.
+
++ Version 0.10 - Initial public release (06.01.2012)
+
