@@ -78,6 +78,8 @@ def print_srclines(dwarfinfo, input, printAllLines):
     # try to match objdump format
     opc = re.compile(" +([a-f0-9]+):")
     
+    newblock = True
+
     for line in input:
         
         # Check if we have a PC at the beginning of the line
@@ -88,20 +90,23 @@ def print_srclines(dwarfinfo, input, printAllLines):
                 PC = int(m.group(1), 16)
                 break
         if not PC:
-            print(line, end="")                
+            print(line, end="")
+            newblock = True
             continue
         
         funcname = decode_funcname(dwarfinfo, PC)
-        file, line = decode_file_line(dwarfinfo, PC)
+        file, linenr = decode_file_line(dwarfinfo, PC)
         
-        if (printAllLines or lastFunction != funcname or 
-            lastLineNr != line or lastFilename != file):
-            print('%s:%s %s' % (bytes2str(file), line, bytes2str(funcname)))
+        if (printAllLines or newblock or lastFunction != funcname or 
+            lastLineNr != linenr or lastFilename != file):
+            if file or linenr or funcname:
+                print('Line %s:%s, Function %s' % (bytes2str(file), linenr, bytes2str(funcname)))
                 
         lastFunction = funcname
         lastFilename = file
-        lastLineNr = line
-        
+        lastLineNr = linenr
+        newblock = False
+
         print(line, end="")
 
 def load_dwarfinfo(filename):
