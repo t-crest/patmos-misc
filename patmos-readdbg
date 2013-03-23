@@ -29,50 +29,64 @@ from elftools.dwarf.descriptions import (
     describe_DWARF_expr, set_global_machine_arch)
 
 
-def decode_funcname(dwarfinfo, address):
-    # Go over all DIEs in the DWARF information, looking for a subprogram
-    # entry with an address range that includes the given address. Note that
-    # this simplifies things by disregarding subprograms that may have 
-    # split address ranges.
-    for CU in dwarfinfo.iter_CUs():
-        for DIE in CU.iter_DIEs():
-            try:
-                if DIE.tag == 'DW_TAG_subprogram':
-                    lowpc = DIE.attributes['DW_AT_low_pc'].value
-                    highpc = DIE.attributes['DW_AT_high_pc'].value
-                    if lowpc <= address <= highpc:
-                        return DIE.attributes['DW_AT_name'].value
-            except KeyError:
-                continue
+def decode_funcname(funcinfo, address):
+    for info in funcinfo:
+        lowpc = info[0]
+        highpc = info[1]
+        if lowpc <= address <= highpc:
+            return info[2]
     return None
 
 
-def decode_file_line(dwarfinfo, address):
-    # Go over all the line programs in the DWARF information, looking for
-    # one that describes the given address.
+def decode_file_line(lineinfo, address):
+    for info in lineinfo:
+        prevaddr = info[0]
+        stateaddress = info[1]
+        if prevaddr <= address <= stateaddress:
+            filename = info[2]
+            line = info[3]
+            return filename, line
+    return None, None
+
+def load_lineinfo(dwarfinfo):
+    # load all line infos and all function names into lists
+    # lines contains tuples of startaddr, endaddress, filename, line
+    lines = []
+    # functions contains tuples of lowpc, highpc, function
+    functions = []
     for CU in dwarfinfo.iter_CUs():
-        # First, look at line programs to find the file/line for the address
+        # First, look at line programs to find the file/line map
         lineprog = dwarfinfo.line_program_for_CU(CU)
         prevaddr = maxint
         for entry in lineprog.get_entries():
             # We're interested in those entries where a new state is assigned
             state = entry.state
             if state is not None and not state.end_sequence:
-                if prevaddr <= address <= state.address:
+                if prevaddr <= state.address:
                     filename = lineprog['file_entry'][state.file - 1].name
                     line = state.line
-                    return filename, line
+                    info = prevaddr, state.address, filename, line
+                    lines.append( info )
                 prevaddr = state.address
-    return None, None
-
+        # Go over all DIEs in the DWARF information. Note that
+        # this simplifies things by disregarding subprograms that may have 
+        # split address ranges.
+        for DIE in CU.iter_DIEs():
+            try:
+                if DIE.tag == 'DW_TAG_subprogram':
+                    lowpc = DIE.attributes['DW_AT_low_pc'].value
+                    highpc = DIE.attributes['DW_AT_high_pc'].value
+                    info = lowpc, highpc, DIE.attributes['DW_AT_name'].value
+                    functions.append( info )
+            except KeyError:
+                continue
+    return lines, functions
 
 lastLineNr = None
 lastFilename = None
 lastFunction = None
 
-def print_srclines(dwarfinfo, input, printAllLines):
-    location_lists = dwarfinfo.location_lists()
-    
+def print_srclines(lineinfo, functioninfo, input, printAllLines):
     # try to match first column as hex PC
     ppc = re.compile("([a-fA-F0-9]+)[ \t\n]")
     # try to match objdump format
@@ -94,13 +108,13 @@ def print_srclines(dwarfinfo, input, printAllLines):
             newblock = True
             continue
         
-        funcname = decode_funcname(dwarfinfo, PC)
-        file, linenr = decode_file_line(dwarfinfo, PC)
+        funcname = decode_funcname(functioninfo, PC)
+        file, linenr = decode_file_line(lineinfo, PC)
         
         if (printAllLines or newblock or lastFunction != funcname or 
             lastLineNr != linenr or lastFilename != file):
             if file or linenr or funcname:
-                print('Line %s:%s, Function %s' % (bytes2str(file), linenr, bytes2str(funcname)))
+                print('# Line %s:%s, Function %s' % (bytes2str(file), linenr, bytes2str(funcname)))
                 
         lastFunction = funcname
         lastFilename = file
@@ -135,6 +149,7 @@ parser.add_argument('-l', '--lines', help='Display line numbers for the given in
 args = parser.parse_args()
 
 dwarfinfo = load_dwarfinfo(args.elffile)
+lineinfo, funcinfo = load_lineinfo(dwarfinfo)
 
 if args.lines: 
     input = None
@@ -147,11 +162,11 @@ if args.lines:
             print("Could not open input file " + args.lines + ": " + e)
             sys.exit(1)
     
-    print_srclines(dwarfinfo, input, args.all)
+    print_srclines(lineinfo, funcinfo, input, args.all)
     
     if args.lines != "-":
         input.close()
     
 else:
     # For now, just default to "-l -" if no other action is given
-    print_srclines(dwarfinfo, sys.stdin, args.all)
+    print_srclines(lineinfo, funcinfo, sys.stdin, args.all)
