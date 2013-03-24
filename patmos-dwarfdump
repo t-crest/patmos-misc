@@ -22,6 +22,7 @@ import re
 # We do not care about closed stdout pipe, just abort 
 import signal
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+signal.signal(signal.SIGINT,  signal.SIG_DFL)
 
 # If elftools is not installed, maybe we're running from the root or examples
 # dir of the source distribution
@@ -93,6 +94,8 @@ def load_lineinfo(dwarfinfo):
                     lowpc = DIE.attributes['DW_AT_low_pc'].value
                     highpc = DIE.attributes['DW_AT_high_pc'].value
                     function = DIE.attributes['DW_AT_name'].value
+                    # Skip entries that have not been relocated
+                    if not lowpc and not highpc: continue
                     info = lowpc, highpc, bytes2str(function)
                     functions.append( info )
             except KeyError:
