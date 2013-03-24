@@ -66,16 +66,16 @@ def decode_file_line(dwarfinfo, address):
     for CU in dwarfinfo.iter_CUs():
         # First, look at line programs to find the file/line for the address
         lineprog = dwarfinfo.line_program_for_CU(CU)
-        prevaddr = maxint
+        prevstate = None
         for entry in lineprog.get_entries():
             # We're interested in those entries where a new state is assigned
             state = entry.state
-            if state is not None and not state.end_sequence:
-                if prevaddr <= address <= state.address:
-                    filename = lineprog['file_entry'][state.file - 1].name
-                    line = state.line
+            if state is not None:
+                if prevstate and prevstate.address <= address < state.address and not prevstate.end_sequence:
+                    filename = lineprog['file_entry'][prevstate.file - 1].name
+                    line = prevstate.line
                     return filename, line
-                prevaddr = state.address
+                prevstate = state
     return None, None
 
 
