@@ -21,6 +21,7 @@ import re
 # We do not care about closed stdout pipe, just abort 
 import signal
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+signal.signal(signal.SIGINT,  signal.SIG_DFL)
 
 # If elftools is not installed, maybe we're running from the root or examples
 # dir of the source distribution
