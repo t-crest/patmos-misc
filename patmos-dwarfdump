@@ -145,10 +145,9 @@ def load_dwarfinfo(filename):
     if not elffile.has_dwarf_info():
         print(filename.name + ': ELF file has no DWARF info!')
         sys.exit(1)
-    
-    # get_dwarf_info returns a DWARFInfo context object, which is the
-    # starting point for all DWARF-based processing in pyelftools.
-    dwarfinfo = elffile.get_dwarf_info()
+
+    # TODO support Patmos relocation types, enable resolving relocations here    
+    dwarfinfo = elffile.get_dwarf_info(False)
     
     return dwarfinfo
 
