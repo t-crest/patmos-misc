@@ -6,9 +6,9 @@
 # This script is designed to be used with objdump or similar tools.
 # To annotate the objdump output with line infos, use
 #
-# objdump -d <binary> | dwarf_print_lines.py <binary>
+# objdump -d <binary> | python dwarfdump.py <binary>
 #
-# Author: Stefan Hepp <hepp@complang.tuwien.ac.at>
+# Author: Stefan Hepp <stefan@stefant.org>
 # This code is in the public domain
 #----------------------------------------------------------------------
 
