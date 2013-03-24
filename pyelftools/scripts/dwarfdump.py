@@ -1,13 +1,13 @@
 #----------------------------------------------------------------------
 # This script reads DWARF debug info from an ELF file and
 # prints out function names and line number infos for every
-# address that is given as an input. 
+# address that is given as an input.
 #
 # This script is designed to be used with objdump or similar tools.
-# To annotate the objdump output with line infos, use 
+# To annotate the objdump output with line infos, use
 #
 # objdump -d <binary> | dwarf_print_lines.py <binary>
-# 
+#
 # Author: Stefan Hepp <hepp@complang.tuwien.ac.at>
 # This code is in the public domain
 #----------------------------------------------------------------------
@@ -17,7 +17,7 @@ import sys
 import argparse
 import re
 
-# We do not care about closed stdout pipe, just abort 
+# We do not care about closed stdout pipe, just abort
 import signal
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 signal.signal(signal.SIGINT,  signal.SIG_DFL)
@@ -70,7 +70,7 @@ def load_lineinfo(dwarfinfo):
                 file_entry = lineprog['file_entry'][prevstate.file - 1]
                 if file_entry.dir_index == 0:
                     # current directory
-                    # TODO get directory of source file and prepend it 
+                    # TODO get directory of source file and prepend it
                     filename = './%s' % (bytes2str(file_entry.name))
                 else:
                     filename = '%s/%s' % (
@@ -81,7 +81,7 @@ def load_lineinfo(dwarfinfo):
                 lines.append( info )
             prevstate = state
         # Go over all DIEs in the DWARF information. Note that
-        # this simplifies things by disregarding subprograms that may have 
+        # this simplifies things by disregarding subprograms that may have
         # split address ranges.
         for DIE in CU.iter_DIEs():
             try:
@@ -100,16 +100,16 @@ def print_lineinfos(lineinfo, functioninfo, input, printAllLines, printInput = T
     ppc = re.compile("([a-fA-F0-9]+)[ \t\n]")
     # Try to match objdump format
     opc = re.compile(" +([a-f0-9]+):")
-    
+
     lastLineNr = None
     lastFilename = None
     lastFunction = None
 
     for line in input:
-        
+
         # Check if we have a PC at the beginning of the line
         PC = None
-        for r in [ppc, opc]: 
+        for r in [ppc, opc]:
             m = r.match(line)
             if m:
                 PC = int(m.group(1), 16)
@@ -117,18 +117,18 @@ def print_lineinfos(lineinfo, functioninfo, input, printAllLines, printInput = T
         if PC is None:
             if printInput: print(line, end="")
             continue
-        
+
         function = decode_funcname(functioninfo, PC)
         filename, linenr = decode_file_line(lineinfo, PC)
-        
+
         if printAllLines:
             print('%s:%s, %s():' % (filename, linenr, function))
         else:
             if function and lastFunction != function:
                 print("%s():" % function)
             if (filename or linenr) and (lastLineNr != linenr or lastFilename != filename):
-        	   print("%s:%s" % (filename, linenr))
-                
+                print("%s:%s" % (filename, linenr))
+
         lastFunction = function
         lastFilename = filename
         lastLineNr = linenr
@@ -137,15 +137,15 @@ def print_lineinfos(lineinfo, functioninfo, input, printAllLines, printInput = T
 
 def load_dwarfinfo(filename):
     elffile = ELFFile(filename)
-    
+
     if not elffile.has_dwarf_info():
         print(filename.name + ': ELF file has no DWARF info!')
         sys.exit(1)
-    
+
     # get_dwarf_info returns a DWARFInfo context object, which is the
     # starting point for all DWARF-based processing in pyelftools.
     dwarfinfo = elffile.get_dwarf_info()
-    
+
     return dwarfinfo
 
 
@@ -161,18 +161,18 @@ dwarfinfo = load_dwarfinfo(args.elffile)
 # Load all dwarf line number and function infos into a lookup table
 lineinfo, funcinfo = load_lineinfo(dwarfinfo)
 
-if args.lines and args.lines != "-": 
+if args.lines and args.lines != "-":
     input = None
     try:
-	input = open(args.lines, 'r')
+        input = open(args.lines, 'r')
     except:
-	print("Could not open input file " + args.lines + ": " + e)
-	sys.exit(1)
-    
+        print("Could not open input file " + args.lines + ": " + e)
+        sys.exit(1)
+
     print_lineinfos(lineinfo, funcinfo, input, args.all)
-    
+
     input.close()
-    
+
 else:
     print_lineinfos(lineinfo, funcinfo, sys.stdin, args.all)
 
