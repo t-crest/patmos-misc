@@ -100,6 +100,8 @@ def print_lineinfos(lineinfo, functioninfo, input, printAllLines, printInput = T
     ppc = re.compile("([a-fA-F0-9]+)[ \t\n]")
     # Try to match objdump format
     opc = re.compile(" +([a-f0-9]+):")
+    # Try to match stacktraces
+    spc = re.compile(" +at 0x([a-f0-9]+) ")
     
     lastLineNr = None
     lastFilename = None
@@ -109,9 +111,11 @@ def print_lineinfos(lineinfo, functioninfo, input, printAllLines, printInput = T
         
         # Check if we have a PC at the beginning of the line
         PC = None
-        for r in [ppc, opc]: 
+	isStacktrace = False
+        for r in [ppc, opc, spc]: 
             m = r.match(line)
             if m:
+		isStacktrace = (r == spc)
                 PC = int(m.group(1), 16)
                 break
         if PC is None:
@@ -121,7 +125,10 @@ def print_lineinfos(lineinfo, functioninfo, input, printAllLines, printInput = T
         function = decode_funcname(functioninfo, PC)
         filename, linenr = decode_file_line(lineinfo, PC)
         
-        if printAllLines:
+	if isStacktrace:
+	    print(line, end="")
+            print('   %s:%s' % (filename, linenr))
+        elif printAllLines:
             print('%s:%s, %s():' % (filename, linenr, function))
         else:
             if function and lastFunction != function:
@@ -133,7 +140,7 @@ def print_lineinfos(lineinfo, functioninfo, input, printAllLines, printInput = T
         lastFilename = filename
         lastLineNr = linenr
 
-        if printInput: print(line, end="")
+        if printInput and not isStacktrace: print(line, end="")
 
 def load_dwarfinfo(filename):
     elffile = ELFFile(filename)
