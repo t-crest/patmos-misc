@@ -66,14 +66,20 @@ def load_lineinfo(dwarfinfo):
             if state is None: continue
             if prevstate and prevstate.address <= state.address and not prevstate.end_sequence:
                 file_entry = lineprog['file_entry'][prevstate.file - 1]
+                file_name = bytes2str(file_entry.name)
                 if file_entry.dir_index == 0:
                     # current directory
                     # TODO get directory of source file and prepend it 
-                    filename = './%s' % (bytes2str(file_entry.name))
+                    filename = './%s' % (file_name)
+                elif file_name[0] == '/':
+                    # This ssems to be a hack.. can we detect somehow else if 
+                    # this is an absolute path, and is include_rirectory the 
+                    # correct path if it is not absolute?
+                    filename = file_name
                 else:
                     filename = '%s/%s' % (
                         bytes2str(lineprog['include_directory'][file_entry.dir_index - 1]),
-                        bytes2str(file_entry.name))
+                        file_name)
                 line = prevstate.line
                 info = prevstate.address, state.address, filename, line
                 lines.append( info )
@@ -111,11 +117,11 @@ def print_lineinfos(lineinfo, functioninfo, input, printAllLines, printInput = T
         
         # Check if we have a PC at the beginning of the line
         PC = None
-	isStacktrace = False
+        isStacktrace = False
         for r in [ppc, opc, spc]: 
             m = r.match(line)
             if m:
-		isStacktrace = (r == spc)
+                isStacktrace = (r == spc)
                 PC = int(m.group(1), 16)
                 break
         if PC is None:
