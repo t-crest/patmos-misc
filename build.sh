@@ -665,11 +665,17 @@ for target in $TARGETS; do
     build_cmake patmos/ctools    build_default $(get_build_dir patmos ctools) "$CTOOLS_ARGS"
     ;;
   'bench')
+    repo=$(get_repo_dir bench)
     if [ -z "$BENCH_REPO_URL" ]; then
-      echo "Benchmark repository URL is not configured, skipped. Set BENCH_REPO_URL to enable."
+      if [ -d $ROOT_DIR/$repo ]; then
+	echo "Skipped updating of benchmark repository, BENCH_REPO_URL is not set."
+      else
+        echo "Benchmark repository URL is not configured, skipped. Set BENCH_REPO_URL to enable."
+      fi
     else
       clone_update $BENCH_REPO_URL $(get_repo_dir bench)
-      repo=$(get_repo_dir bench)
+    fi
+    if [ -d $ROOT_DIR/$repo ]; then
       build_cmake bench build_bench $(get_build_dir bench) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin" "$BENCH_ARGS"
     fi
     ;;
