@@ -93,20 +93,28 @@ Inline Assembler
 
 Inline assembly syntax is similar to GCC inline assembly. It uses %0, %1, ... as placeholders for
 operands. Accepted register constraints are: r or R for any general purpose register,
-{<registername>} to use a specific register, i for immediates, or the index of an output register to
+{$<registername>} to use a specific register, i for immediates, or the index of an output register to
 assign an input register the same register as the output register.
 
 -- Example --
     int i, j, k;
     asm("mov  $r31 = %1 ; # copy i into r31\n\t"
         "add  %0 = $r5, %2\n\t"
-	"bs %3\n\t"	     // call myfunction
+	"br %3\n\t"	     // call myfunction
 	"nop 0 ;; nop 0\n\t" // delay slots
         : "=r" (j)
-        : "0" (i), "{r10}" (k), "i" (&myfunction));
+        : "0" (i), "{$r10}" (k), "i" (&myfunction)
+	: "$r5" );
 -- End --
 
 Please see backend.txt for a description of the Patmos assembler syntax.
+
+Known Bugs: 
+
+Clobbering any of $r27-$r31 does not work correctly, you should not modify those registers.
+
+Constraining an output to a register ("={$r10}") does not work, for some reason LLVM looses the output
+register operand somewhere between SelectionDAGBuilder::visitInlineAsm() and AsmPrinter::EmitInlineAsm().
 
 
 Scratchpad Memory
