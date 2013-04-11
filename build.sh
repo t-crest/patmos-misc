@@ -152,6 +152,7 @@ DO_SHOW_CONFIGURE=false
 DO_RUN_TESTS=false
 DRYRUN=false
 VERBOSE=false
+DO_RUN_ALL=false
 
 # user config
 if [ -f $CFGFILE ]; then
@@ -382,7 +383,7 @@ function build_autoconf() {
 
 function usage() {
   cat <<EOT
-  Usage: $0 [-c] [-j<n>] [-p] [-i <install_dir>] [-h] [<targets>]
+  Usage: $0 [-c] [-j<n>] [-p] [-i <install_dir>] [-h] [-a|<targets>]
 
     -c		Cleanup builds and rerun configure
     -j <n> 	Pass -j<n> to make
@@ -395,6 +396,7 @@ function usage() {
     -v		Show command that are executed
     -V		Make make verbosive
     -t		Run tests
+    -a          Build llvm and do a clean build of newlib, compiler-rt and bench with tests.
 
   Available targets:
     $ALLTARGETS eclipse
@@ -540,9 +542,70 @@ function run_llvm_build() {
 }
 
 
+build_target() {
+  local target=$1
+
+  if [ "$DO_SHOW_CONFIGURE" ]; then
+    info "Configure for '$target'"
+  else
+    info "Processing '"$target"'"
+  fi
+  case $target in
+  'llvm')
+    clone_update ${GITHUB_BASEURL}/patmos-llvm.git $(get_repo_dir llvm)
+    if [ "$LLVM_OMIT_CLANG" != "true" ]; then
+        clone_update ${GITHUB_BASEURL}/patmos-clang.git $(get_repo_dir llvm)/tools/clang
+    fi
+    run_llvm_build
+    ;;
+  'eclipse')
+    run_llvm_build eclipse
+    ;;
+  'gold')
+    clone_update ${GITHUB_BASEURL}/patmos-gold.git $(get_repo_dir gold)
+    build_autoconf gold build_gold $(get_build_dir gold) --program-prefix=patmos- --enable-gold=yes --enable-ld=no "$GOLD_ARGS"
+    ;;
+  'newlib')
+    clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib)
+    build_autoconf newlib build_default $(get_build_dir newlib) --target=$TARGET AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
+        RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
+        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target ${TARGET} -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
+    ;;
+  'compiler-rt')
+    clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $(get_repo_dir compiler-rt)
+    repo=$(get_repo_dir compiler-rt)
+    build_cmake compiler-rt build_default $(get_build_dir compiler-rt) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
+    ;;
+  'patmos'|'pasim')
+    clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
+    info "Building simulator in patmos .. "
+    build_cmake patmos/simulator build_and_test_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
+    info "Building ctools in patmos .. "
+    build_cmake patmos/ctools    build_default $(get_build_dir patmos ctools) "$CTOOLS_ARGS"
+    ;;
+  'bench')
+    repo=$(get_repo_dir bench)
+    if [ -z "$BENCH_REPO_URL" ]; then
+      if [ -d $ROOT_DIR/$repo ]; then
+	echo "Skipped updating of benchmark repository, BENCH_REPO_URL is not set."
+      else
+        echo "Benchmark repository URL is not configured, skipped. Set BENCH_REPO_URL to enable."
+      fi
+    else
+      clone_update $BENCH_REPO_URL $(get_repo_dir bench)
+    fi
+    if [ -d $ROOT_DIR/$repo ]; then
+      build_cmake bench build_bench $(get_build_dir bench) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin" "$BENCH_ARGS"
+    fi
+    ;;
+  *) echo "Don't know about $target." ;;
+  esac
+}
+
+
 
 # one-shot config
-while getopts ":chi:j:pudsvxVte" opt; do
+while getopts ":chi:j:pudsvxVtae" opt; do
   case $opt in
     c) DO_CLEAN=true ;;
     h) usage; exit 0 ;;
@@ -555,6 +618,7 @@ while getopts ":chi:j:pudsvxVte" opt; do
     v) VERBOSE=true ;;
     V) MAKE_VERBOSE="VERBOSE=1" ;;
     t) DO_RUN_TESTS=true ;;
+    a) DO_RUN_ALL=true ;;
     x) set -x ;;
     e) # recreate build.cfg.dist
        cat build.sh | sed -n '/##* Start of user configs/,/##* End of user configs/p' | sed "$ d" | sed "/Start of user configs/d" > build.cfg.dist 
@@ -624,63 +688,17 @@ fi
 
 mkdir -p "${INSTALL_DIR}"
 
-TARGETS=${@-$ALLTARGETS}
-for target in $TARGETS; do
-  if [ "$DO_SHOW_CONFIGURE" ]; then
-    info "Configure for '$target'"
-  else
-    info "Processing '"$target"'"
-  fi
-  case $target in
-  'llvm')
-    clone_update ${GITHUB_BASEURL}/patmos-llvm.git $(get_repo_dir llvm)
-    if [ "$LLVM_OMIT_CLANG" != "true" ]; then
-        clone_update ${GITHUB_BASEURL}/patmos-clang.git $(get_repo_dir llvm)/tools/clang
-    fi
-    run_llvm_build
-    ;;
-  'eclipse')
-    run_llvm_build eclipse
-    ;;
-  'gold')
-    clone_update ${GITHUB_BASEURL}/patmos-gold.git $(get_repo_dir gold)
-    build_autoconf gold build_gold $(get_build_dir gold) --program-prefix=patmos- --enable-gold=yes --enable-ld=no "$GOLD_ARGS"
-    ;;
-  'newlib')
-    clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib)
-    build_autoconf newlib build_default $(get_build_dir newlib) --target=$TARGET AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
-        RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
-        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target ${TARGET} -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
-    ;;
-  'compiler-rt')
-    clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $(get_repo_dir compiler-rt)
-    repo=$(get_repo_dir compiler-rt)
-    build_cmake compiler-rt build_default $(get_build_dir compiler-rt) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
-    ;;
-  'patmos'|'pasim')
-    clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
-    info "Building simulator in patmos .. "
-    build_cmake patmos/simulator build_and_test_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
-    info "Building ctools in patmos .. "
-    build_cmake patmos/ctools    build_default $(get_build_dir patmos ctools) "$CTOOLS_ARGS"
-    ;;
-  'bench')
-    repo=$(get_repo_dir bench)
-    if [ -z "$BENCH_REPO_URL" ]; then
-      if [ -d $ROOT_DIR/$repo ]; then
-	echo "Skipped updating of benchmark repository, BENCH_REPO_URL is not set."
-      else
-        echo "Benchmark repository URL is not configured, skipped. Set BENCH_REPO_URL to enable."
-      fi
-    else
-      clone_update $BENCH_REPO_URL $(get_repo_dir bench)
-    fi
-    if [ -d $ROOT_DIR/$repo ]; then
-      build_cmake bench build_bench $(get_build_dir bench) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin" "$BENCH_ARGS"
-    fi
-    ;;
-  *) echo "Don't know about $target." ;;
-  esac
-done
-
+if [ "$DO_RUN_ALL" == "true" ]; then
+    build_target llvm
+    DO_CLEAN=true
+    DO_RUN_TESTS=true
+    build_target compiler-rt
+    build_target newlib
+    build_target bench
+else
+    TARGETS=${@-$ALLTARGETS}
+    for target in $TARGETS; do
+	build_target $target
+    done
+fi
 
