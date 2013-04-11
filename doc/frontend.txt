@@ -111,8 +111,6 @@ Please see backend.txt for a description of the Patmos assembler syntax.
 
 Known Bugs: 
 
-Clobbering any of $r27-$r31 does not work correctly, you should not modify those registers.
-
 Constraining an output to a register ("={$r10}") does not work, for some reason LLVM looses the output
 register operand somewhere between SelectionDAGBuilder::visitInlineAsm() and AsmPrinter::EmitInlineAsm().
 
