@@ -100,7 +100,7 @@ assign an input register the same register as the output register.
     int i, j, k;
     asm("mov  $r31 = %1 ; # copy i into r31\n\t"
         "add  %0 = $r5, %2\n\t"
-	"br %3\n\t"	     // call myfunction
+	"call %3\n\t"	     // call myfunction
 	"nop 0 ;; nop 0\n\t" // delay slots
         : "=r" (j)
         : "0" (i), "{$r10}" (k), "i" (&myfunction)
@@ -110,6 +110,9 @@ assign an input register the same register as the output register.
 Please see backend.txt for a description of the Patmos assembler syntax.
 
 Known Bugs: 
+
+Clobbering the registers $r30/$r31 is not supported and calls inside inline assembler will not cause the
+prologue to save $r30/$31.
 
 Constraining an output to a register ("={$r10}") does not work, for some reason LLVM looses the output
 register operand somewhere between SelectionDAGBuilder::visitInlineAsm() and AsmPrinter::EmitInlineAsm().
