@@ -690,6 +690,7 @@ mkdir -p "${INSTALL_DIR}"
 
 if [ "$DO_RUN_ALL" == "true" ]; then
     build_target llvm
+    build_target patmos
     DO_CLEAN=true
     DO_RUN_TESTS=true
     build_target compiler-rt
