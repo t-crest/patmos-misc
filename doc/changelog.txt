@@ -1,6 +1,16 @@
 Patmos Toolchain Changelog
 ==========================
 
+2013-04-15 ISA Revision
+-----------------------
+- using old encoding for xor, added xor ALUi format
+- call instructions must only have exactly two 32bit instructions in the delay slot
+- added $ss alias for $s5
+- using $s5 for stack memory spill pointer (was s6), using $s6 for stack top pointer
+- added sspill with immediate, as well as sens and sspill indirect
+- implemented support for IO-mapped cycle-counter and other IO-devices, dropped counter 
+  implementation using s7/s8
+
 2013-04-04 ISA Revision
 -----------------------
 - removed rsub, nop <nr>, bne, pnor from simulator, ISA and compiler
