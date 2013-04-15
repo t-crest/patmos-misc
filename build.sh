@@ -676,6 +676,7 @@ if [ ! -z "$CLANG_COMPILER" ]; then
 	    echo "Clang version >= 3.1 required!"
 	else
 	    LLVM_CMAKE_ARGS="$LLVM_CMAKE_ARGS -DCMAKE_C_COMPILER=$CLANG_COMPILER -DCMAKE_CXX_COMPILER=$CLANG_COMPILER++"
+	    PASIM_ARGS="$PASIM_ARGS -DCMAKE_C_COMPILER=$CLANG_COMPILER -DCMAKE_CXX_COMPILER=$CLANG_COMPILER++"
 	fi
     else 
 	echo "Clang $clang is not executable, igored!"
