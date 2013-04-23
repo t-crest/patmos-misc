@@ -1,6 +1,15 @@
 Patmos Toolchain Changelog
 ==========================
 
+2013-04-16 Libc and Simulator Features
+--------------------------------------
+- Added --freq option to pasim to set the µs/clock tick rate.
+- Write the status of the LEDs to stdout when writing to the LED IO address.
+- Added uart_flush and uart_fflush to machine/uart.h in newlib. They send a flush
+  control command over the UART to flush the output of the simulator.
+- Added support for sleep, usleep, nanosleep for patmos-unknown-unknown-elf target.
+  The implementation uses the new µs simulator IO (i.e., they depend on the --freq pasim option)
+
 2013-04-15 ISA Revision
 -----------------------
 - using old encoding for xor, added xor ALUi format
