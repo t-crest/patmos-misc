@@ -69,31 +69,37 @@ end of the line.
 For memory operations, the syntax is [$register + offset]. Register or offset can be ommited, in
 that case the zero register r0 or an offset of 0 is used.
 
-Labels that are prefixed by .L are local labels.
+Labels that are prefixed by .L are local labels. Labels may only appear between bundles, not inside bundles. 
 
 -- Example --
     # add 42 to contents of r2
     # and store result in r1 (first slot)
-    add   $r1 = $r2, $42;
+    { add   $r1 = $r2, $42
     # if r3 equals 50, set p1 to true
-    cmpeq $p1, $r3, 50 
+    cmpeq $p1, $r3, 50 }
     # if p1 is true, jump to label_1
-    ($p1) br .Llabel1 ;; nop 3   # then wait 3 cycles
+    ($p1) br .Llabel1 ; nop ; nop   # then wait 2 cycles
     # Load the address of a symbol into r2
-    li $r2 = .L.str2 ;;
+    li $r2 = .L.str2
     # perform a memory store and a pred op
-    swc [$r31 + 2] = $r3 ; or $p1 = !$p2, $p3
+    { swc [$r31 + 2] = $r3 ; or $p1 = !$p2, $p3 }
     ...
 .Llabel1:
     ...
 -- End --
 
+
 o) Bundles 
 
-A double semi-colon ;; or a newline denotes the end of an instruction. If an instruction contains
-two operations, the operations must be separated by a single semi-colon or a single semi-colon
-followed by either a newline or a comment. Note that since newline is an instruction separator, the
-operation separator must always appear on the same line as the operation for the first slot. 
+A semi-colon ; or a newline denotes the end of an instruction or operation. If an instruction contains
+two operations, the operations in the bundle must be enclosed by curly brackets. For bundles consisting
+only of one operation, the brackets are optional. 
+
+Known bugs: 
+
+The closing bracket must appear on the same line as the last operation in the bundle. The opening bracket might
+be followed by a newline, but no comments or labels may appear between the bracket and the first operation.
+
 
 o) Function Block Start Markers and Subfunction Calls
 

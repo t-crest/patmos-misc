@@ -1,6 +1,10 @@
 Patmos Toolchain Changelog
 ==========================
 
+2013-04-26 Assembler Bundle Syntax
+----------------------------------
+- Dropped the double-semicolon separator, using curly brackets for bundles now
+
 2013-04-16 Libc and Simulator Features
 --------------------------------------
 - Added --freq option to pasim to set the µs/clock tick rate.

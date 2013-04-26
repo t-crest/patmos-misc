@@ -98,10 +98,10 @@ assign an input register the same register as the output register.
 
 -- Example --
     int i, j, k;
-    asm("mov  $r31 = %1 ; # copy i into r31\n\t"
+    asm("mov  $r31 = %1  # copy i into r31\n\t"
         "add  %0 = $r5, %2\n\t"
 	"call %3\n\t"	     // call myfunction
-	"nop 0 ;; nop 0\n\t" // delay slots
+	"nop ; nop \n\t"     // delay slots
         : "=r" (j)
         : "0" (i), "{$r10}" (k), "i" (&myfunction)
 	: "$r5" );
