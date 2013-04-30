@@ -40,3 +40,9 @@ use clang to compile the toolchain.
 If you are using the build.sh script, set GOLD_CXXFLAGS="-Wno-narrowing" in build.cfg.
 
 
+
+o) Keeping relocations in the executable (-Xgold -q) and debugging info (-g) do not work together.
+
+This seems to be a gold restriction.
+
+
