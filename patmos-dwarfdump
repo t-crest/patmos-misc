@@ -19,6 +19,8 @@ import os
 import argparse
 import re
 
+from libs.IntervalTree import IntervalTree
+
 # We do not care about closed stdout pipe, just abort 
 import signal
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)
@@ -30,24 +32,31 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'pyelftools'))
 from elftools.common.py3compat import itervalues, maxint, bytes2str
 from elftools.elf.elffile import ELFFile
 
+class IntervalInfo:
+    def __init__(self, start, end, info):
+	self.start = start
+	self.end = end
+	self.info = info
+    def get_begin(self):
+	return self.start
+    def get_end(self):
+	return self.end
+    def get_info(self):
+	return self.info
 
 def decode_funcname(funcinfo, address):
-    for info in funcinfo:
-        lowpc = info[0]
-        highpc = info[1]
-        if lowpc <= address <= highpc:
-            return info[2]
+    if funcinfo:
+	intervals = funcinfo.search(address)
+	if len(intervals) > 0:
+	    return intervals[0].get_info()
     return None
 
 
 def decode_file_line(lineinfo, address):
-    for info in lineinfo:
-        stateaddress = info[0]
-        nextaddress = info[1]
-        if stateaddress <= address < nextaddress:
-            filename = info[2]
-            line = info[3]
-            return filename, line
+    if lineinfo:
+	intervals = lineinfo.search(address)
+	if len(intervals) > 0:
+	    return intervals[0].get_info()
     return None, None
 
 def load_lineinfo(dwarfinfo):
@@ -80,9 +89,8 @@ def load_lineinfo(dwarfinfo):
                     filename = '%s/%s' % (
                         bytes2str(lineprog['include_directory'][file_entry.dir_index - 1]),
                         file_name)
-                line = prevstate.line
-                info = prevstate.address, state.address, filename, line
-                lines.append( info )
+		info = filename, prevstate.line
+                lines.append( IntervalInfo(prevstate.address, state.address, info) )
             prevstate = state
         # Go over all DIEs in the DWARF information. Note that
         # this simplifies things by disregarding subprograms that may have 
@@ -95,11 +103,17 @@ def load_lineinfo(dwarfinfo):
                     function = DIE.attributes['DW_AT_name'].value
                     # Skip entries that have not been relocated
                     if not lowpc and not highpc: continue
-                    info = lowpc, highpc, bytes2str(function)
-                    functions.append( info )
+                    info = bytes2str(function)
+                    functions.append( IntervalInfo( lowpc, highpc + 1, info) )
             except KeyError:
                 continue
-    return lines, functions
+    linetree = None
+    functree = None
+    if lines: 
+	linetree = IntervalTree(lines)
+    if functions:
+	functree = IntervalTree(functions)
+    return linetree, functree
 
 def print_lineinfos(lineinfo, functioninfo, input, printAllLines, printInput = True):
     # Try to match first column as hex PC
@@ -130,7 +144,7 @@ def print_lineinfos(lineinfo, functioninfo, input, printAllLines, printInput = T
         
         function = decode_funcname(functioninfo, PC)
         filename, linenr = decode_file_line(lineinfo, PC)
-        
+
 	if isStacktrace:
 	    print(line, end="")
             print('   %s:%s' % (filename, linenr))
