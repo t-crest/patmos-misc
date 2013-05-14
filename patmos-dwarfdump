@@ -90,7 +90,7 @@ def load_lineinfo(dwarfinfo):
                         bytes2str(lineprog['include_directory'][file_entry.dir_index - 1]),
                         file_name)
 		info = filename, prevstate.line
-                lines.append( IntervalInfo(prevstate.address, state.address, info) )
+                lines.append( IntervalInfo(prevstate.address, state.address - 1, info) )
             prevstate = state
         # Go over all DIEs in the DWARF information. Note that
         # this simplifies things by disregarding subprograms that may have 
@@ -104,7 +104,7 @@ def load_lineinfo(dwarfinfo):
                     # Skip entries that have not been relocated
                     if not lowpc and not highpc: continue
                     info = bytes2str(function)
-                    functions.append( IntervalInfo( lowpc, highpc + 1, info) )
+                    functions.append( IntervalInfo( lowpc, highpc, info) )
             except KeyError:
                 continue
     linetree = None
