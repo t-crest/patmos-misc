@@ -1,6 +1,10 @@
 Patmos Toolchain Changelog
 ==========================
 
+2013-05-23 ISA Revision
+-----------------------
+- Changed delay slot size for CALL and BRCF from 2 to 3 cycles
+
 2013-04-26 Assembler Bundle Syntax
 ----------------------------------
 - Dropped the double-semicolon separator, using curly brackets for bundles now
