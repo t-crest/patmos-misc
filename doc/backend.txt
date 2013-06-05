@@ -154,8 +154,10 @@ Used address spaces:
     - nontemporal flag: main memory with bypass
       Set only by the compiler (at the moment)
 - Address Space 1: (local) scratchpad memory
-    - use macro _SPM defined in <machine/spm.h>
+    - use macro _SPM defined in <machine/spm.h> for SPM accesses
+    - use macro _IODEV defined in <machine/patmos.h> to access memory mapped IO devices
 - Address Space 2: Stack cache
     - Compiler-maintained, must not be used in application code (at the moment)
-
+- Address Space 3: main memory without data cache
+    - use macro _UNCACHED defined in <machine/patmos.h>
 
