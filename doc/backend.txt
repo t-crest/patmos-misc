@@ -69,6 +69,14 @@ end of the line.
 For memory operations, the syntax is [$register + offset]. Register or offset can be ommited, in
 that case the zero register r0 or an offset of 0 is used.
 
+For decoupled loads, the target operand $sm has to be omitted, i.e., a decoupled word load from global 
+memory would look like this:
+
+    dlwc [$r5 + 2]
+    ...
+    wait.mem
+    mfs  $r2 = $sm
+
 Labels that are prefixed by .L are local labels. Labels may only appear between bundles, not inside bundles. 
 
 -- Example --
