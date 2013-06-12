@@ -520,6 +520,14 @@ function build_bench() {
     fi
 }
 
+function build_emulator() {
+    root="${ROOT_DIR}/$(get_repo_dir patmos)"
+    run mkdir -p "${INSTALL_DIR}/bin"
+    run pushd "${root}"
+    run make $MAKEJ $MAKE_VERBOSE patsim emulator
+    install "${root}"/bin/emulator "${INSTALL_DIR}"/bin/patmos-emulator
+    run popd
+}
 
 function run_llvm_build() {
     local eclipse_args=
@@ -582,6 +590,8 @@ build_target() {
     build_cmake patmos/simulator build_and_test_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
     info "Building ctools in patmos .. "
     build_cmake patmos/ctools    build_default $(get_build_dir patmos ctools) "$CTOOLS_ARGS"
+    info "Building patmos-emulator in patmos .."
+    build_emulator $(get_repo_dir patmos)
     ;;
   'bench')
     repo=$(get_repo_dir bench)
