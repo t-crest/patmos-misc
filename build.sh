@@ -189,6 +189,8 @@ function install() {
 	dst=$dst/$(basename $src)
     fi
 
+    run mkdir -p $(dirname $dst)
+
     if [ "$INSTALL_SYMLINKS" == "true" ]; then
 	echo "Symlinking $src -> $dst"
 
@@ -206,7 +208,7 @@ function install() {
 	# Maybe, if $src is a directory, make sure we remove any trash in $dst (use rsync??) .. should be optional, off by default!
 	if [ "$OS_NAME" == "Linux" ]; then
 	    run cp -fauT $src $dst
-	else 
+	else
 	    if [ -e $dst ]; then
 		run rm -rf $dst
 	    fi
@@ -457,7 +459,7 @@ function build_llvm() {
 
     for file in `find $builddir/bin -type f`; do
 	filename=`basename $file`
-	
+
 	# Not sure how to add a program prefix for cmake install.. so just copy what we need
 	install $file $INSTALL_DIR/bin/patmos-$filename
     done
@@ -472,7 +474,7 @@ function build_llvm() {
     for file in `find $builddir/lib -name "*.$LIBEXT"`; do
 	install $file $INSTALL_DIR/lib/
     done
-    
+
     # Install system headers
     install $builddir/lib/clang $INSTALL_DIR/lib/clang
 
@@ -522,10 +524,10 @@ function build_bench() {
 
 function build_emulator() {
     root="${ROOT_DIR}/$(get_repo_dir patmos)"
-    run mkdir -p "${INSTALL_DIR}/bin"
     run pushd "${root}"
     run make $MAKEJ $MAKE_VERBOSE patsim emulator
     install "${root}"/bin/emulator "${INSTALL_DIR}"/bin/patmos-emulator
+    install "${root}"/chisel/spm.t "${INSTALL_DIR}"/lib/ld-scripts/patmos_spm.t
     run popd
 }
 
