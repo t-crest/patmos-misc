@@ -1,0 +1,60 @@
+# Buildbot configuration
+
+[project]
+title = Patmos
+url   = http://github.com/t-crest/
+buildbot-url = localhost
+
+[auth]
+username = patmos
+password = changeme
+
+[ports]
+master-port = 8010
+slave-port  = 9989
+
+[repositories]
+
+# llvm =
+# crt =
+# newlib =
+# clang =
+# patmos =
+# benchmarks = http://github.com/t-crest/patmos-benchmarks.git
+
+[mail]
+
+enabled   = 0
+fromaddr  = buildbot@yourdomain.com
+# relayhost = mail.yourcompany.com
+
+[mailrecipients]
+
+benedikt = benedikt@localhost
+
+[irc]
+
+enabled   = 0
+host      = irc.yourdomain.com
+nick      = patmosbb
+channel   = #patmos
+
+[slaves]
+
+# name = password
+
+# buildbot server vm
+buildbot-slave = changeme
+i686-slave = changeme
+
+[slaves-main]
+buildbot-slave = 1
+
+[slaves-synth]
+buildbot-slave = 1
+
+[slaves-i686]
+i686-slave = 1
+
+[slaves-x64]
+buildbot-slave = 1

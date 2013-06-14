@@ -1,0 +1,13 @@
+Patmos Buildbot Configuration
+=============================
+
+master.cfg         ... buildbot setup
+server.db.template ... server configuration (template)
+
+Setup master
+------------
+
+1. Edit server.db
+2. copy master.cfg and server.db.template to buildmaster root (e.g., /var/lib/buildbot/masters/yourbuildbotname/)
+3. copy your public_html directory to the buildmaster root (should include README.html)
+4. copy your templates directory to the buildmaster root (default templates on Ubuntu are in /usr/share/pyshared/buildbot/status/web/templates/)
