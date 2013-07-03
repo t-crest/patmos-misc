@@ -9,21 +9,32 @@ build_settings = [ {'name' => 'O0', 'cflags' => '-O0'},
 
 # Configuration
 configurations = [ {'name' => 'blockglobal', 'recorders' => 'g:bil', 'flow-fact-selection' => 'all' },
-                   {'name' => 'blocklocal',  'recorders' => 'g:cil,f:b', 'flow-fact-selection' => 'local' },
-                   {'name' => 'minimal',     'recorders' => 'g:cil', 'flow-fact-selection' => 'minimal' } ]
+                   {'name' => 'blocklocal',  'recorders' => 'g:cil,f:b', 'flow-fact-selection' => 'all' },
+                   {'name' => 'minimal',     'recorders' => 'g:cil', 'flow-fact-selection' => 'all' } ]
 
+#
 # MRTC
-# duff: (no loop bounds for -O0/minimal)
+#
+# disabled = %w{duff fac}
+# duff: irreducible loop (no loop bounds for -O0/minimal)
 # fac: recursion (not properly supported by analyze-trace's local recorders)
-benchmarks =
-  %w{adpcm bs bsort100 cnt compress cover crc duff
+benchmarks = %w{adpcm bs bsort100 cnt compress cover crc
      edn expint fdct fft1 fibcall fir insertsort janne_complex jfdctint lcdnum lms loop3
-     ludcmp matmult minmax minver ns qsort-exam qurt select sqrt statemate}
+     ludcmp matmult minmax minver ndes ns nsichneu qsort-exam qurt select sqrt statemate ud}
+
 current = {}
-current['buildsettings'] = build_settings[2..2]
+
+# Compile with -O1
+current['buildsettings'] = build_settings[1..1]
+
+# Analyze using the following trace facts: loop bounds, infeasible blocks, calltargets and function-local block frequencies
 current['configurations'] = configurations[1..1]
+
+# generate list of benchmarks
+
 $benchmarks = []
 begin
+  # MRTC
   mrtc = current.dup
   mrtc['analysis_entry'] = 'main'
   mrtc['trace_entry']    = 'main'
