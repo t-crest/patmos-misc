@@ -334,7 +334,7 @@ function build_cmake() {
 	echo "$flags" cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
 	return
     fi
-    if [ -e $builddir -a ! -e $builddir/Makefile ]; then
+    if [ -e $builddir -a ! -e $builddir/Makefile -a ! -e $builddir/build.ninja  ]; then
 	echo "Recreating builddir after unfinished configure"
 	run rm -rf $builddir
     fi
@@ -446,7 +446,11 @@ function build_llvm() {
     local rootdir=$1
     local builddir=$2
 
-    run make $MAKEJ $MAKE_VERBOSE all
+    if [ -e build.ninja ] ; then
+        run ninja
+    else
+        run make $MAKEJ $MAKE_VERBOSE all
+    fi
 
     echo "Installing files .. "
 
