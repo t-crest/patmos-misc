@@ -39,15 +39,37 @@ class BenchTool < WcetTool
     original_flow_fact_selection = options.flow_fact_selection
     prepare_pml
 
-    plain_unknown = Set.new
+    ait_errors = Set.new
     ait_problem_name("plain")
     wcet_analysis([])
     File.readlines(options.ait_report_file).each do |line|
+      # this is not a good metric (it does not determine whether WCET can be calculated)
       if line =~ /Loop '(.*?)': unknown loop bound/
-        plain_unknown.add($1)
+        ait_errors.add($1)
       end
     end
-    options.report_append['aiT-errors-plain'] = plain_unknown.size
+    options.report_append['aiT-errors'] = ait_errors.size
+
+    transform_down(["llvm.bc"],"llvm")
+    pml.flowfacts.each { |ff|
+      if ff.origin == "llvm.bc"
+        info("LLVM BC flowfact: #{ff}")
+      elsif ff.origin == "llvm"
+        info("LLVM MC flowfact: #{ff}")
+      end
+    }
+
+    ait_problem_name("llvm")
+    wcet_analysis(["llvm"])
+
+    trace_analysis
+
+    ait_problem_name("tfplain")
+    wcet_analysis(["trace"])
+
+    ait_problem_name("tf")
+    wcet_analysis(["llvm","trace"])
+
     report
     pml
   end
@@ -56,6 +78,7 @@ class BenchTool < WcetTool
     outdir = options.outdir
     mod = File.basename(options.binary_file, ".elf")
     basename = if name != "" then "#{mod}.#{name}" else mod end
+    options.timing_output = name
     options.ais_file = File.join(outdir, "#{basename}.ais")
     options.apx_file = File.join(outdir, "#{basename}.apx")
     options.ait_result_file = File.join(outdir, "#{basename}.ait.xml")
@@ -148,7 +171,7 @@ benchmarks.each do |benchmark|
 end
 
 # Summarize
-keys = %w{benchmark build analysis source analysis-entry cycles aiT-errors-plain}
+keys = %w{benchmark build analysis source analysis-entry cycles aiT-errors}
 print_csv(report, :keys => keys, :outfile => File.join(workdir,'report.csv'))
 puts
 print_table(report, keys)
