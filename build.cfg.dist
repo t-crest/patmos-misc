@@ -59,12 +59,16 @@ TARGET="patmos-unknown-unknown-elf"
 
 # Additional arguments for cmake / configure
 LLVM_CMAKE_ARGS=
+# e.g., use ninja for building instead of make
+#LLVM_CMAKE_ARGS="-G Ninja"
 LLVM_CONFIGURE_ARGS=
 GOLD_ARGS=
 NEWLIB_ARGS=
 
 # Build simulator in Release mode
 #PASIM_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
+# Use a custom installation of Boost libraries
+#PASIM_ARGS="-DBOOST_ROOT=$HOME/local/ -DBoost_NO_BOOST_CMAKE=TRUE"
 
 # Patmos C-tools cmake options
 CTOOLS_ARGS=
