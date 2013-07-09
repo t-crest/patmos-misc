@@ -100,6 +100,8 @@ TARGET="patmos-unknown-unknown-elf"
 
 # Additional arguments for cmake / configure
 LLVM_CMAKE_ARGS=
+# e.g., use ninja for building instead of make
+#LLVM_CMAKE_ARGS="-G Ninja"
 LLVM_CONFIGURE_ARGS=
 GOLD_ARGS=
 NEWLIB_ARGS=
