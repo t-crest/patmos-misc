@@ -18,6 +18,9 @@ configurations = [ {'name' => 'blockglobal', 'recorders' => 'g:bil', 'flow-fact-
 # disabled = %w{duff fac}
 # duff: irreducible loop (no loop bounds for -O0/minimal)
 # fac: recursion (not properly supported by analyze-trace's local recorders)
+#
+# long_running (in decreasing order): lms ludcmp minver ff1 qurt nischneu
+
 benchmarks = %w{adpcm bs bsort100 cnt compress cover crc
      edn expint fdct fft1 fibcall fir insertsort janne_complex jfdctint lcdnum lms loop3
      ludcmp matmult minmax minver ndes ns nsichneu qsort-exam qurt select sqrt statemate ud}
