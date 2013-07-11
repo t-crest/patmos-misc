@@ -498,7 +498,7 @@ function build_llvm() {
 
     # install platin
     echo "Installing platin toolkit .. "
-    run $rootdir/tools/platin/install.sh $INSTALL_DIR
+    run $rootdir/tools/platin/install.sh -i $INSTALL_DIR
 
     if [ "$DO_RUN_TESTS" == "true" ]; then
 	echo "Running tests.."
