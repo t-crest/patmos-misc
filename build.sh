@@ -84,7 +84,7 @@ BUILD_SOFTFLOAT=true
 INSTALL_SYMLINKS=false
 
 # URL for the repository containing the benchmarks
-#BENCH_REPO_URL="ssh+git://tipca.imm.dtu.dk/home/fbrandne/repos/patmos-benchmarks"
+#BENCH_REPO_URL="git@github.com:t-crest/patmos-benchmarks.git"
 BENCH_REPO_URL=
 
 # Set the target architecture for gold
@@ -533,11 +533,28 @@ function build_bench() {
 }
 
 function build_emulator() {
-    root="${ROOT_DIR}/$(get_repo_dir patmos)"
-    run pushd "${root}"
-    run make $MAKEJ $MAKE_VERBOSE patsim emulator
-    install "${root}"/bin/emulator "${INSTALL_DIR}"/bin/patmos-emulator
-    install "${root}"/chisel/spm.t "${INSTALL_DIR}"/lib/ld-scripts/patmos_spm.t
+    repo=$1
+    tmp=$2
+    ctoolsbuild=$(get_build_dir patmos ctools)
+    chiselbuild=$(get_build_dir patmos chisel)
+    rootdir=$(abspath $ROOT_DIR/$repo)
+    ctoolsbuilddir=$(abspath $ROOT_DIR/$ctoolsbuild)
+    chiselbuilddir=$(abspath $ROOT_DIR/$chiselbuild)
+    tmpdir=$(abspath $ROOT_DIR/$tmp)
+    
+    if [ $DO_CLEAN == true -o ! -e "$chiselbuilddir" ] ; then
+        run rm -rf $chiselbuilddir
+        run mkdir -p $chiselbuilddir
+    fi
+    if [ $DO_CLEAN == true -o ! -e "$tmpdir" ] ; then
+        run rm -rf $tmpdir
+        run mkdir -p $tmpdir
+    fi
+    
+    run pushd "${rootdir}"
+    run make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${tmpdir}'" "CTOOLSBUILDDIR='${ctoolsbuilddir}'" "CHISELBUILDDIR='${chiselbuilddir}'" "CHISELINSTALLDIR='${tmpdir}'" "INSTALLDIR='${INSTALL_DIR}/bin'" emulator
+    install "${chiselbuilddir}/emulator" "${INSTALL_DIR}/bin/patmos-emulator"
+    install "${rootdir}/chisel/spm.t" "${INSTALL_DIR}/lib/ld-scripts/patmos_spm.t"
     run popd
 }
 
@@ -603,7 +620,7 @@ build_target() {
     info "Building ctools in patmos .. "
     build_cmake patmos/ctools    build_default $(get_build_dir patmos ctools) "$CTOOLS_ARGS"
     info "Building patmos-emulator in patmos .."
-    build_emulator $(get_repo_dir patmos)
+    build_emulator $(get_repo_dir patmos) $(get_build_dir patmos)/tmp
     ;;
   'bench')
     repo=$(get_repo_dir bench)
