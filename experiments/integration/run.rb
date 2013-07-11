@@ -3,11 +3,13 @@
 # Experiments with compiler integration
 #
 
+# stdlib
 require 'yaml'
 require 'set'
 require 'fileutils'
 
-# parallel library
+# libraries available as gems
+require 'rubygems'
 begin
   require 'parallel'
 rescue LoadError => e
@@ -21,8 +23,12 @@ begin
 rescue LoadError => e
   path_to_platin=`which platin 2>/dev/null`.strip
   if File.exist?(path_to_platin)
-    libdir=File.join(File.dirname(File.dirname(path_to_platin)),"lib","platin")
-    $:.unshift libdir
+
+    libdir = File.join(File.dirname(File.dirname(path_to_platin)),"lib")
+    $:.unshift File.join(libdir,"platin")
+    Gem.clear_paths
+    ENV['GEM_PATH'] = File.join(libdir,"platin", "gems") + (ENV['GEM_PATH'] ? ":#{ENV['GEM_PATH']}" : "")
+
     require 'platin'
   else
     $stderr.puts("When trying to locate platin library - failed to locate platin executable #{path_to_platin}")
@@ -57,9 +63,8 @@ srcdir     = $benchsrc
 builddir   = $builddir
 workdir    = $workdir
 benchmarks = $benchmarks
-report     = File.join(workdir, 'report.yml')
 build_log  = File.join(builddir, 'build.log')
-do_update  = File.exist?(report)
+do_update  = true
 
 class BenchTool < WcetTool
   def initialize(pml, options)
@@ -174,7 +179,6 @@ end
 
 
 # remove old files unless updating
-File.unlink(report) if File.exist?(report) && ! do_update
 FileUtils.remove_entry_secure(build_log) if File.exist?(build_log) && ! do_update
 FileUtils.mkdir_p(builddir)
 
@@ -266,6 +270,8 @@ build_settings.each do |build_setting, benchmark_list|
 end
 
 # Join reports
+report = File.join(workdir, 'report.yml')
+File.unlink(report) if File.exist?(report)
 benchmarks.each do |benchmark|
   benchmark['buildsettings'].each do |build_setting|
     benchmark['configurations'].each do |configuration|
