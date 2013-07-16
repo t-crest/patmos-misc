@@ -38,6 +38,9 @@ BUILD_LTO=true
 # Build newlib, compiler-rt and benchmarks with softfloats
 BUILD_SOFTFLOAT=true
 
+# Build the Patmos Chisel emulator
+BUILD_EMULATOR=true
+
 # Create symlinks instead of copying files where applicable
 # (llvm, clang, gold)
 INSTALL_SYMLINKS=false

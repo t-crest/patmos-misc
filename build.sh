@@ -79,6 +79,9 @@ BUILD_LTO=true
 # Build newlib, compiler-rt and benchmarks with softfloats
 BUILD_SOFTFLOAT=true
 
+# Build the Patmos Chisel emulator
+BUILD_EMULATOR=true
+
 # Create symlinks instead of copying files where applicable
 # (llvm, clang, gold)
 INSTALL_SYMLINKS=false
@@ -619,8 +622,12 @@ build_target() {
     build_cmake patmos/simulator build_and_test_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
     info "Building ctools in patmos .. "
     build_cmake patmos/ctools    build_default $(get_build_dir patmos ctools) "$CTOOLS_ARGS"
-    info "Building patmos-emulator in patmos .."
-    build_emulator $(get_repo_dir patmos) $(get_build_dir patmos)/tmp
+    if [ "$BUILD_EMULATOR" == "false" ]; then
+	info "Skipping patmos-emulator in patmos."
+    else
+	info "Building patmos-emulator in patmos .."
+	build_emulator $(get_repo_dir patmos) $(get_build_dir patmos)/tmp
+    fi
     ;;
   'bench')
     repo=$(get_repo_dir bench)
