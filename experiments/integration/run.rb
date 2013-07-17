@@ -8,63 +8,25 @@ require 'yaml'
 require 'set'
 require 'fileutils'
 
-# libraries available as gems
-require 'rubygems'
+# load libraries
 begin
-  require 'parallel'
-rescue LoadError => e
-  $stderr.puts("FATAL parallel library not found => gem install parallel")
-  exit 1
-end
-
-# Attempt to find platin lib
-begin
-  require 'platin'
-rescue LoadError => e
-  path_to_platin=`which platin 2>/dev/null`.strip
-  if File.exist?(path_to_platin)
-
-    libdir = File.join(File.dirname(File.dirname(path_to_platin)),"lib")
-    $:.unshift File.join(libdir,"platin")
-    Gem.clear_paths
-    ENV['GEM_PATH'] = File.join(libdir,"platin", "gems") + (ENV['GEM_PATH'] ? ":#{ENV['GEM_PATH']}" : "")
-
-    require 'platin'
-  else
-    $stderr.puts("When trying to locate platin library - failed to locate platin executable #{path_to_platin}")
-    raise e
-  end
-end
-
-# Benchmark driver
-include PML
-require 'tools/transform'
-require 'tools/wcet'
-
-# benchmarking lib / benchmarks
-begin
-  require 'lib/console' # Console utils from ../lib
+  require 'lib/experiments'
 rescue LoadError => e
   $:.unshift File.join(File.dirname(__FILE__),"..")
-  require 'lib/console'
+  require 'lib/experiments'
 end
-require 'integration/benchmarks'
+require_configuration 'integration'
 
 # configuration
-begin
-  require 'configuration'
-rescue LoadError => e
-  die("Failed to load ../configuration.rb => create one from ../configuration.rb.dist")
-end
-
-
-# configuration
-srcdir     = $benchsrc
-builddir   = $builddir
-workdir    = $workdir
-benchmarks = $benchmarks
-build_log  = File.join(builddir, 'build.log')
-do_update  = true
+config = OpenStruct.new
+config.srcdir        = $benchsrc
+config.builddir      = $builddir
+config.workdir       = $workdir
+config.benchmarks    = $benchmarks
+config.build_log     = File.join(config.builddir, 'build.log')
+config.report        = File.join(config.workdir, 'report.yml')
+config.do_update     = true
+config.nice_pasim    = nil # positive integer
 
 class BenchTool < WcetTool
   def initialize(pml, options)
@@ -177,115 +139,21 @@ class BenchTool < WcetTool
   end
 end
 
-
 # remove old files unless updating
-FileUtils.remove_entry_secure(build_log) if File.exist?(build_log) && ! do_update
-FileUtils.mkdir_p(builddir)
+FileUtils.remove_entry_secure(config.build_log) if File.exist?(config.build_log) && ! config.do_update
+FileUtils.mkdir_p(config.builddir)
 
 # options
-options = OpenStruct.new
-options.objdump="patmos-llvm-objdump"
-options.pasim = "nice -n 0 pasim"
-options.a3 = "a3patmos"
-options.text_sections=[".text"]
-options.stats = true
-options.enable_sweet = false
-options.disable_wca = true
+config.options = default_options(:nice_pasim => config.nice_pasim)
+config.options.enable_sweet = false
+config.options.enable_wca   = true
+config.options.trace_analysis = true
+config.options.use_trace_facts = true
 
-# Collect build settings
-build_settings = {}
-benchmarks.each do |benchmark|
-  benchmark['buildsettings'].each do |setting|
-    (build_settings[setting]||=[]).push(benchmark)
-  end
-end
+# run benchmarks
+build_and_run(config, BenchTool)
 
-# forall benchmarks/buildsettings
-run = 0
-build_settings.each do |build_setting, benchmark_list|
-
-  # Configure
-  cmake_flags = ["-DCMAKE_TOOLCHAIN_FILE=#{File.join(srcdir,"cmake","patmos-clang-toolchain.cmake")}",
-                 "-DREQUIRES_PASIM=true",
-                 "-DENABLE_TESTING=true",
-                 "-DCMAKE_C_FLAGS='#{build_setting['cflags']}'"].join(" ")
-  build_msg_opts = { :log => build_log, :log_append => true, :console => true }
-  build_cmd_opts = { :log => build_log, :log_stderr => true, :log_append => true }
-  run("cd #{builddir} && cmake #{srcdir} #{cmake_flags}", build_cmd_opts)
-
-  Parallel.each(benchmark_list) do |benchmark|
-
-    binary = "#{builddir}/#{benchmark['path']}"
-
-    log("##{run} Building Benchmark #{binary} [#{build_setting['name']}]", build_msg_opts)
-    run("cd #{File.dirname(binary)} && make #{File.basename(binary)}", build_cmd_opts)
-
-    options.trace_file = nil # run for first configuration
-
-    # For all analysis targets
-    benchmark['configurations'].each do |configuration|
-
-      options.outdir = File.join(workdir, "#{benchmark['name']}.#{build_setting['name']}.#{configuration['name']}")
-      options.report=File.join(options.outdir, "report.yml")
-      next if File.exists?(options.report) && do_update
-      FileUtils.remove_entry_secure(options.outdir) if File.exist?(options.outdir)
-      FileUtils.mkdir_p(options.outdir)
-
-      # First analysis of this binary
-      if ! options.trace_file
-        options.trace_file = File.join(options.outdir, "trace.gz")
-        log("##{run} Generating Trace File #{options.trace_file}", build_msg_opts)
-        run("pasim -q --debug 0 --debug-fmt trace -b #{binary} 2>&1 1>/dev/null | nice -n 19 gzip > #{options.trace_file}",
-            build_cmd_opts)
-      end
-
-      reportkeys = { 'benchmark' => benchmark['name'],
-                     'build' => build_setting['name'],
-                     'analysis' => configuration['name'] }
-
-      options.binary_file=binary
-      options.bitcode_file="#{binary}.bc"
-      options.input=["#{binary}.pml"]
-      options.recorders = RecorderSpecification.parse(configuration['recorders'], 0)
-      options.flow_fact_selection = configuration['flow-fact-selection']
-      options.report_append=reportkeys
-      options.analysis_entry = benchmark['analysis_entry']
-      options.trace_entry = benchmark['trace_entry']
-
-      analysis_log = File.join(options.outdir,"wcet.log")
-
-      log_analysis_opts  = { :log => analysis_log, :console => true }
-      log("##{run} Analyzing Benchmark #{benchmark['name']} / #{build_setting['name']} / #{configuration['name']}", log_analysis_opts)
-      log_analysis_opts[:log_append] = true
-
-      run_analysis_opts = { :log => analysis_log, :log_stderr => true, :log_append => true }
-      BenchTool.run(options, run_analysis_opts)
-
-      log("##{run} Finished Analyzing Benchmark #{benchmark['name']} / #{build_setting['name']} / #{configuration['name']}", log_analysis_opts)
-
-      run+=1
-    end
-    FileUtils.remove_entry_secure(options.trace_file) if options.trace_file && File.exist?(options.trace_file) # save some disk space
-  end
-end
-
-# Join reports
-report = File.join(workdir, 'report.yml')
-File.unlink(report) if File.exist?(report)
-benchmarks.each do |benchmark|
-  benchmark['buildsettings'].each do |build_setting|
-    benchmark['configurations'].each do |configuration|
-      bench_report = File.join(workdir, "#{benchmark['name']}.#{build_setting['name']}.#{configuration['name']}", "report.yml")
-      File.open(report, "a") { |fh|
-        fh.write(File.read(bench_report))
-      }
-    end
-  end
-end
-      
-# Summarize
+# summarize
 keys = %w{benchmark build  aiT-unknown-loops analysis source analysis-entry cycles tracefacts flowfacts}
-print_csv(report, :keys => keys, :outfile => File.join(workdir,'report.csv'))
-puts
-print_table(report, keys)
-
+print_csv(config.report, :keys => keys, :outfile => File.join(config.workdir,'report.csv'))
+print_table(config.report, keys)
