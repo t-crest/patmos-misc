@@ -45,6 +45,13 @@ BUILD_EMULATOR=true
 # (llvm, clang, gold)
 INSTALL_SYMLINKS=false
 
+# Update rpath of binaries during installation:
+# - 'remove'  Remove rpath
+# - 'build'   Set install rpath at build time
+# - 'true'    Update rpath to the install dir on installation
+# - 'false'   Do not change rpath on installation
+INSTALL_RPATH=true
+
 # URL for the repository containing the benchmarks
 #BENCH_REPO_URL="git@github.com:t-crest/patmos-benchmarks.git"
 BENCH_REPO_URL=

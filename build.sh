@@ -38,6 +38,9 @@ OS_NAME=$(uname -s)
 self=$(abspath $0)
 CFGFILE=$(dirname $self)/build.cfg
 
+# location of the patmos-chrpath script
+CHRPATH=$(dirname $self)/patmos-chrpath
+
 ########### Start of user configs, overwrite in build.cfg ##############
 
 # List of targets to build by default
@@ -85,6 +88,13 @@ BUILD_EMULATOR=true
 # Create symlinks instead of copying files where applicable
 # (llvm, clang, gold)
 INSTALL_SYMLINKS=false
+
+# Update rpath of binaries during installation:
+# - 'remove'  Remove rpath
+# - 'build'   Set install rpath at build time
+# - 'true'    Update rpath to the install dir on installation
+# - 'false'   Do not change rpath on installation
+INSTALL_RPATH=true
 
 # URL for the repository containing the benchmarks
 #BENCH_REPO_URL="git@github.com:t-crest/patmos-benchmarks.git"
@@ -222,6 +232,25 @@ function install() {
 		run rm -rf $dst
 	    fi
 	    run cp -fR $src $dst
+	fi
+    fi
+}
+
+function update_rpath() {
+    local repo=$1
+
+    if [ "$INSTALL_RPATH" == "true" ]; then
+	if [ -x $CHRPATH ]; then
+	    run $CHRPATH -w -p $repo -i $INSTALL_DIR
+	else
+	    echo "** Warning: patmos-chrpath script not found, skipping setting rpath."
+	fi
+    fi
+    if [ "$INSTALL_RPATH" == "remove" ]; then
+	if [ -x $CHRPATH ]; then
+	    run $CHRPATH -w -d -p $repo -i $INSTALL_DIR
+	else
+	    echo "** Warning: patmos-chrpath script not found, skipping setting rpath."
 	fi
     fi
 }
@@ -467,6 +496,8 @@ function build_llvm() {
 	builddir=$builddir/Debug+Asserts
     fi
 
+    
+
     run mkdir -p $INSTALL_DIR/bin
     run mkdir -p $INSTALL_DIR/lib
 
@@ -504,6 +535,9 @@ function build_llvm() {
     # install platin
     echo "Installing platin toolkit .. "
     run $rootdir/tools/platin/install.sh -i $INSTALL_DIR
+
+    # Update rpaths, since we are not using cmake install
+    update_rpath llvm
 
     if [ "$DO_RUN_TESTS" == "true" ]; then
 	echo "Running tests.."
@@ -727,6 +761,10 @@ if [ ! -z "$CLANG_COMPILER" ]; then
     else 
 	echo "Clang $clang is not executable, igored!"
     fi
+fi
+
+if [ "$INSTALL_RPATH" == "build" ]; then
+    LLVM_LDFLAGS="$LLVM_LDFLAGS -Wl,-R${INSTALL_DIR}/lib"
 fi
 
 if [ "$BUILD_SOFTFLOAT" != "true" ]; then

@@ -1,0 +1,162 @@
+#!/bin/bash
+###############################################################################
+#
+# rpath update script for the Patmos compiler tool chain build scripts.
+#
+# Authors:
+# Stefan Hepp <hepp@complang.tuwien.ac.at>
+#
+###############################################################################
+
+function abspath() {
+    local path=$1
+    local pwd_restore="$(pwd)"
+
+    # readlink -f does not work on OSX, so we do this manually
+    cd $(dirname "$path")
+    path=$(basename "$path")
+    # follow chain of symlinks
+    while [ -L "$path" ]; do
+        path=$(readlink "$path")
+        cd $(dirname "$path")
+        path=$(basename "$path")
+    done
+    echo "$(pwd -P)/$path"
+    cd "$pwd_restore"
+}
+
+
+OS_NAME=$(uname -s)
+
+# physical location of this script, and the config
+self=$(abspath $0)
+CFGFILE=$(dirname $self)/build.cfg
+
+########################################################################
+
+# Root directory for all repositories
+ROOT_DIR=$(pwd)
+
+# Set to 'short' for llvm/clang/... directory names, 'long' for
+# patmos-llvm/patmos-clang/.. or 'prefix' to use $(REPO_PREFIX)llvm/..
+REPO_NAMES=short
+REPO_PREFIX=
+
+# Installation directory prefix
+INSTALL_DIR="$ROOT_DIR/local"
+
+
+########################################################################
+
+VERBOSE=false
+WARN=false
+DELETE=false
+PACKAGE=
+BINARY=
+
+# user config
+if [ -f $CFGFILE ]; then
+  source $CFGFILE
+fi
+
+
+function usage() {
+  cat <<EOT
+Usage: $0 [<options>] [-p <reponame> | -b <binary>] [-i <installdir>] [<new_rpath>]
+
+  Update the rpath of the installed Patmos binaries.
+   -h      Show this help.
+   -d      Delete the rpath instead of updating it.
+   -v      Be verbose.
+   -w      Warn only if chrpath is not found.
+   -p      Update binaries from the given Patmos package ('llvm','patmos')
+   -b      Update the given binary only.
+
+  The default installdir will be taken from build.cfg if not given.
+  The new rpath will be <installdir>/lib if not set.
+
+EOT
+    exit 0
+}
+
+function update_binary() {
+    local binary=$1
+
+    if [ "$DELETE" == "true" ]; then
+	if [ "$VERBOSE" == "true" ]; then
+	    echo "$CHRPATH -d $binary"
+	fi
+	$CHRPATH -d $binary >/dev/null
+    else
+	if [ "$VERBOSE" == "true" ]; then
+	    echo "$CHRPATH -r $RPATH $binary"
+	fi
+	$CHRPATH -r $RPATH $binary >/dev/null 
+    fi
+}
+
+function update_llvm() {
+    bindir=$INSTALL_DIR/bin
+
+    for file in $bindir/patmos-*; do 
+	case $file in
+	    *patmos-llvm-lit|*patmos-ld|*patmos-ar|*patmos-ld.gold) ;;
+	    *) 
+	       update_binary $file
+	       ;;
+	esac
+    done
+}
+
+# one-shot config
+while getopts ":hi:dvp:b:wx" opt; do
+  case $opt in
+    h) usage; exit 0 ;;
+    i) INSTALL_DIR="$(abspath $OPTARG)" ;;
+    d) DELETE=true ;;
+    v) VERBOSE=true ;;
+    p) PACKAGE=$OPTARG ;;
+    b) BINARY=$OPTARG ;;
+    w) WARN=true ;;
+    x) set -x ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      usage >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+RPATH=$1
+if [ -z $RPATH ]; then
+    RPATH="$INSTALL_DIR/lib"
+fi
+
+CHRPATH=$(which chrpath)
+if [ $? != 0 -o ! -x "$CHRPATH" ]; then
+    if [ "$WARN" == "true" ]; then
+	echo "** Warning: chrpath not found, skipping."
+	exit 0
+    else
+	echo "** Error: chrpath not found, exiting."
+	exit 2
+    fi
+fi
+
+if [ ! -z $BINARY ]; then
+    update_binary $BINARY
+elif [ -z $PACKAGE ]; then 
+    update_llvm
+elif [ "$PACKAGE" == "llvm" ]; then
+    update_llvm
+else
+    echo "Unsupported package name: $PACKAGE."
+    exit 2
+fi
+
