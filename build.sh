@@ -241,6 +241,7 @@ function update_rpath() {
 
     if [ "$INSTALL_RPATH" == "true" ]; then
 	if [ -x $CHRPATH ]; then
+	    echo "Setting rpath of binaries to install dir .. "
 	    run $CHRPATH -w -p $repo -i $INSTALL_DIR
 	else
 	    echo "** Warning: patmos-chrpath script not found, skipping setting rpath."
@@ -248,9 +249,10 @@ function update_rpath() {
     fi
     if [ "$INSTALL_RPATH" == "remove" ]; then
 	if [ -x $CHRPATH ]; then
+	    echo "Removing rpath from installed binaries .. "
 	    run $CHRPATH -w -d -p $repo -i $INSTALL_DIR
 	else
-	    echo "** Warning: patmos-chrpath script not found, skipping setting rpath."
+	    echo "** Warning: patmos-chrpath script not found, skipping removing rpath."
 	fi
     fi
 }
