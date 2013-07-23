@@ -146,7 +146,7 @@ FileUtils.mkdir_p(config.builddir)
 # options
 config.options = default_options(:nice_pasim => config.nice_pasim)
 config.options.enable_sweet = false
-config.options.enable_wca   = true
+config.options.enable_wca   = false
 config.options.trace_analysis = true
 config.options.use_trace_facts = true
 
