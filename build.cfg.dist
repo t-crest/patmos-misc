@@ -55,6 +55,8 @@ INSTALL_RPATH=true
 # URL for the repository containing the benchmarks
 #BENCH_REPO_URL="git@github.com:t-crest/patmos-benchmarks.git"
 BENCH_REPO_URL=
+# URL for repository containing additional non-free benchmarks
+BENCH_NONFREE_REPO_URL=
 
 # Set the target architecture for gold
 # auto      use HOST on Linux, 'patmos-unknown-unknown-elf' otherwise

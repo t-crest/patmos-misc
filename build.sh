@@ -99,6 +99,8 @@ INSTALL_RPATH=true
 # URL for the repository containing the benchmarks
 #BENCH_REPO_URL="git@github.com:t-crest/patmos-benchmarks.git"
 BENCH_REPO_URL=
+# URL for repository containing additional non-free benchmarks
+BENCH_NONFREE_REPO_URL=
 
 # Set the target architecture for gold
 # auto      use HOST on Linux, 'patmos-unknown-unknown-elf' otherwise
@@ -675,6 +677,9 @@ build_target() {
       fi
     else
       clone_update $BENCH_REPO_URL $(get_repo_dir bench)
+      if [ -n "$BENCH_NONFREE_REPO_URL" ]; then
+        clone_update $BENCH_NONFREE_REPO_URL $(get_repo_dir bench)/nonfree
+      fi
     fi
     if [ -d $ROOT_DIR/$repo ]; then
       build_cmake bench build_bench $(get_build_dir bench) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin" "$BENCH_ARGS"
