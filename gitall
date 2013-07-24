@@ -61,6 +61,10 @@ done
 for repo in $GITREPOS; do
     echo -e "====$RED $repo$NOCOLOR ===="
     pushd $GITBASE/$repo >/dev/null
+    if [ $? != 0 ]; then
+        echo -e "no$RED $repo$NOCOLOR directory, skipping..."
+        continue
+    fi
     git "$@"
     popd >/dev/null
     echo
