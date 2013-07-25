@@ -2,3 +2,18 @@
 Compiler/Platin/aiT Benchmark and Evaluation framework
 
 * Copy configuration.rb.dist to configuration.rb and adapt accordingly
+
+Experiments:
+
+* cfrg: experiments with CFRGs (tests all of platin the toolchain, including SWEET) [LCTES13]
+* integration: experiments with LLVM/aiT integration [COMPUTING13]
+* wcet: standard compiler/wcet calculation tests
+
+Recommended Benchmark Set for every-day use / regression testing
+
+# Development: benchmarks with acceptable analysis time for development
+benchmarks = %w{adpcm bs bsort100 cnt compress cover crc edn expint fdct fir insertsort janne_complex jfdctint lcdnum
+               matmult minmax ndes ns qsort-exam select sqrt statemate ud}
+# Compile with -O1, analyze with global trace facts
+current['buildsettings'] = build_settings[1..1]
+current['configurations'] = configurations[0..0]

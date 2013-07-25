@@ -58,6 +58,8 @@ def default_options(opts = {})
   options.objdump="patmos-llvm-objdump"
   options.pasim = "pasim"
   options.gzip  = "gzip"
+  options.sweet = "sweet"
+  options.alf_llc = "alf-llc"
   if nice_level = opts[:nice_pasim]
     options.pasim = "nice -n 0 #{options.pasim}"
     options.gzip  = "nice -n #{nice_level} gzip"
@@ -155,6 +157,7 @@ private
     # Configure
     cmake_flags = ["-DCMAKE_TOOLCHAIN_FILE=#{File.join(@config.srcdir,"cmake","patmos-clang-toolchain.cmake")}",
                    "-DREQUIRES_PASIM=true",
+                   "-DENABLE_CTORTURE=false",
                    "-DENABLE_TESTING=true",
                    "-DCMAKE_C_FLAGS='#{build_setting['cflags']}'"].join(" ")
     run("cd #{@config.builddir} && cmake #{@config.srcdir} #{cmake_flags}", @build_cmd_opts)
