@@ -51,7 +51,7 @@ class BenchTool < WcetTool
     wcet_analysis([])
     add_timing_info("plain", "tracefacts" => 0, "flowfacts" => 0)
 
-    File.readlines(options.ait_report_file).each do |line|
+    File.readlines(options.ait_report_prefix + ".xml").each do |line|
       # this is no useful metric for comparison (it does not determine whether WCET can be calculated)
       if line =~ /Loop '(.*?)': unknown loop bound/
         ait_unknown_loops.add($1)
@@ -103,8 +103,7 @@ class BenchTool < WcetTool
     options.timing_output = name
     options.ais_file = File.join(outdir, "#{basename}.ais")
     options.apx_file = File.join(outdir, "#{basename}.apx")
-    options.ait_result_file = File.join(outdir, "#{basename}.ait.xml")
-    options.ait_report_file = File.join(outdir, "#{basename}.ait.txt")
+    options.ait_report_prefix = File.join(outdir, "#{basename}.ait")
   end
 
   def minimize_trace_facts(srcs, tracefacts, output)
