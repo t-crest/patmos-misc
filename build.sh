@@ -97,8 +97,7 @@ INSTALL_SYMLINKS=false
 INSTALL_RPATH=true
 
 # URL for the repository containing the benchmarks
-#BENCH_REPO_URL="git@github.com:t-crest/patmos-benchmarks.git"
-BENCH_REPO_URL=
+BENCH_REPO_URL="git@github.com:t-crest/patmos-benchmarks.git"
 # URL for repository containing additional non-free benchmarks
 BENCH_NONFREE_REPO_URL=
 
