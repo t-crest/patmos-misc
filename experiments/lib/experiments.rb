@@ -83,10 +83,11 @@ class BenchmarkTool
     @build_msg_opts = { :log => @config.build_log, :log_append => true, :console => true }
     @build_cmd_opts = { :log => @config.build_log, :log_stderr => true, :log_append => true }
     # forall benchmarks/buildsettings
-    @config.benchmarks.each_with_index { |b,ix| b['index'] = ix } 
+    @config.benchmarks.each_with_index { |b,ix| b['index'] = ix }
+    errors = 0
     collect_build_settings.each do |build_setting, benchmark_list|
       configure(build_setting)
-      Parallel.each(benchmark_list) do |benchmark|
+      errors += Parallel.map(benchmark_list) { |benchmark|
 
         options = @config.options.dup
         options.binary_file  = "#{@config.builddir}/#{benchmark['path']}"
@@ -101,6 +102,7 @@ class BenchmarkTool
         run("cd #{File.dirname(options.binary_file)} && make #{File.basename(options.binary_file)}", @build_cmd_opts)
 
         # For all analysis targets
+        errors = 0
         benchmark['configurations'].each do |configuration|
 
           options.outdir = File.join(@config.workdir, "#{benchmark['name']}.#{build_setting['name']}.#{configuration['name']}")
@@ -120,12 +122,24 @@ class BenchmarkTool
           options.report_append = reportkeys
           options.recorders = RecorderSpecification.parse(configuration['recorders'], 0)
           options.flow_fact_selection = configuration['flow-fact-selection']
-
-          run_analysis(options, benchmark, build_setting, configuration)
+          begin
+            run_analysis(options, benchmark, build_setting, configuration)
+          rescue Exception => e
+            $stderr.puts "ERROR: Analysis failed: #{e}"
+            puts e.backtrace[0..2]
+            errors += 1
+          end
         end
+
         # save some disk space
-        FileUtils.remove_entry_secure(options.trace_file) if options.trace_file && File.exist?(options.trace_file)
-      end
+        unless @config.keep_trace_files
+          FileUtils.remove_entry_secure(options.trace_file) if options.trace_file && File.exist?(options.trace_file)
+        end
+        errors
+      }.inject(0) { |a,b| a+b }
+    end
+    if errors > 0
+      raise Exception.new("#{errors} Errors.")
     end
 
     # Join reports
@@ -141,7 +155,7 @@ class BenchmarkTool
           }
         end
       end
-    end      
+    end
   end
 private
   def collect_build_settings
