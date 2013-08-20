@@ -73,8 +73,8 @@ LLVM_BUILD_SHARED=true
 LLVM_OMIT_CLANG=false
 
 # Set to the name of the clang binary to use for compiling LLVM itself.
-# Leave empty to use cmake defaults
-CLANG_COMPILER=clang
+# Leave empty to use cmake defaults, set to "clang" to use clang
+CLANG_COMPILER=
 
 # Build gold binutils and LLVM LTO plugin
 BUILD_LTO=true
@@ -97,8 +97,7 @@ INSTALL_SYMLINKS=false
 INSTALL_RPATH=true
 
 # URL for the repository containing the benchmarks
-#BENCH_REPO_URL="git@github.com:t-crest/patmos-benchmarks.git"
-BENCH_REPO_URL=
+BENCH_REPO_URL="https://github.com/t-crest/patmos-benchmarks.git"
 # URL for repository containing additional non-free benchmarks
 BENCH_NONFREE_REPO_URL=
 
@@ -137,9 +136,8 @@ CTOOLS_ARGS=
 
 # Additional CFLAGS, LDFLAGS 
 GOLD_CFLAGS=
-GOLD_CXXFLAGS=
-# Enable this if gcc throws errors about narrowing conversions
-#GOLD_CXXFLAGS="-Wno-narrowing"
+# Without this flag gcc throws errors about narrowing conversions
+GOLD_CXXFLAGS="-Wno-narrowing"
 
 COMPILER_RT_CFLAGS=
 # Disable inline-assembly implementations in compiler-rt
