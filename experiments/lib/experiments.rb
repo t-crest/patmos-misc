@@ -42,6 +42,7 @@ def require_configuration(directory)
   # configuration
   begin
     require 'configuration'
+    require 'benchmarks'
   rescue LoadError => e
     die("Failed to load ../configuration.rb => create one from ../configuration.rb.dist")
   end
@@ -49,7 +50,7 @@ def require_configuration(directory)
     benchmark_file = File.join(directory,'benchmarks')
     require benchmark_file
   rescue LoadError => e
-    die("Failed to load 'benchmarks' => create a file 'benchmarks.rb' providing the benchmarks")
+    die("Failed to load 'benchmarks' => create a file 'benchmarks.rb' to select the benchmarks")
   end
 end
 
@@ -89,24 +90,24 @@ class BenchmarkTool
       configure(build_setting)
       errors += Parallel.map(benchmark_list) { |benchmark|
 
+        # benchmark options
         options = @config.options.dup
-        options.binary_file  = "#{@config.builddir}/#{benchmark['path']}"
+        options.binary_file  = "#{build_setting['builddir']}/#{benchmark['path']}"
         options.bitcode_file = "#{options.binary_file}.bc"
         options.input        = ["#{options.binary_file}.pml"]
-        options.trace_file   = nil # run for first configuration
-        options.analysis_entry = benchmark['analysis_entry']
-        options.trace_entry = benchmark['trace_entry']
 
         # build
         log("##{benchmark['index']} Building Benchmark #{options.binary_file} [#{build_setting['name']}]", @build_msg_opts)
         run("cd #{File.dirname(options.binary_file)} && make #{File.basename(options.binary_file)}", @build_cmd_opts)
 
-        # For all analysis targets
+        # For all analysis targets and all analysis configurations
         errors = 0
-        benchmark['configurations'].each do |configuration|
+        benchmark['analyses'].each do |configuration|
 
           options.outdir = File.join(@config.workdir, "#{benchmark['name']}.#{build_setting['name']}.#{configuration['name']}")
           options.report=File.join(options.outdir, "report.yml")
+          options.analysis_entry = configuration['analysis_entry']
+          options.flow_fact_selection = configuration['flow-fact-selection']
 
           # skip on update and existing report
           next if File.exists?(options.report) && @config.do_update
@@ -114,14 +115,20 @@ class BenchmarkTool
           FileUtils.mkdir_p(options.outdir)
 
           # trace analysis
-          trace_analysis(options, benchmark) if ! options.trace_file  && options.trace_analysis
+          if ! configuration['recorders']
+            options.trace_analysis = false
+            options.use_trace_facts = false
+            options.runcheck = false
+          elsif options.trace_analysis
+            options.trace_entry =  configuration['trace_entry']
+            options.recorders = RecorderSpecification.parse(configuration['recorders'], 0)
+            generate_trace(options, benchmark)
+          end
 
           reportkeys = { 'benchmark' => benchmark['name'],
             'build' => build_setting['name'],
             'analysis' => configuration['name'] }
           options.report_append = reportkeys
-          options.recorders = RecorderSpecification.parse(configuration['recorders'], 0)
-          options.flow_fact_selection = configuration['flow-fact-selection']
           begin
             run_analysis(options, benchmark, build_setting, configuration)
           rescue Exception => e
@@ -146,7 +153,7 @@ class BenchmarkTool
     File.unlink(@config.report) if File.exist?(@config.report)
     @config.benchmarks.each do |benchmark|
       benchmark['buildsettings'].each do |build_setting|
-        benchmark['configurations'].each do |configuration|
+        benchmark['analyses'].each do |configuration|
           bench_report = File.join(@config.workdir,
                                    "#{benchmark['name']}.#{build_setting['name']}.#{configuration['name']}",
                                    "report.yml")
@@ -167,23 +174,32 @@ private
     end
     build_settings
   end
+
   def configure(build_setting)
     # Configure
+    build_setting['builddir'] ||= File.join(@config.builddir, build_setting['name'])
+    FileUtils.mkdir_p(build_setting['builddir'])
     cmake_flags = ["-DCMAKE_TOOLCHAIN_FILE=#{File.join(@config.srcdir,"cmake","patmos-clang-toolchain.cmake")}",
                    "-DREQUIRES_PASIM=true",
                    "-DENABLE_CTORTURE=false",
                    "-DENABLE_TESTING=true",
                    "-DCMAKE_C_FLAGS='#{build_setting['cflags']}'"].join(" ")
-    run("cd #{@config.builddir} && cmake #{@config.srcdir} #{cmake_flags}", @build_cmd_opts)
+    run("cd #{build_setting['builddir']} && cmake #{@config.srcdir} #{cmake_flags}", @build_cmd_opts)
   end
-  def trace_analysis(options, benchmark)
-    options.trace_file = File.join(options.outdir, "trace.gz")
-    log("##{benchmark['index']} Generating Trace File #{options.trace_file}",
+
+  def generate_trace(options, benchmark)
+    options.trace_file = File.join(options.outdir, "#{options.trace_entry}.trace.gz")
+    if File.exist?(options.trace_file) && File.mtime(options.trace_file) <= File.mtime(options.binary_file)
+      log("##{benchmark['index']} Using existing trace file #{options.trace_file}",
         @build_msg_opts)
-    run("#{options.pasim} -q --debug 0 --debug-fmt trace -b #{options.binary_file} 2>&1 1>/dev/null | " +
-        "#{options.gzip} > #{options.trace_file}",
-        @build_cmd_opts)
+    else
+      log("##{benchmark['index']} Generating Trace File #{options.trace_file}", @build_msg_opts)
+      run("#{options.pasim} -q --debug 0 --debug-fmt trace -b #{options.binary_file} 2>&1 1>/dev/null | " +
+          "#{options.gzip} > #{options.trace_file}",
+          @build_cmd_opts)
+    end
   end
+
   def run_analysis(options, benchmark, build_setting, configuration)
     analysis_log = File.join(options.outdir,"wcet.log")
     FileUtils.remove_entry_secure(analysis_log) if File.exist?(analysis_log)

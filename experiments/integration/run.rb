@@ -114,7 +114,7 @@ class BenchTool < WcetTool
     while ! queue.empty?
       test = queue.pop
       set = keep + queue
-      pml.try do
+      pml.with_temporary_sections do
         name = "#{@testcnt}.min"
         pml.flowfacts.add_copies(flowfacts+keep+queue,name)
         ait_problem_name(name)

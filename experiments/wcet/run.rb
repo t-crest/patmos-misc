@@ -27,7 +27,8 @@ config.benchmarks    = $benchmarks
 config.build_log     = File.join(config.builddir, 'build.log')
 config.report        = File.join(config.workdir, 'report.yml')
 config.do_update     = true
-config.nice_pasim    = nil # positive integer
+config.keep_trace_files = true
+config.nice_pasim    = 10 # positive integer
 
 # customized benchmark script
 class BenchTool < WcetTool
@@ -45,7 +46,6 @@ end
 
 # remove old files unless updating
 FileUtils.remove_entry_secure(config.build_log) if File.exist?(config.build_log) && ! config.do_update
-FileUtils.mkdir_p(config.builddir)
 
 # options
 config.options = default_options(:nice_pasim => config.nice_pasim)
@@ -54,12 +54,13 @@ config.options.enable_wca   = true
 config.options.runcheck     = true
 config.options.trace_analysis = true
 config.options.use_trace_facts = true
+# config.options.compute_criticalities = true
 
 # run benchmarks
 build_and_run(config, BenchTool)
 
 # summarize
-keys = %w{benchmark build  aiT-unknown-loops analysis source analysis-entry cycles tracefacts flowfacts}
+keys = %w{benchmark build analysis source analysis-entry cycles}
 print_csv(config.report, :keys => keys, :outfile => File.join(config.workdir,'report.csv'))
 print_table(config.report, keys)
 
