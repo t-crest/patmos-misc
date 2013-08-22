@@ -32,15 +32,13 @@ class BenchTool < WcetTool
   def initialize(pml, options)
     super(pml,options)
     @testcnt = 0
+    @stats = {}
   end
   def add_timing_info(name, dict, tool = "aiT")
     origin = [name,tool].compact.join("/")
     entry = pml.timing.by_origin(origin)
     assert("No unique timing entry for origin #{origin}") { entry.length == 1 }
-    entry = entry.first
-    dict.each { |k,v|
-      entry[k] = v
-    }
+    @stats[origin] = dict
   end
   def run_analysis
     options.flow_fact_selection = "all"
@@ -92,7 +90,7 @@ class BenchTool < WcetTool
     wcet_analysis(["llvm","llvm_tf"])
     add_timing_info("llvmtf", "tracefacts" => llvm_tf.length, "flowfacts" => llvm_tf.length + llvm_ff.length)
 
-    report(["tracefacts","flowfacts"])
+    report(@stats)
     pml
   end
 

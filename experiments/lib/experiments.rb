@@ -105,6 +105,7 @@ class BenchmarkTool
         benchmark['analyses'].each do |configuration|
 
           options.outdir = File.join(@config.workdir, "#{benchmark['name']}.#{build_setting['name']}.#{configuration['name']}")
+          options.output = File.join(options.outdir,"#{benchmark['name']}.pml")
           options.report=File.join(options.outdir, "report.yml")
           options.analysis_entry = configuration['analysis_entry']
           options.flow_fact_selection = configuration['flow-fact-selection']
