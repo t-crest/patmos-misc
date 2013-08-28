@@ -139,9 +139,8 @@ GOLD_CFLAGS=
 # Without this flag gcc throws errors about narrowing conversions
 GOLD_CXXFLAGS="-Wno-narrowing"
 
-COMPILER_RT_CFLAGS=
 # Disable inline-assembly implementations in compiler-rt
-#COMPILER_RT_CFLAGS="-DCRT_NO_INLINE_ASM"
+COMPILER_RT_CFLAGS="-DCRT_NO_INLINE_ASM"
 BENCH_LDFLAGS=
 
 # CFLAGS for host compiler
