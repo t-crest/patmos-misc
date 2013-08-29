@@ -41,7 +41,7 @@ def papabench
   shortname = { 'fly_by_wire' => 'fbw', 'autopilot' => 'autopilot' }
   targets = {
     'fly_by_wire' => %w{check_failsafe_task check_mega128_values_task send_data_to_autopilot_task servo_transmit test_ppm_task},
-    'autopilot' =>  %w{altitude_control_task climb_control_task link_fbw_send navigation_task radio_control_task receive_gps_data_task reporting_task stabilisation_task}
+    'autopilot' =>  %w{altitude_control_task climb_control_task link_fbw_send navigation_task radio_control_task receive_gps_data_task reporting_task stabilisation_task} # main
   }
   benchmarks = benchmarks.map { |bench|
     { 'analyses' => targets[bench].map { |entry|
@@ -51,13 +51,31 @@ def papabench
         }
       },
       'name' => "papa_#{shortname[bench]}",
-      'path' => File.join("PapaBench-0.4","sw","airborne",bench,bench)
+      'path' => File.join("PapaBench-0.4","sw","airborne",bench,bench),
+      'expensive' => bench == 'autopilot'
+    }
+  }
+end
+
+def wcet_tests
+  benchmarks = %w{triangle1 triangle2 triangle3}
+  targets = Hash.new(['main'])
+  benchmarks.map { |bench|
+    { 'analyses' => targets[bench].map { |entry|
+        { 'name' => entry,
+          'analysis_entry' => entry,
+          'trace_entry' => 'main'
+        }
+      },
+      'name' => "tests_#{bench}",
+      'path' => File.join("tests","C",bench),
+      'expensive' => false
     }
   }
 end
 
 def all_benchmarks
-  mrtc_benchmarks + papabench
+  mrtc_benchmarks + wcet_tests + papabench
 end
 
 # Standard Build settings
