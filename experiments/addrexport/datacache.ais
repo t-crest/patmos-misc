@@ -1,0 +1,17 @@
+
+# 512 B data cache, 2-way LRU, 32-byte lines; used only for load/store that don't bypass the cache
+cache data
+  size = 512, associativity = 2, line-size = 32,
+  policy = LRU, may = chaos;
+
+# memory map with transfer timings
+area 0x00000000 .. 0xffffffff access
+  # timing for code access, first number == single beat access, second number == cache line fill
+  code transfer-time = [4, 8],
+  # if you uncomment the next line, method cache is used and always hit is assumed ATM
+  code locked,
+  # timing for data read access, first number == single beat access, second number == cache line fill
+  data read transfer-time = [4, 8],
+  # timing for data write, single beat write
+  data write time = 4;
+

@@ -81,8 +81,6 @@ class BenchmarkTool
     @config, @analysis_tool = config, analysis_tool
   end
   def run_all
-    @build_msg_opts = { :log => @config.build_log, :log_append => true, :console => true }
-    @build_cmd_opts = { :log => @config.build_log, :log_stderr => true, :log_append => true }
     # forall benchmarks/buildsettings
     @config.benchmarks.each_with_index { |b,ix| b['index'] = ix }
     errors = 0
@@ -97,8 +95,9 @@ class BenchmarkTool
         options.input        = ["#{options.binary_file}.pml"]
 
         # build
-        log("##{benchmark['index']} Building Benchmark #{options.binary_file} [#{build_setting['name']}]", @build_msg_opts)
-        run("cd #{File.dirname(options.binary_file)} && make #{File.basename(options.binary_file)}", @build_cmd_opts)
+        @build_log = File.join(build_setting['builddir'],"build.#{benchmark['name']}.log")
+        log("##{benchmark['index']} Building Benchmark #{options.binary_file} [#{build_setting['name']}]", :log => @build_log, :console => true)
+        run("cd #{File.dirname(options.binary_file)} && make #{File.basename(options.binary_file)}", :log => @build_log, :log_stderr => true)
 
         # For all analysis targets and all analysis configurations
         errors = 0
@@ -116,16 +115,15 @@ class BenchmarkTool
           FileUtils.mkdir_p(options.outdir)
 
           # trace analysis
-          if ! configuration['recorders']
+          if ! configuration['recorders'] || ! options.trace_analysis
             options.trace_analysis = false
             options.use_trace_facts = false
             options.runcheck = false
-          elsif options.trace_analysis
+          else
             options.trace_entry =  configuration['trace_entry']
             options.recorders = RecorderSpecification.parse(configuration['recorders'], 0)
             generate_trace(options, benchmark)
           end
-
           reportkeys = { 'benchmark' => benchmark['name'],
             'build' => build_setting['name'],
             'analysis' => configuration['name'] }
@@ -133,8 +131,8 @@ class BenchmarkTool
           begin
             run_analysis(options, benchmark, build_setting, configuration)
           rescue Exception => e
-            $stderr.puts "ERROR: Analysis failed: #{e}"
-            puts e.backtrace[0..2]
+            $stderr.puts "ERROR: Analysis #{reportkeys.inspect} failed: #{e}"
+            puts e.backtrace
             errors += 1
           end
         end
@@ -185,19 +183,20 @@ private
                    "-DENABLE_CTORTURE=false",
                    "-DENABLE_TESTING=true",
                    "-DCMAKE_C_FLAGS='#{build_setting['cflags']}'"].join(" ")
-    run("cd #{build_setting['builddir']} && cmake #{@config.srcdir} #{cmake_flags}", @build_cmd_opts)
+    configure_log    = File.join(build_setting['builddir'], 'configure.log')
+    run("cd #{build_setting['builddir']} && cmake #{@config.srcdir} #{cmake_flags}", :log => configure_log, :log_stderr => true)
   end
 
   def generate_trace(options, benchmark)
     options.trace_file = File.join(options.outdir, "#{options.trace_entry}.trace.gz")
+    build_msg_opts = { :log => @build_log, :console => true, :log_append => true }
     if File.exist?(options.trace_file) && File.mtime(options.trace_file) <= File.mtime(options.binary_file)
       log("##{benchmark['index']} Using existing trace file #{options.trace_file}",
-        @build_msg_opts)
+        build_msg_opts)
     else
-      log("##{benchmark['index']} Generating Trace File #{options.trace_file}", @build_msg_opts)
+      log("##{benchmark['index']} Generating Trace File #{options.trace_file}", build_msg_opts)
       run("#{options.pasim} -q --debug 0 --debug-fmt trace -b #{options.binary_file} 2>&1 1>/dev/null | " +
-          "#{options.gzip} > #{options.trace_file}",
-          @build_cmd_opts)
+          "#{options.gzip} > #{options.trace_file}", :log => @build_log, :log_stderr => true, :log_append => true)
     end
   end
 
