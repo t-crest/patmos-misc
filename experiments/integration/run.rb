@@ -32,13 +32,12 @@ class BenchTool < WcetTool
   def initialize(pml, options)
     super(pml,options)
     @testcnt = 0
-    @stats = {}
   end
   def add_timing_info(name, dict, tool = "aiT")
     origin = [name,tool].compact.join("/")
     entry = pml.timing.by_origin(origin)
     assert("No unique timing entry for origin #{origin}") { entry.length == 1 }
-    @stats[origin] = dict
+    additional_report_info[origin] = dict
   end
   def run_analysis
     options.flow_fact_selection = "all"
@@ -60,7 +59,8 @@ class BenchTool < WcetTool
     # run trace analysis
     trace_analysis
     add_timing_info("trace", {"tracefacts" => -1, "flowfacts" => 0}, nil)
-    tracefacts = pml.flowfacts.filter(pml, "minimal", "trace", "machinecode")
+    tracefacts = pml.flowfacts.filter(pml, "minimal", ["trace"], "machinecode")
+    tracefacts.each { |tf| puts "tf: #{tf}" }
     pml.flowfacts.add_copies(tracefacts,"tf")
 
     # wcet analysis using all trace facts
@@ -90,7 +90,7 @@ class BenchTool < WcetTool
     wcet_analysis(["llvm","llvm_tf"])
     add_timing_info("llvmtf", "tracefacts" => llvm_tf.length, "flowfacts" => llvm_tf.length + llvm_ff.length)
 
-    report(@stats)
+    report(additional_report_info)
     pml
   end
 
