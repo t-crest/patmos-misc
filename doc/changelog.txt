@@ -1,6 +1,13 @@
 Patmos Toolchain Changelog
 ==========================
 
+2013-09-03 Libc and Simulator Features
+--------------------------------------
+- Dropped uart_flush and uart_fflush.
+- Added I-cache to simulator, collect memory usage statistics in simulator
+- padasm now supports ELF input
+- Added pacheck tool to statically check Patmos binaries for common encoding errors
+
 2013-05-23 ISA Revision
 -----------------------
 - Changed delay slot size for CALL and BRCF from 2 to 3 cycles
