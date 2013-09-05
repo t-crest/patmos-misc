@@ -157,7 +157,7 @@ NEWLIB_TARGET_CFLAGS=
 MAKEJ=-j2
 
 # Arguments to pass to ctest
-# Use "-jN" to enable parallel benchmark testing 
+# Use "-jN" to enable parallel benchmark testing
 CTEST_ARGS=
 
 #################### End of user configs #####################
@@ -497,8 +497,6 @@ function build_llvm() {
 	builddir=$builddir/Debug+Asserts
     fi
 
-    
-
     run mkdir -p $INSTALL_DIR/bin
     run mkdir -p $INSTALL_DIR/lib
 
@@ -560,6 +558,20 @@ function build_and_test_default() {
     fi
 }
 
+function build_compiler_rt() {
+    clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $(get_repo_dir compiler-rt${TARGET_BUILD_SUFFIX})
+    repo=$(get_repo_dir compiler-rt${TARGET_BUILD_SUFFIX})
+    build_cmake compiler-rt${TARGET_BUILD_SUFFIX} build_default $(get_build_dir compiler-rt${TARGET_BUILD_SUFFIX}) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
+}
+
+function build_newlib() {
+    clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib${TARGET_BUILD_SUFFIX})
+    build_autoconf newlib${TARGET_BUILD_SUFFIX} build_default $(get_build_dir newlib${TARGET_BUILD_SUFFIX}) --target=$TARGET AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
+        RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
+        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target ${TARGET} -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
+}
+
+
 function build_bench() {
     # TODO if we do not have BUILD_SOFTFLOAT=true, then do not build softfloat benchmarks!
 
@@ -579,7 +591,7 @@ function build_emulator() {
     ctoolsbuilddir=$(abspath $ROOT_DIR/$ctoolsbuild)
     chiselbuilddir=$(abspath $ROOT_DIR/$chiselbuild)
     tmpdir=$(abspath $ROOT_DIR/$tmp)
-    
+
     if [ $DO_CLEAN == true -o ! -e "$chiselbuilddir" ] ; then
         run rm -rf $chiselbuilddir
         run mkdir -p $chiselbuilddir
@@ -588,7 +600,7 @@ function build_emulator() {
         run rm -rf $tmpdir
         run mkdir -p $tmpdir
     fi
-    
+
     run pushd "${rootdir}"
     run make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${tmpdir}'" "CTOOLSBUILDDIR='${ctoolsbuilddir}'" "CHISELBUILDDIR='${chiselbuilddir}'" "CHISELINSTALLDIR='${tmpdir}'" "INSTALLDIR='${INSTALL_DIR}/bin'" emulator
     install "${chiselbuilddir}/emulator" "${INSTALL_DIR}/bin/patmos-emulator"
@@ -616,6 +628,69 @@ function run_llvm_build() {
     fi
 }
 
+function build_rtems() {
+    repodir=$(get_repo_dir rtems)
+    srcdir=$(abspath "${repodir}/rtems-4.10.2")
+    builddir=$(abspath $(get_build_dir rtems ""))
+    if [ "$DRYRUN" == "true" ]; then
+        echo "# would check if all binaries necessary for RTEMS build are available"
+    else
+        # TODO: check we have *all* necessary binaries
+        required="clang ld"
+        for bin in ${required} ; do
+            if [ ! -e "${INSTALL_DIR}/bin/patmos-${bin}" ] ; then
+                echo "[rtems] Error: missing binary ${INSTALL_DIR}/bin/patmos-${bin}"
+                echo "[rtems] Error: Need to build and install compiler toolchain before building RTEMS" >&2
+                exit
+            fi
+        done
+    fi
+
+    # symbolic link from all bin/patmos-* binaries to patmos-unknown-rtems-*
+    if [ "$DRYRUN" == "true" ]; then
+        echo "# would symlink ${INSTALL_DIR}/bin/patmos-(.*) to ${INSTALL_DIR}/bin/patmos-unknown-rtems-\$1"
+    fi
+    for f in $(find "${INSTALL_DIR}/bin" -name 'patmos-*' | grep -v unknown-rtems) ; do
+        target="${f/bin\/patmos-/bin/patmos-unknown-rtems-}"
+        if [ ! -e "${target}" ] ; then
+            run ln -s "${f}" "${target}"
+        fi
+    done
+
+    # build newlib and compiler-rt for target patmos-unknown-rtems
+    OLD_TARGET="${TARGET}"
+    OLD_BUILD_SUFFIX="${TARGET_BUILD_SUFFIX}"
+    export TARGET=patmos-unknown-rtems
+    export TARGET_BUILD_SUFFIX=-rtems
+    build_compiler_rt
+    build_newlib
+    export TARGET_BUILD_SUFFIX="${OLD_BUILD_SUFFIX}"
+    export TARGET="${OLD_TARGET}"
+
+    # bootstrap
+    run pushd "${srcdir}"
+    ./bootstrap
+    run popd
+
+    # build
+    run mkdir -p "${builddir}"
+    run pushd "${builddir}"
+    run "${srcdir}"/configure --target=patmos-unknown-rtems --disable-posix \
+         --disable-networking --disable-cxx --enable-rtemsbsp=pasim --prefix="${INSTALL_DIR}"
+    run make install
+    run popd
+
+    # checkout examples
+    clone_update ' https://github.com/RTEMS/examples-v2' "$(get_repo_dir rtems)"/rtems-4.10.2-examples
+
+    run echo "\# Add the following environment variable"
+    run echo "export RTEMS_MAKEFILE_PATH=${INSTALL_DIR}/patmos-unknown-rtems/pasim/Makefile.inc"
+    run echo "\# To run an example, try:"
+    run echo "cd ${INSTALL_DIR}/rtems/rtems-4.10.2-examples/classic_api/triple_period"
+    run echo "make"
+    run echo "pasim --interrupt 1 o-optimize/triple_period.exe"
+}
+
 
 build_target() {
   local target=$1
@@ -641,15 +716,10 @@ build_target() {
     build_autoconf gold build_gold $(get_build_dir gold) --program-prefix=patmos- --enable-gold=yes --enable-ld=no "$GOLD_ARGS"
     ;;
   'newlib')
-    clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib)
-    build_autoconf newlib build_default $(get_build_dir newlib) --target=$TARGET AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
-        RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
-        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target ${TARGET} -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
+    build_newlib
     ;;
   'compiler-rt')
-    clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $(get_repo_dir compiler-rt)
-    repo=$(get_repo_dir compiler-rt)
-    build_cmake compiler-rt build_default $(get_build_dir compiler-rt) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
+    build_compiler_rt
     ;;
   'patmos'|'pasim')
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
@@ -681,6 +751,11 @@ build_target() {
     if [ -d $ROOT_DIR/$repo ]; then
       build_cmake bench build_bench $(get_build_dir bench) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin" "$BENCH_ARGS"
     fi
+    ;;
+  'rtems')
+    # following the readme instructions in rtems.git/readme.txt
+    clone_update ${GITHUB_BASEURL}/rtems.git $(get_repo_dir rtems)/rtems-4.10.2
+    build_rtems
     ;;
   *) echo "Don't know about $target." ;;
   esac
