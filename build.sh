@@ -684,9 +684,9 @@ function build_rtems() {
     clone_update ' https://github.com/RTEMS/examples-v2' "$(get_repo_dir rtems)"/rtems-4.10.2-examples
 
     run echo "\# Add the following environment variable"
-    run echo "export RTEMS_MAKEFILE_PATH=${INSTALL_DIR}/patmos-unknown-rtems/pasim/Makefile.inc"
+    run echo "export RTEMS_MAKEFILE_PATH=${INSTALL_DIR}/patmos-unknown-rtems/pasim"
     run echo "\# To run an example, try:"
-    run echo "cd ${INSTALL_DIR}/rtems/rtems-4.10.2-examples/classic_api/triple_period"
+    run echo "cd $ROOT_DIR/$(get_repo_dir rtems)/rtems-4.10.2-examples/classic_api/triple_period"
     run echo "make"
     run echo "pasim --interrupt 1 o-optimize/triple_period.exe"
 }
