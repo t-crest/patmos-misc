@@ -19,16 +19,24 @@ function abspath() {
     local pwd_restore="$(pwd)"
 
     # readlink -f does not work on OSX, so we do this manually
-    cd $(dirname "$path")
-    path=$(basename "$path")
-    # follow chain of symlinks
-    while [ -L "$path" ]; do
-        path=$(readlink "$path")
-        cd $(dirname "$path")
-        path=$(basename "$path")
-    done
-    echo "$(pwd -P)/$path"
-    cd "$pwd_restore"
+    local dir=$(dirname "$path")
+    if [ -d "$dir" ]; then
+	cd "$dir"
+	path=$(basename "$path")
+	# follow chain of symlinks
+	while [ -L "$path" ]; do
+	    path=$(readlink "$path")
+	    cd $(dirname "$path")
+	    path=$(basename "$path")
+	done
+	echo "$(pwd -P)/$path"
+	cd "$pwd_restore"
+    elif [[ "$BUILDDIR_SUFFIX" =~ ^/ ]]; then
+	echo $path
+    else
+	echo "Trying to resolve non-existent relative path $path, don't want to use PWD."
+	exit 1
+    fi
 }
 
 
@@ -58,6 +66,9 @@ REPO_PREFIX=
 INSTALL_DIR="$ROOT_DIR/local"
 # Directory suffix for directory containing generated files
 BUILDDIR_SUFFIX="/build"
+
+# RTEMS subdirectory prefix. Set to empty to checkout without subdirectories.
+RTEMS_SUBDIR_PREFIX="rtems-4.10.2"
 
 # Targets to support with patmos-clang
 #LLVM_TARGETS=all
@@ -256,8 +267,26 @@ function update_rpath() {
     fi
 }
 
+# This function expects the same arguments as get_build_dir, just that subdirectories
+# are separeted by '/' instead of being passed as separate directory.
+#
 function get_repo_dir() {
     local repo=$1
+
+    # TODO if subdir is set to empty, we could instead make a flat hierarchy, 
+    #      i.e., check out patmos-rtems, patmos-rtems-examples, patmos-rtems-compiler-rt, ..
+    #      Needs to be consistent with get_build_dir.
+    if [ ! -z "$RTEMS_SUBDIR_PREFIX" ]; then
+        case $repo in 
+        rtems/rtems)
+	    repo=rtems/${RTEMS_SUBDIR_PREFIX}
+	    ;;
+        rtems/examples)
+	    repo=rtems/${RTEMS_SUBDIR_PREFIX}-examples
+	    ;;
+        *) ;;
+        esac
+    fi
 
     case $REPO_NAMES in
     short)
@@ -292,6 +321,9 @@ function get_build_dir() {
 	else
 	    builddir=$repodir$BUILDDIR_SUFFIX/$subdir
 	fi
+    elif [ "$repo" == "rtems" ]; then
+	# For RTEMS, we always subdir the build directory, not the other way round
+	builddir=$repodir$BUILDDIR_SUFFIX/$subdir
     else
 	builddir=$repodir$BUILDDIR_SUFFIX
     fi
@@ -559,16 +591,22 @@ function build_and_test_default() {
 }
 
 function build_compiler_rt() {
-    clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $(get_repo_dir compiler-rt${TARGET_BUILD_SUFFIX})
-    repo=$(get_repo_dir compiler-rt${TARGET_BUILD_SUFFIX})
-    build_cmake compiler-rt${TARGET_BUILD_SUFFIX} build_default $(get_build_dir compiler-rt${TARGET_BUILD_SUFFIX}) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
+    local builddir=$1
+    local target=$2
+    local repo=$(get_repo_dir compiler-rt)
+    clone_update ${GITHUB_BASEURL}/patmos-compiler-rt.git $repo
+    build_cmake compiler-rt build_default $builddir \
+        "-DTRIPLE=${target} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin"
 }
 
 function build_newlib() {
-    clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir newlib${TARGET_BUILD_SUFFIX})
-    build_autoconf newlib${TARGET_BUILD_SUFFIX} build_default $(get_build_dir newlib${TARGET_BUILD_SUFFIX}) --target=$TARGET AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
+    local builddir=$1
+    local target=$2
+    local repo=$(get_repo_dir newlib)
+    clone_update ${GITHUB_BASEURL}/patmos-newlib.git $repo
+    build_autoconf newlib build_default $builddir --target=$target AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
         RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
-        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target ${TARGET} -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
+        CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target ${target} -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
 }
 
 
@@ -629,22 +667,21 @@ function run_llvm_build() {
 }
 
 function build_rtems() {
-    repodir=$(get_repo_dir rtems)
-    srcdir=$(abspath "${repodir}/rtems-4.10.2")
-    builddir=$(abspath $(get_build_dir rtems ""))
-    if [ "$DRYRUN" == "true" ]; then
-        echo "# would check if all binaries necessary for RTEMS build are available"
-    else
-        # TODO: check we have *all* necessary binaries
-        required="clang ld"
-        for bin in ${required} ; do
-            if [ ! -e "${INSTALL_DIR}/bin/patmos-${bin}" ] ; then
-                echo "[rtems] Error: missing binary ${INSTALL_DIR}/bin/patmos-${bin}"
-                echo "[rtems] Error: Need to build and install compiler toolchain before building RTEMS" >&2
-                exit
-            fi
-        done
-    fi
+    repodir=$(get_repo_dir rtems/rtems)
+    srcdir=$(abspath "$ROOT_DIR/${repodir}")
+    exampledir="$(get_repo_dir rtems/examples)"
+
+    # TODO: check we have *all* necessary binaries
+    required="clang ld"
+    for bin in ${required} ; do
+	if [ ! -e "${INSTALL_DIR}/bin/patmos-${bin}" ] ; then
+	    echo "[rtems] Error: missing binary ${INSTALL_DIR}/bin/patmos-${bin}"
+	    echo "[rtems] Error: Need to build and install compiler toolchain before building RTEMS" >&2
+	    if [ "$DRYRUN" != "true" ]; then
+		exit
+	    fi
+	fi
+    done
 
     # symbolic link from all bin/patmos-* binaries to patmos-unknown-rtems-*
     if [ "$DRYRUN" == "true" ]; then
@@ -658,37 +695,31 @@ function build_rtems() {
     done
 
     # build newlib and compiler-rt for target patmos-unknown-rtems
-    OLD_TARGET="${TARGET}"
-    OLD_BUILD_SUFFIX="${TARGET_BUILD_SUFFIX}"
-    export TARGET=patmos-unknown-rtems
-    export TARGET_BUILD_SUFFIX=-rtems
-    build_compiler_rt
-    build_newlib
-    export TARGET_BUILD_SUFFIX="${OLD_BUILD_SUFFIX}"
-    export TARGET="${OLD_TARGET}"
+    build_compiler_rt $(get_build_dir rtems compiler-rt) patmos-unknown-rtems
+    build_newlib $(get_build_dir rtems newlib) patmos-unknown-rtems
+
+    # TODO cleanup whatever bootstrap does if $CLEAN == true ?
 
     # bootstrap
     run pushd "${srcdir}"
-    ./bootstrap
+    run ./bootstrap
     run popd
 
     # build
-    run mkdir -p "${builddir}"
-    run pushd "${builddir}"
-    run "${srcdir}"/configure --target=patmos-unknown-rtems --disable-posix \
-         --disable-networking --disable-cxx --enable-rtemsbsp=pasim --prefix="${INSTALL_DIR}"
-    run make install
-    run popd
+    build_autoconf rtems/rtems build_default $(get_build_dir rtems rtems) --target=patmos-unknown-rtems --disable-posix \
+         --disable-networking --disable-cxx --enable-rtemsbsp=pasim "${RTEMS_ARGS}"
 
     # checkout examples
-    clone_update ' https://github.com/RTEMS/examples-v2' "$(get_repo_dir rtems)"/rtems-4.10.2-examples
+    clone_update ' https://github.com/RTEMS/examples-v2' "${exampledir}"
 
-    run echo "\# Add the following environment variable"
-    run echo "export RTEMS_MAKEFILE_PATH=${INSTALL_DIR}/patmos-unknown-rtems/pasim"
-    run echo "\# To run an example, try:"
-    run echo "cd $ROOT_DIR/$(get_repo_dir rtems)/rtems-4.10.2-examples/classic_api/triple_period"
-    run echo "make"
-    run echo "pasim --interrupt 1 o-optimize/triple_period.exe"
+    echo
+    echo "##### Add the following environment variable #####"
+    echo "export RTEMS_MAKEFILE_PATH=${INSTALL_DIR}/patmos-unknown-rtems/pasim"
+    echo "##### To run an example, try: #####"
+    echo "cd $ROOT_DIR/${exampledir}/classic_api/triple_period"
+    echo "make"
+    echo "pasim --interrupt 1 o-optimize/triple_period.exe"
+    echo
 }
 
 
@@ -716,10 +747,10 @@ build_target() {
     build_autoconf gold build_gold $(get_build_dir gold) --program-prefix=patmos- --enable-gold=yes --enable-ld=no "$GOLD_ARGS"
     ;;
   'newlib')
-    build_newlib
+    build_newlib $(get_build_dir newlib) $TARGET
     ;;
   'compiler-rt')
-    build_compiler_rt
+    build_compiler_rt $(get_build_dir compiler_rt) $TARGET
     ;;
   'patmos'|'pasim')
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
@@ -754,7 +785,7 @@ build_target() {
     ;;
   'rtems')
     # following the readme instructions in rtems.git/readme.txt
-    clone_update ${GITHUB_BASEURL}/rtems.git $(get_repo_dir rtems)/rtems-4.10.2
+    clone_update ${GITHUB_BASEURL}/rtems.git $(get_repo_dir rtems/rtems)
     build_rtems
     ;;
   *) echo "Don't know about $target." ;;

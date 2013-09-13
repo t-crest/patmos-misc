@@ -15,6 +15,9 @@ INSTALL_DIR="$ROOT_DIR/local"
 # Directory suffix for directory containing generated files
 BUILDDIR_SUFFIX="/build"
 
+# RTEMS subdirectory prefix. Set to empty to checkout without subdirectories.
+RTEMS_SUBDIR_PREFIX="rtems-4.10.2"
+
 # Targets to support with patmos-clang
 #LLVM_TARGETS=all
 #LLVM_TARGETS="ARM;Mips;Patmos;X86"
@@ -113,6 +116,6 @@ NEWLIB_TARGET_CFLAGS=
 MAKEJ=-j2
 
 # Arguments to pass to ctest
-# Use "-jN" to enable parallel benchmark testing 
+# Use "-jN" to enable parallel benchmark testing
 CTEST_ARGS=
 
