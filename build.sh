@@ -533,7 +533,7 @@ function build_llvm() {
 
     # install platin
     echo "Installing platin toolkit .. "
-    run $rootdir/tools/platin/install.sh -i $INSTALL_DIR
+    run $rootdir/tools/platin/install.sh -i $INSTALL_DIR -b $builddir/tools/platin
 
     # Update rpaths, since we are not using cmake install
     update_rpath llvm
