@@ -59,7 +59,7 @@ end
 
 def wcet_tests
   benchmarks = %w{triangle1 triangle2 triangle3}
-  targets = Hash.new(['main'])
+  targets = Hash.new(['run'])
   benchmarks.map { |bench|
     { 'analyses' => targets[bench].map { |entry|
         { 'name' => entry,
