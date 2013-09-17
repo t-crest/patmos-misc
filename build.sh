@@ -131,6 +131,10 @@ LLVM_CONFIGURE_ARGS=
 GOLD_ARGS=
 NEWLIB_ARGS=
 
+# RTEMS configure options
+#RTEMS_ARGS=--enable-tests
+RTEMS_ARGS=
+
 # Build simulator in Release mode
 #PASIM_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
 # Use a custom installation of Boost libraries
@@ -698,15 +702,17 @@ function build_rtems() {
     build_compiler_rt $(get_build_dir rtems compiler-rt) patmos-unknown-rtems
     build_newlib $(get_build_dir rtems newlib) patmos-unknown-rtems
 
-    # TODO cleanup whatever bootstrap does if $CLEAN == true ?
-
-    # bootstrap
+    # bootstrap; bit of a hack, we rerun it on clean builds
+    # TODO this should be rerun if any new files are added
     run pushd "${srcdir}"
-    run ./bootstrap
+    if [ "$DO_CLEAN" == "true" ]; then
+	run ./bootstrap -p
+	run ./bootstrap
+    fi
     run popd
 
     # build
-    build_autoconf rtems/rtems build_default $(get_build_dir rtems rtems) --target=patmos-unknown-rtems --disable-posix \
+    build_autoconf rtems/rtems build_default $(get_build_dir rtems rtems) --target=patmos-unknown-rtems --enable-posix \
          --disable-networking --disable-cxx --enable-rtemsbsp=pasim "${RTEMS_ARGS}"
 
     # checkout examples
