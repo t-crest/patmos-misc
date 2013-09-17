@@ -750,7 +750,7 @@ build_target() {
     build_newlib $(get_build_dir newlib) $TARGET
     ;;
   'compiler-rt')
-    build_compiler_rt $(get_build_dir compiler_rt) $TARGET
+    build_compiler_rt $(get_build_dir compiler-rt) $TARGET
     ;;
   'patmos'|'pasim')
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
