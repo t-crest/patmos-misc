@@ -49,6 +49,9 @@ CFGFILE=$(dirname $self)/build.cfg
 # location of the patmos-chrpath script
 CHRPATH=$(dirname $self)/patmos-chrpath
 
+# location of the custom install script
+INSTALL_SH=$(dirname $self)/scripts/install.sh
+
 ########### Start of user configs, overwrite in build.cfg ##############
 
 # List of targets to build by default
@@ -378,6 +381,7 @@ function build_flags() {
     local cppflagsname=$(echo "${repo}_CPPFLAGS" | tr '[a-z-/]' '[A-Z__]')
     local cxxflagsname=$(echo "${repo}_CXXFLAGS" | tr '[a-z-/]' '[A-Z__]')
     local ldflagsname=$(echo "${repo}_LDFLAGS" | tr '[a-z-/]' '[A-Z__]')
+    local envvarsname=$(echo "${repo}_ENVVARS" | tr '[a-z-/]' '[A-Z__]')
 
     if [ ! -z "${!cflagsname}$CFLAGS" ]; then
 	echo -n "CFLAGS='${!cflagsname} $CFLAGS'"
@@ -390,6 +394,9 @@ function build_flags() {
     fi
     if [ ! -z "${!ldflagsname}$LDFLAGS" ]; then
 	echo -n " LDFLAGS='${!ldflagsname} $LDFLAGS'"
+    fi
+    if [ ! -z "${!envvarsname}" ]; then
+	echo -n " ${!envvarsname}"
     fi
 }
 
@@ -426,13 +433,13 @@ function build_cmake() {
 }
 
 function build_autoconf() {
-    repo=$1
-    root=$ROOT_DIR/$(get_repo_dir $repo)
-    build_call=$2
-    builddir=$ROOT_DIR/$3
+    local repo=$1
+    local root=$ROOT_DIR/$(get_repo_dir $repo)
+    local build_call=$2
+    local builddir=$ROOT_DIR/$3
     shift 3
-    rootdir=$(abspath $root)
-    configscript=$rootdir/configure
+    local rootdir=$(abspath $root)
+    local configscript=$rootdir/configure
 
     # Read out GOLD_CPPFLAGS, NEWLIB_CPPFLAGS, ..
     local flags=$(build_flags $repo)
@@ -476,7 +483,7 @@ function usage() {
     -a          Build llvm and do a clean build of newlib, compiler-rt and bench with tests.
 
   Available targets:
-    $ALLTARGETS eclipse
+    gold llvm newlib compiler-rt pasim|patmos bench rtems eclipse
 
   The command-line options override the user-config read from '$CFGFILE'.
 EOT
@@ -608,6 +615,10 @@ function build_newlib() {
     local target=$2
     local repo=$(get_repo_dir newlib)
     clone_update ${GITHUB_BASEURL}/patmos-newlib.git $repo
+
+    # Use a different install script for newlib that does not change the modification time if
+    # the files did not change.
+    NEWLIB_ENVVARS="INSTALL='$INSTALL_SH' $NEWLIB_ENVVARS"
     build_autoconf newlib build_default $builddir --target=$target AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
         RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
         CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target ${target} -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
@@ -714,6 +725,11 @@ function build_rtems() {
     # build
     build_autoconf rtems/rtems build_default $(get_build_dir rtems rtems) --target=patmos-unknown-rtems --enable-posix \
          --disable-networking --disable-cxx --enable-rtemsbsp=pasim "${RTEMS_ARGS}"
+
+    if [ "$DO_RUN_TESTS" == "true" ]; then
+	echo "Running tests.."
+	# TODO run tests in testsuite, compare outputs with .scn files
+    fi
 
     # checkout examples
     clone_update ' https://github.com/RTEMS/examples-v2' "${exampledir}"
@@ -846,8 +862,7 @@ fi
 
 if [ "$GOLD_TARGET_ARCH" == "auto" ]; then
     if [ "$OS_NAME" != "Linux" ]; then
-	# TODO should we use $TARGET instead here? Precise target should not matter though, as long as it is patmos.
-	GOLD_ARGS="$GOLD_ARGS --target=patmos-unknown-unknown-elf"
+	GOLD_ARGS="$GOLD_ARGS --target=$TARGET"
     fi
 elif [ "$GOLD_TARGET_ARCH" != "none" ]; then
     GOLD_ARGS="$GOLD_ARGS --target='$GOLD_TARGET_ARCH'"
