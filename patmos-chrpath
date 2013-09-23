@@ -100,7 +100,7 @@ function update_llvm() {
 
     for file in $bindir/patmos-*; do 
 	case $file in
-	    *patmos-llvm-lit|*patmos-ld|*patmos-ar|*patmos-ld.gold|*patmos-clang-wcet) ;;
+	    *patmos*-llvm-lit|*patmos*-ld|*patmos*-ar|*patmos*-ld.gold|*patmos*-clang-wcet) ;;
 	    *) 
 	       update_binary $file
 	       ;;
