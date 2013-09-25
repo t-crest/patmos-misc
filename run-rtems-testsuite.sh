@@ -1,16 +1,23 @@
 #!/bin/bash
 #################################################
 #
-#script for running the RTEMS testsuite
+# Script for running the RTEMS testsuite
+#
+# Author: André Filipe Pereira Rocha
+#         Stefan Hepp <stefan@stefant.org>
 #
 #################################################
 
 cdlevel=1
 partest=
 simargs=("--interrupt=1")
-pwd=$(pwd)
-testsuites=$(pwd)/testsuites/results
-log=$testsuites/testsuite-log.txt
+sourcedir=$(pwd)/testsuites
+builddir=$(pwd)/../rtems-4.10.2-build-patmos/patmos-unknown-rtems/c/pasim/testsuites
+
+# defaults are set after options are read
+resultsdir=
+log=
+
 tests=(itrontests libtests mptests psxtests samples sptests tmitrontests tmtests)
 runtests=()
 failtests=0
@@ -29,6 +36,8 @@ function usage() {
  -r				Resume test execution
  -p <pasim args>		Pass additional arguments to pasim. Arguments should be passed between quotation marks
  -t <tests>			Tests to be executed (itrontests, libtests, mptests, psxtests, samples, sptests, tmitrontests, tmtests)
+ -s <source dir>                Directory containing the testsuites sources
+ -b <build dir>                 Build directory of the testsuites
  -l <log file>			Override the default log file
  
 EOT
@@ -41,7 +50,7 @@ function containsElement() {
 }
 
 function cleanFiles() {
-	rm -rf $testsuites
+	rm -rf $resultsdir
 }
 
 function writeFile() {
@@ -59,31 +68,35 @@ function testsOnResume() {
 }
 
 function runTest() {	
-	local bin=$(find $pwd/../rtems-4.10.2-build-patmos/patmos-unknown-rtems/c/pasim/testsuites -iname "$1.exe")	
+	local bin=$(find $builddir -iname "$1.exe")	
 	if [[ $bin ]]; then
-		pasim "${simargs[@]}" $bin > $testsuites/$1-tmp.txt
-		if [[ $(find -maxdepth 1 -iname "*.scn" ) ]]; then
-			sed -i -e '/Cyc :/,$ d' -e 's/\r//' $testsuites/$1-tmp.txt
-			diff --ignore-blank-lines $testsuites/$1-tmp.txt $1.scn > $testsuites/$1-log.txt
-			if [[ -s $testsuites/$1-log.txt ]]; then
+		pasim "${simargs[@]}" $bin -O $resultsdir/$1-tmp.txt > $resultsdir/$1-stats.txt 2>&1
+		local retcode=$?
+		if [[ $retcode != 0 ]]; then
+			writeFile $log "$1: Test executed: Failed with return code $retcode!"
+			echo "$(tput setaf 1)$1: Test executed: Failed with return code $retcode!$(tput setaf 7)"
+			let "failtests += 1 "
+		elif [[ $(find -maxdepth 1 -iname "*.scn" ) ]]; then
+			diff --ignore-blank-lines $resultsdir/$1-tmp.txt $1.scn > $resultsdir/$1-log.txt
+			if [[ -s $resultsdir/$1-log.txt ]]; then
 				writeFile $log "$1: Test executed: Failed!"
 				echo "$(tput setaf 1)$1: Test executed: Failed!$(tput setaf 7)"
 				let "failtests += 1 "
 			else
 				writeFile $log "$1: Test executed: Passed!"
 				echo "$(tput setaf 2)$1: Test executed: Passed!$(tput setaf 7)"
-				rm -rf $testsuites/$1-log.txt
+				rm -rf $resultsdir/$1-log.txt
 				let "successtests += 1 "
 			fi			
 		else
-			writeFile $testsuites/$2-log.txt "##### $1 #####"
-			cat $testsuites/$1-tmp.txt >> $testsuites/$2-log.txt
-			writeFile $testsuites/$2-log.txt "##### $1 #####"
+			writeFile $resultsdir/$2-log.txt "##### $1 #####"
+			cat $resultsdir/$1-tmp.txt >> $resultsdir/$2-log.txt
+			writeFile $resultsdir/$2-log.txt "##### $1 #####"
 			writeFile $log "$1: Test executed: check $2-log.txt"
 			echo "$1: Test executed: check $2-log.txt"	
 			let "noresulttests += 1 "
 		fi
-		rm -rf $testsuites/$1-tmp.txt
+		rm -rf $resultsdir/$1-tmp.txt
 	elif [[ $(find -maxdepth 1 -iname "*.scn" ) ]]; then
 			writeFile $log "$1: Test not executed: $1.exe file not found"
 			echo "$(tput setaf 3)$1: Test not executed: $1.exe file not found$(tput setaf 7)"
@@ -117,7 +130,7 @@ function recurseDirs
 	done
 }
 
-while getopts ":hHp:P:t:T:l:L:cCrR" opt; do	
+while getopts ":hHp:P:t:T:l:L:cCrRb:B:s:S:" opt; do	
 	case "$opt" in	
 	h|H) 
 		usage
@@ -140,7 +153,7 @@ while getopts ":hHp:P:t:T:l:L:cCrR" opt; do
 		fi
 	;;
 	l|L)
-		log=$testsuites/"$OPTARG"
+		log=$resultsdir/"$OPTARG"
 	;;
 	c|C)
 		cleanFiles
@@ -149,6 +162,13 @@ while getopts ":hHp:P:t:T:l:L:cCrR" opt; do
 	r|R)
 		resumeflag=1
 		testsOnResume $log		
+	;;
+	s|S)
+		sourcedir=$OPTARG
+	;;
+	b|B)
+		builddir=$OPTARG
+		resultsdir=$builddir/results
 	;;
 	\?) 		
 		echo "Invalid option: -$OPTARG"
@@ -163,15 +183,22 @@ while getopts ":hHp:P:t:T:l:L:cCrR" opt; do
 	esac	
 done
 
-if [[ ! -d testsuites ]]; then
-	echo "Invalid dir. Go to RTEMS source dir."
+if [[ "$resultsdir" == "" ]]; then
+    resultsdir=$builddir/results
+fi
+if [[ "$log" == "" ]]; then
+    log=$resultsdir/testsuite-log.txt
+fi
+
+if [[ ! -d $sourcedir ]]; then
+	echo "Invalid source dir. Go to RTEMS source dir or specify the testsuites source dir with -s."
 	exit 1
 fi
 
-cd testsuites
+cd $sourcedir
 if [[ $resumeflag == 0 ]]; then
 	cleanFiles
-	mkdir $testsuites
+	mkdir $resultsdir
 fi
 recurseDirs $(ls -1)
 
