@@ -52,9 +52,6 @@ CHRPATH=$(dirname $self)/patmos-chrpath
 # location of the custom install script
 INSTALL_SH=$(dirname $self)/scripts/install.sh
 
-# location of the rtems test script
-RTEMS_TESTSCRIPT=$(dirname $self)/run-rtems-testsuite.sh
-
 ########### Start of user configs, overwrite in build.cfg ##############
 
 # List of targets to build by default
@@ -739,12 +736,14 @@ function build_rtems_test() {
     builddir=$(get_build_dir rtems rtems-test)
     srcdir=$(abspath "$ROOT_DIR/${repodir}")
 
+    rtems_testscript=$ROOT_DIR/$repodir/run-testsuite.sh
+
     build_autoconf rtems/rtems build_default $builddir --target=patmos-unknown-rtems --enable-posix \
          --disable-networking --disable-cxx --enable-rtemsbsp=pasim --enable-tests "${RTEMS_ARGS}"
 
     if [ "$DO_RUN_TESTS" == "true" ]; then
 	echo "Running tests.."
-	run $RTEMS_TESTSCRIPT -s $repodir/testsuites -b $builddir/patmos-unknown-rtems/c/pasim/testsuites
+	run $rtems_testscript -s $ROOT_DIR/$repodir/testsuites -b $ROOT_DIR/$builddir/patmos-unknown-rtems/c/pasim/testsuites -o $ROOT_DIR/$builddir/results
     fi
 }
 
