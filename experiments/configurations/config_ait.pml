@@ -21,13 +21,24 @@ machine-configuration:
     - name: "data-cache"
       block-size: 32
       associativity: 4
-      size: 2048
+      size: 8192
       policy: "lru"
       type: "set-associative"
+    - name: "method-cache"
+      block-size: 512
+      associativity: 4
+      size: 2048
+      policy: "fifo"
+      type: "method-cache"
+    - name: "stack-cache"
+      block-size: 4
+      size: 1024
+      type: "stack-cache"
   memory-areas:
     - name: "code"
       type: "code"
-      memory: "local"
+      memory: "main"
+      cache: "method-cache"
       address-range:
         min: 0
         max: 0xFFFFFFFF

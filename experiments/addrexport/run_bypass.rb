@@ -26,11 +26,12 @@ config.workdir       = $workdir
 config.benchmarks    = $benchmarks
 config.report        = File.join(config.workdir, 'report.yml')
 config.do_update     = false
-config.pml_config_file = File.join(File.dirname(__FILE__),'config_dc.pml')
+config.pml_config_file = File.join(File.dirname(__FILE__),'config.pml')
 #config.keep_trace_files = true
 config.nice_pasim    = nil # 10 # positive integer
 config.options = default_options(:nice_pasim => config.nice_pasim)
 config.options.enable_sweet = false
+config.options.debug_type = :cache
 config.options.enable_wca   = false
 config.options.trace_analysis =  true
 config.options.use_trace_facts = true
@@ -66,23 +67,29 @@ class BenchTool < WcetTool
     end
 
     # run analysis with address export, bypass
-    pml.with_temporary_sections([:valuefacts]) do
-      options.ais_disable_export = Set.new
-      ait_problem_name("with-addresses")
+    begin
+      pml.with_temporary_sections([:valuefacts]) do
+        options.ais_disable_export = Set.new
+        ait_problem_name("with-addresses")
+        wcet_analysis_ait(srcs)
+        wcet_analysis_platin(srcs)
+        extract_stats("with-addresses")
+
+        options.range_treshold = Math.log2(pml.arch.data_cache.size)
+        options.backup   = true
+        LateBypassTool.run(pml, options)
+      end
+
+      # run analysis on final executable (with bypassed loads)
+      ait_problem_name("with-bypass")
       wcet_analysis_ait(srcs)
       wcet_analysis_platin(srcs)
-      extract_stats("with-addresses")
-
-      options.range_treshold = Math.log2(pml.arch.data_cache.size)
-      options.backup   = true
-      LateBypassTool.run(pml, options)
+      extract_stats("with-bypass")
+    ensure
+      if File.exist?(options.binary_file + ".bak")
+        FileUtils.mv(options.binary_file+".bak", options.binary_file)
+      end
     end
-
-    # run analysis on final executable (with bypassed loads)
-    ait_problem_name("with-bypass")
-    wcet_analysis_ait(srcs)
-    wcet_analysis_platin(srcs)
-    extract_stats("with-bypass")
   end
   def extract_stats(problem_name)
     # extract statistics

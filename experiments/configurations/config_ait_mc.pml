@@ -18,21 +18,18 @@ machine-configuration:
       write-latency: 0
       write-transfer-time: 0
   caches:
-    - name: "data-cache"
-      block-size: 32
-      associativity: 4
-      size: 2048
-      policy: "lru"
-      type: "set-associative"
     - name: "method-cache"
-      block-size: 64
-      associativity: 32
-      size: 2048
+      block-size: 128
+      associativity: 4
+      size: 512
       policy: "fifo"
       type: "method-cache"
+      attributes:
+        - key:   max-subfunction-size
+          value: 128
     - name: "stack-cache"
       block-size: 4
-      size: 2048
+      size: 1024
       type: "stack-cache"
   memory-areas:
     - name: "code"
@@ -44,8 +41,7 @@ machine-configuration:
         max: 0xFFFFFFFF
     - name: "data"
       type: "data"
-      memory: "main"
-      cache: "data-cache"
+      memory: "local"
       address-range:
         min: 0
         max: 0xFFFFFFFF

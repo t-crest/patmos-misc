@@ -186,13 +186,15 @@ private
     # Configure
     build_setting['builddir'] ||= File.join(@config.builddir, build_setting['name'])
     FileUtils.mkdir_p(build_setting['builddir'])
+    hw_cflags = "" # not always possible ...  `platin tool-config -t clang -i #{@config.pml_config_file}`.chomp
+    cflags = [ hw_cflags, build_setting['cflags'] ].join(" ")
     cmake_flags = ["-DCMAKE_TOOLCHAIN_FILE=#{File.join(@config.srcdir,"cmake","patmos-clang-toolchain.cmake")}",
                    "-DREQUIRES_PASIM=true",
                    "-DENABLE_CTORTURE=false",
                    "-DENABLE_TESTING=true",
-                   "-DCMAKE_C_FLAGS='#{build_setting['cflags']}'"].join(" ")
-    configure_log    = File.join(build_setting['builddir'], 'configure.log')
-    run("cd #{build_setting['builddir']} && cmake #{@config.srcdir} #{cmake_flags}", :log => configure_log, :log_stderr => true)
+                   "-DCMAKE_C_FLAGS='#{cflags}'"].join(" ")
+    configure_log = File.join(build_setting['builddir'], 'configure.log')
+    run("cd #{build_setting['builddir']} && cmake #{@config.srcdir} #{cmake_flags}", :log => configure_log, :console => true, :log_stderr => true)
   end
 
   def generate_trace(options, benchmark)

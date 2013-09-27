@@ -27,6 +27,7 @@ config.build_log     = File.join(config.builddir, 'build.log')
 config.report        = File.join(config.workdir, 'report.yml')
 config.do_update     = true
 config.nice_pasim    = nil # positive integer
+config.pml_config_file = File.join(File.dirname(__FILE__),"../configurations/config_local.pml")
 
 class BenchTool < WcetTool
   def initialize(pml, options)

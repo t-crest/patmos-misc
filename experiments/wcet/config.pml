@@ -1,1 +1,1 @@
-../configurations/config_dc.pml
+../configurations/config_ait.pml

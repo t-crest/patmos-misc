@@ -1,7 +1,7 @@
 #
 # Benchmark Selection for 'wcet' experiments
 #
-builds = %w{O1f O2} # {O0 O1 O1f O2}
+builds = %w{O1f} # O2} # {O0 O1 O1f O2}
 configs = %w{minimal} # {blockglobal blocklocal minimal notrace}
 $benchmarks = all_benchmarks.select { |b|
   if b['irreducible'] || b['recursive']
