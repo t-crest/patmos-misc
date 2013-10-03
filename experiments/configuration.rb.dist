@@ -1,6 +1,18 @@
 #
 # Configuration for Experiments
 #
+
+# path to patmos-benchmarks repository
 $benchsrc = '~/tcrest/patmos-benchmarks'
+
+# directory for CMake build of patmos-benchmarks
+# relative to the directory of the experiment (e.g., experiments/wcet)
 $builddir = 'build'
+
+# working directory
+# relative to the directory of the experiment (e.g., experiments/wcet)
 $workdir  = 'work'
+
+# For development, it is advisable to set a filter selecting a few relevant benchmarks
+$benchfilter = Proc.new { |b| true }
+# $benchfilter = Proc.new { |b| %w{mrtc_bs mrtc_crc mrtc_compress}.include?(b['name']) }

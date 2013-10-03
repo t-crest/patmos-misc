@@ -58,8 +58,9 @@ def papabench
 end
 
 def wcet_tests
-  benchmarks = %w{triangle1 triangle2 triangle3}
-  targets = Hash.new(['main'])
+  benchmarks = %w{triangle1 triangle2 triangle3 jumptable lift_cov}
+  targets = Hash.new(['run'])
+  targets['lift_cov'] = ['ctrl_init', 'controller']
   benchmarks.map { |bench|
     { 'analyses' => targets[bench].map { |entry|
         { 'name' => entry,

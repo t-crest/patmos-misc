@@ -79,8 +79,7 @@ LLVM_CONFIGURE_ARGS=
 GOLD_ARGS=
 NEWLIB_ARGS=
 
-# RTEMS configure options
-#RTEMS_ARGS=--enable-tests
+# Additional RTEMS configure options
 RTEMS_ARGS=
 
 # Build simulator in Release mode

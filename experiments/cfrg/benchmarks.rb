@@ -1,10 +1,10 @@
 #
 # Benchmark Selection for 'cfrg' experiments
 #
-builds = %w{O0 O1 O2}
-configs = %w{blockglobal blocklocal minimal}
-$benchmarks = mrtc_benchmarks.select { |b|
-  if b['irreducible'] || b['recursive']
+builds = %w{O2} # O0 O1
+configs = %w{blockglobal} # blocklocal minimal
+$benchmarks = all_benchmarks.select { |b|
+  if (b['irreducible'] || b['recursive'])
     false
   else
     true

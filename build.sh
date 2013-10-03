@@ -134,8 +134,7 @@ LLVM_CONFIGURE_ARGS=
 GOLD_ARGS=
 NEWLIB_ARGS=
 
-# RTEMS configure options
-#RTEMS_ARGS=--enable-tests
+# Additional RTEMS configure options
 RTEMS_ARGS=
 
 # Build simulator in Release mode
@@ -483,7 +482,7 @@ function usage() {
     -a          Build llvm and do a clean build of newlib, compiler-rt and bench with tests.
 
   Available targets:
-    gold llvm newlib compiler-rt pasim|patmos bench rtems eclipse
+    gold llvm newlib compiler-rt pasim|patmos bench rtems rtems-test rtems-examples rtems-all eclipse
 
   The command-line options override the user-config read from '$CFGFILE'.
 EOT
@@ -685,7 +684,6 @@ function run_llvm_build() {
 function build_rtems() {
     repodir=$(get_repo_dir rtems/rtems)
     srcdir=$(abspath "$ROOT_DIR/${repodir}")
-    exampledir="$(get_repo_dir rtems/examples)"
 
     # TODO: check we have *all* necessary binaries
     required="clang ld"
@@ -723,18 +721,38 @@ function build_rtems() {
     fi
     run popd
 
-    # build
+    # build with tests disabled here, testing is done using a separate build
     build_autoconf rtems/rtems build_default $(get_build_dir rtems rtems) --target=patmos-unknown-rtems --enable-posix \
-         --disable-networking --disable-cxx --enable-rtemsbsp=pasim "${RTEMS_ARGS}"
+         --disable-networking --disable-cxx --enable-rtemsbsp=pasim --disable-tests "${RTEMS_ARGS}"
+
+    
+    echo
+    echo "##### Add the following environment variable #####"
+    echo "export RTEMS_MAKEFILE_PATH=${INSTALL_DIR}/patmos-unknown-rtems/pasim"
+    echo 
+}
+
+function build_rtems_test() {
+    repodir=$(get_repo_dir rtems/rtems)
+    builddir=$(get_build_dir rtems rtems-test)
+    srcdir=$(abspath "$ROOT_DIR/${repodir}")
+
+    rtems_testscript=$ROOT_DIR/$repodir/run-testsuite.sh
+
+    build_autoconf rtems/rtems build_default $builddir --target=patmos-unknown-rtems --enable-posix \
+         --disable-networking --disable-cxx --enable-rtemsbsp=pasim --enable-tests "${RTEMS_ARGS}"
 
     if [ "$DO_RUN_TESTS" == "true" ]; then
 	echo "Running tests.."
-	# TODO run tests in testsuite, compare outputs with .scn files
+	run $rtems_testscript -s $ROOT_DIR/$repodir/testsuites -b $ROOT_DIR/$builddir/patmos-unknown-rtems/c/pasim/testsuites -o $ROOT_DIR/$builddir/results
     fi
+}
 
-    # checkout examples
-    clone_update ' https://github.com/RTEMS/examples-v2' "${exampledir}"
+function build_rtems_examples() {
+    exampledir="$(get_repo_dir rtems/examples)"
 
+    #TODO build all examples (but do not install)
+    
     echo
     echo "##### Add the following environment variable #####"
     echo "export RTEMS_MAKEFILE_PATH=${INSTALL_DIR}/patmos-unknown-rtems/pasim"
@@ -744,7 +762,6 @@ function build_rtems() {
     echo "pasim --interrupt 1 o-optimize/triple_period.exe"
     echo
 }
-
 
 build_target() {
   local target=$1
@@ -810,6 +827,14 @@ build_target() {
     # following the readme instructions in rtems.git/readme.txt
     clone_update ${GITHUB_BASEURL}/rtems.git $(get_repo_dir rtems/rtems)
     build_rtems
+    ;;
+  "rtems-test")
+    # This requires rtems target to be built already
+    build_rtems_test
+    ;;
+  "rtems-examples")
+    clone_update ' https://github.com/RTEMS/examples-v2' "$(get_repo_dir rtems/examples)"
+    build_rtems_examples
     ;;
   *) echo "Don't know about $target." ;;
   esac

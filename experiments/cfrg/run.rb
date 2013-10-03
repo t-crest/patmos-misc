@@ -28,6 +28,7 @@ config.build_log     = File.join(config.builddir, 'build.log')
 config.report        = File.join(config.workdir, 'report.yml')
 config.do_update     = true
 config.nice_pasim    = nil # positive integer
+config.pml_config_file = File.join(File.dirname(__FILE__),"../configurations/config_local.pml")
 
 # customized benchmark script
 class BenchTool < WcetTool
@@ -52,7 +53,7 @@ class BenchTool < WcetTool
     options.flow_fact_selection = "all" # all transformed
     options.timing_output = "roundtrip"
     wcet_file_suffix('roundtrip')
-    wcet_analysis(["roundtrip","support"])
+    wcet_analysis(["roundtrip"])
 
     # sweet
     if options.enable_sweet
@@ -97,7 +98,7 @@ class BenchTool < WcetTool
   end
   def downtransform(support,src,dst)
     opts = options.dup
-    opts.flow_fact_srcs = [support,src]
+    opts.flow_fact_srcs = [src]
     opts.flow_fact_selection = "all" # already selected
     opts.flow_fact_output = dst
     opts.transform_action = "down"
@@ -118,7 +119,7 @@ FileUtils.mkdir_p(config.builddir)
 
 # options
 config.options = default_options(:nice_pasim => config.nice_pasim)
-config.options.enable_sweet = true
+config.options.enable_sweet = true # disable for CFRG roundtrip tests only
 config.options.enable_wca   = true
 config.options.runcheck     = false
 config.options.trace_analysis = true
@@ -128,6 +129,6 @@ config.options.use_trace_facts = true
 build_and_run(config, BenchTool)
 
 # summarize
-keys = %w{benchmark build  aiT-unknown-loops analysis source analysis-entry cycles tracefacts flowfacts}
+keys = %w{benchmark build analysis source analysis-entry cycles}
 print_csv(config.report, :keys => keys, :outfile => File.join(config.workdir,'report.csv'))
 print_table(config.report, keys)

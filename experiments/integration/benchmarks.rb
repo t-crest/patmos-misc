@@ -7,8 +7,7 @@ $benchmarks = all_benchmarks.select { |b|
   if b['irreducible'] || b['recursive']
     false
   else
-    b['name'] == 'mrtc_compress'
-    # true
+    true
   end
 }.map { |b|
   settings = standard_buildsettings.select { |s| builds.include?(s['name']) }

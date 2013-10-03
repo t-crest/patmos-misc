@@ -66,6 +66,7 @@ def default_options(opts = {})
     options.gzip  = "nice -n #{nice_level} gzip"
   end
   options.a3 = "a3patmos"
+  options.ait_import_addresses = true
   options.text_sections=[".text"]
   options.stats = true
   options
@@ -81,6 +82,13 @@ class BenchmarkTool
     @config, @analysis_tool = config, analysis_tool
   end
   def run_all
+    if ! @config.pml_config_file
+      $stderr.puts "No config file configured. Exit."
+      exit 1
+    elsif ! File.exist?(@config.pml_config_file)
+      $stderr.puts "Config file #{@config.pml_config_file} does not exist. Exit."
+      exit 1
+    end
     # forall benchmarks/buildsettings
     @config.benchmarks.each_with_index { |b,ix| b['index'] = ix }
     errors = 0
@@ -92,7 +100,7 @@ class BenchmarkTool
         options = @config.options.dup
         options.binary_file  = "#{build_setting['builddir']}/#{benchmark['path']}"
         options.bitcode_file = "#{options.binary_file}.bc"
-        options.input        = ["#{options.binary_file}.pml"]
+        options.input        = [ "#{options.binary_file}.pml", @config.pml_config_file ]
 
         # build
         @build_log = File.join(build_setting['builddir'],"build.#{benchmark['name']}.log")
@@ -178,13 +186,15 @@ private
     # Configure
     build_setting['builddir'] ||= File.join(@config.builddir, build_setting['name'])
     FileUtils.mkdir_p(build_setting['builddir'])
+    hw_cflags = "" # not always possible ...  `platin tool-config -t clang -i #{@config.pml_config_file}`.chomp
+    cflags = [ hw_cflags, build_setting['cflags'] ].join(" ")
     cmake_flags = ["-DCMAKE_TOOLCHAIN_FILE=#{File.join(@config.srcdir,"cmake","patmos-clang-toolchain.cmake")}",
                    "-DREQUIRES_PASIM=true",
                    "-DENABLE_CTORTURE=false",
                    "-DENABLE_TESTING=true",
-                   "-DCMAKE_C_FLAGS='#{build_setting['cflags']}'"].join(" ")
-    configure_log    = File.join(build_setting['builddir'], 'configure.log')
-    run("cd #{build_setting['builddir']} && cmake #{@config.srcdir} #{cmake_flags}", :log => configure_log, :log_stderr => true)
+                   "-DCMAKE_C_FLAGS='#{cflags}'"].join(" ")
+    configure_log = File.join(build_setting['builddir'], 'configure.log')
+    run("cd #{build_setting['builddir']} && cmake #{@config.srcdir} #{cmake_flags}", :log => configure_log, :console => true, :log_stderr => true)
   end
 
   def generate_trace(options, benchmark)
@@ -195,7 +205,7 @@ private
         build_msg_opts)
     else
       log("##{benchmark['index']} Generating Trace File #{options.trace_file}", build_msg_opts)
-      run("#{options.pasim} -q --debug 0 --debug-fmt trace -b #{options.binary_file} 2>&1 1>/dev/null | " +
+      run("#{options.pasim} `platin tool-config -t simulator -i #{@config.pml_config_file}` -q --debug 0 --debug-fmt trace -b #{options.binary_file} 2>&1 1>/dev/null | " +
           "#{options.gzip} > #{options.trace_file}", :log => @build_log, :log_stderr => true, :log_append => true)
     end
   end

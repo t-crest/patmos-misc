@@ -29,6 +29,7 @@ config.report        = File.join(config.workdir, 'report.yml')
 config.do_update     = true
 config.keep_trace_files = true
 config.nice_pasim    = 10 # positive integer
+config.pml_config_file = File.join(File.dirname(__FILE__),"config.pml")
 
 # customized benchmark script
 class BenchTool < WcetTool
@@ -51,8 +52,9 @@ FileUtils.remove_entry_secure(config.build_log) if File.exist?(config.build_log)
 config.options = default_options(:nice_pasim => config.nice_pasim)
 config.options.enable_sweet = false
 config.options.enable_wca   = true
-config.options.runcheck     = true
+config.options.runcheck     = false # true
 config.options.trace_analysis = true
+config.options.debug_type   = :cache
 config.options.use_trace_facts = true
 # config.options.compute_criticalities = true
 
