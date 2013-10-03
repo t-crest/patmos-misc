@@ -658,6 +658,7 @@ function build_emulator() {
     run make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${tmpdir}'" "CTOOLSBUILDDIR='${ctoolsbuilddir}'" "CHISELBUILDDIR='${chiselbuilddir}'" "CHISELINSTALLDIR='${tmpdir}'" "INSTALLDIR='${INSTALL_DIR}/bin'" emulator
     install "${chiselbuilddir}/emulator" "${INSTALL_DIR}/bin/patmos-emulator"
     install "${rootdir}/chisel/spm.t" "${INSTALL_DIR}/lib/ld-scripts/patmos_spm.t"
+    install "${rootdir}/chisel/ram.t" "${INSTALL_DIR}/lib/ld-scripts/patmos_ram.t"
     run popd
 }
 
