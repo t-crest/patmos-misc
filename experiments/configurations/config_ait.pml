@@ -21,7 +21,7 @@ machine-configuration:
     - name: "data-cache"
       block-size: 32
       associativity: 4
-      size: 8192
+      size: 2048
       policy: "lru"
       type: "set-associative"
     - name: "method-cache"
@@ -30,6 +30,9 @@ machine-configuration:
       size: 2048
       policy: "fifo"
       type: "method-cache"
+      attributes:
+        - key:   "max-subfunction-size"
+          value: 512
     - name: "stack-cache"
       block-size: 4
       size: 1024

@@ -13,6 +13,10 @@ $builddir = 'build'
 # relative to the directory of the experiment (e.g., experiments/wcet)
 $workdir  = 'work'
 
+# patmos HW configuration
+# either absolute or relative to the directory of the experiment
+$hw_config = "../configurations/config_ait.pml"
+
 # For development, it is advisable to set a filter selecting a few relevant benchmarks
 $benchfilter = Proc.new { |b| true }
 # $benchfilter = Proc.new { |b| %w{mrtc_bs mrtc_crc mrtc_compress}.include?(b['name']) }
