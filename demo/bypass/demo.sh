@@ -1,8 +1,14 @@
 #!/bin/bash
 
-# current limitation: piping in commands does not work
+file=$1
+if [ -z $file ]; then
+  file="test"
+fi
 
-echo patmos-clang-wcet -mconfig=config_ait.pml --wcet-guided-optimization --platin-wcet-options="--use-trace-facts --recorders g:lci --compute-criticalities" -o test test.c
+options="--compute-criticalities"
+
+echo patmos-clang-wcet -mconfig=config_ait.pml --wcet-guided-optimization --platin-wcet-options="--use-trace-facts --recorders g:lci $options" -o $file $file.c -save-temps
+echo -n "[Press enter to execute]"
 read
-patmos-clang-wcet -mconfig=config_ait.pml --wcet-guided-optimization --platin-wcet-options="--use-trace-facts --recorders g:lci --compute-criticalities" -o test test.c
+patmos-clang-wcet -mconfig=config_ait.pml --wcet-guided-optimization --platin-wcet-options="--use-trace-facts --recorders g:lci $options" -o $file $file.c -save-temps
 
