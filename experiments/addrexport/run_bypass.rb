@@ -87,6 +87,7 @@ class BenchTool < WcetTool
       extract_stats("with-bypass")
     ensure
       if File.exist?(options.binary_file + ".bak")
+        FileUtils.mv(options.binary_file, options.binary_file + ".bypass")
         FileUtils.mv(options.binary_file+".bak", options.binary_file)
       end
     end

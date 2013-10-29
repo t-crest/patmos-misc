@@ -67,6 +67,10 @@ def default_options(opts = {})
   end
   options.a3 = "a3patmos"
   options.ait_import_addresses = true
+  options.wca_cache_regions = true
+  options.wca_persistence_analysis = false
+  options.wca_ideal_cache = false
+  options.wca_minimal_cache = false
   options.text_sections=[".text"]
   options.stats = true
   options
@@ -98,6 +102,8 @@ class BenchmarkTool
 
         # benchmark options
         options = @config.options.dup
+        options.build = build_setting['name']
+        options.benchmark_name = benchmark['name']
         options.binary_file  = "#{build_setting['builddir']}/#{benchmark['path']}"
         options.bitcode_file = "#{options.binary_file}.bc"
         options.input        = [ "#{options.binary_file}.pml", @config.pml_config_file ]
@@ -111,7 +117,7 @@ class BenchmarkTool
         errors = 0
         benchmark['analyses'].each do |configuration|
 
-          options.outdir = File.join(@config.workdir, "#{benchmark['name']}.#{build_setting['name']}.#{configuration['name']}")
+          options.outdir   = File.join(@config.workdir, "#{benchmark['name']}.#{build_setting['name']}.#{configuration['name']}")
           options.output = File.join(options.outdir,"#{benchmark['name']}.pml")
           options.report=File.join(options.outdir, "report.yml")
           options.analysis_entry = configuration['analysis_entry']
@@ -128,6 +134,7 @@ class BenchmarkTool
             options.use_trace_facts = false
             options.runcheck = false
           else
+            options.trace_file = File.join(@config.tracedir || @config.workdir, "#{benchmark['name']}.#{build_setting['name']}.#{configuration['trace_entry']}.tar.gz")
             options.trace_entry =  configuration['trace_entry']
             options.recorders = RecorderSpecification.parse(configuration['recorders'], 0)
             generate_trace(options, benchmark)
@@ -186,26 +193,27 @@ private
     # Configure
     build_setting['builddir'] ||= File.join(@config.builddir, build_setting['name'])
     FileUtils.mkdir_p(build_setting['builddir'])
-    hw_cflags = "" # not always possible ...  `platin tool-config -t clang -i #{@config.pml_config_file}`.chomp
-    cflags = [ hw_cflags, build_setting['cflags'] ].join(" ")
+    hw_flags = `platin tool-config -t clang -i #{@config.pml_config_file}`.chomp
+    cflags = build_setting['cflags']
     cmake_flags = ["-DCMAKE_TOOLCHAIN_FILE=#{File.join(@config.srcdir,"cmake","patmos-clang-toolchain.cmake")}",
                    "-DREQUIRES_PASIM=true",
                    "-DENABLE_CTORTURE=false",
                    "-DENABLE_TESTING=true",
-                   "-DCMAKE_C_FLAGS='#{cflags}'"].join(" ")
+                   "-DCMAKE_C_FLAGS='#{cflags}'",
+                   "-DCMAKE_C_LINK_FLAGS='#{hw_flags}'"
+                  ].join(" ")
     configure_log = File.join(build_setting['builddir'], 'configure.log')
     run("cd #{build_setting['builddir']} && cmake #{@config.srcdir} #{cmake_flags}", :log => configure_log, :console => true, :log_stderr => true)
   end
 
   def generate_trace(options, benchmark)
-    options.trace_file = File.join(options.outdir, "#{options.trace_entry}.trace.gz")
     build_msg_opts = { :log => @build_log, :console => true, :log_append => true }
-    if File.exist?(options.trace_file) && File.mtime(options.trace_file) <= File.mtime(options.binary_file)
+    if File.exist?(options.trace_file) # && File.mtime(options.trace_file) <= File.mtime(options.binary_file)
       log("##{benchmark['index']} Using existing trace file #{options.trace_file}",
         build_msg_opts)
     else
       log("##{benchmark['index']} Generating Trace File #{options.trace_file}", build_msg_opts)
-      run("#{options.pasim} `platin tool-config -t simulator -i #{@config.pml_config_file}` -q --debug 0 --debug-fmt trace -b #{options.binary_file} 2>&1 1>/dev/null | " +
+      run("#{options.pasim} `platin tool-config -t simulator -i #{@config.pml_config_file}` -q --flush-caches=#{options.analysis_entry} --debug 0 --debug-fmt trace -b #{options.binary_file} 2>&1 1>/dev/null | " +
           "#{options.gzip} > #{options.trace_file}", :log => @build_log, :log_stderr => true, :log_append => true)
     end
   end

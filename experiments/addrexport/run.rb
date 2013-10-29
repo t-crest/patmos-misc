@@ -25,8 +25,8 @@ config.builddir      = $builddir
 config.workdir       = $workdir
 config.benchmarks    = $benchmarks
 config.report        = File.join(config.workdir, 'report.yml')
-config.do_update     = false
-config.pml_config_file = File.join(File.dirname(__FILE__),'config_dc.pml')
+config.do_update     = true
+config.pml_config_file = File.join(File.dirname(__FILE__),'config.pml')
 #config.keep_trace_files = true
 config.nice_pasim    = nil # 10 # positive integer
 config.options = default_options(:nice_pasim => config.nice_pasim)

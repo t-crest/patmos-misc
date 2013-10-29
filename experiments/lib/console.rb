@@ -3,11 +3,17 @@ require 'ostruct'
 
 $start = Time.now
 
+
 def log(msg,opts)
   prefix = opts[:prefix] || "LOG"
   str = "[#{prefix} #{Time.now - $start}] #{msg}"
   $stderr.puts(str) if opts[:console]
   File.open(opts[:log], opts[:log_append] ? "a" : "w") { |fh| fh.puts msg } if opts[:log]
+end
+
+# write to console stderr, ignoring redirections
+def puts_stderr(msg)
+  File.open("/dev/stderr","w") { |fh| fh.puts("[DEBUG] #{msg}") }
 end
 
 def die(msg)
@@ -38,7 +44,7 @@ def run(cmd,opts={})
     system_opts[:err] = [ :child, :out ] if opts[:log_stderr]
   end
   system(cmd, system_opts)
-  die("Command failed") unless $? == 0
+  die("Command '#{cmd.inspect}' failed") unless $? == 0
 end
 
 # printing/export

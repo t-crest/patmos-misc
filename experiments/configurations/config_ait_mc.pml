@@ -19,14 +19,14 @@ machine-configuration:
       write-transfer-time: 0
   caches:
     - name: "method-cache"
-      block-size: 128
+      block-size: 512
       associativity: 4
-      size: 512
+      size: 2048
       policy: "fifo"
       type: "method-cache"
       attributes:
-        - key:   max-subfunction-size
-          value: 128
+        - key:   "max-subfunction-size"
+          value: 512
     - name: "stack-cache"
       block-size: 4
       size: 1024

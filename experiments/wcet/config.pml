@@ -1,1 +1,1 @@
-../configurations/config_ait.pml
+config_ic_1024_4_fifo.pml

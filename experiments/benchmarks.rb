@@ -58,7 +58,7 @@ def papabench
 end
 
 def wcet_tests
-  benchmarks = %w{triangle1 triangle2 triangle3 jumptable lift_cov}
+  benchmarks = %w{triangle1 triangle2 triangle3 lift_cov}
   targets = Hash.new(['run'])
   targets['lift_cov'] = ['ctrl_init', 'controller']
   benchmarks.map { |bench|
@@ -84,7 +84,8 @@ def standard_buildsettings
   [ {'name' => 'O0', 'cflags' => '-O0', 'ldflags' => '' }, # todo: remove empty blocks
     {'name' => 'O1', 'cflags' => '-O1', 'ldflags' => '' },
     {'name' => 'O1f', 'cflags' => '-O1 -Xopt -disable-inlining', 'ldflags' => '' },
-    {'name' => 'O2', 'cflags' => '-O2', 'ldflags' => '' }]
+    {'name' => 'O2', 'cflags' => '-O2', 'ldflags' => '' },
+    {'name' => 'Os', 'cflags' => '-Os', 'ldflags' => '-Os'} ]
 end
 
 # Standard Configurations
