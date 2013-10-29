@@ -43,7 +43,7 @@ function report {
 function access_types {
   # memrd_no  memrd_with  memwr_no  memwr_with
   # total/exact/nearly/imprecise/unknown
-  for o in O0 O1 O2
+  for o in O1
   do
     outfile=access_types.${o}.dat
     echo benchmark \
@@ -52,20 +52,25 @@ function access_types {
       st_no_total st_no_exact st_no_nearly st_no_imprecise st_no_unknown \
       st_with_total st_with_exact st_with_nearly st_with_imprecise st_with_unknown \
       > ${outfile}
-    report | grep .${o}. | sed -e "s;////;0/0/0/0/0;g" | tr -s "[:space:]" | \
+    report | grep .${o}f. | sed -e "s;////;0/0/0/0/0;g" | tr -s "[:space:]" | \
       cut -d' ' -f 1,5-8 | tr '/' ' ' | \
-      sed -e 's/^.\+_\(.*\)\.'${o}'\.\(.*\)_minimal/\1.\2/' | \
+      sed -e 's/\.O1f\.main_minimal//g' | \
+      sed -e 's/fbw\.O1f\.//g' -e 's/_minimal//g' | \
+      sed -e 's/^mrtc_/mrtc./g' -e 's/^papa_/papa./g' | \
       sed -e 's/_/-/g' | \
-      grep -v nsichneu  >> ${outfile}
+      grep -v nsichneu | grep -v ^tests- >> ${outfile}
+
+      sed -i -e 's/ld_with_//g' -e 's/ld_no_//g' ${outfile}
   done
 }
 
+      #sed -e 's/^.\+_\(.*\)\.'${o}'\.\(.*\)_minimal/\1.\2/' | \
 
-copy_stats
+#copy_stats
 
 report
 
-get_num_exports
+#get_num_exports
 
 access_types
 
