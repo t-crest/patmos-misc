@@ -1,0 +1,3 @@
+
+# if built with make all > build.log 2> failed.log
+vim $(sed -e "s|^.*\[\([a-z0-9\-]\+\)\.sp\.elf\].*$|\1.log|" failed.log)
