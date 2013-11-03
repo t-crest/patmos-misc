@@ -2,12 +2,14 @@
 Compiler/Platin/aiT Benchmark and Evaluation framework
 
 * Copy configuration.rb.dist to configuration.rb and adapt accordingly
+* Run via 'ruby run.rb' in experiment subdirectories
 
 Experiments:
 
 * cfrg: experiments with CFRGs (tests all of platin the toolchain, including SWEET) [LCTES13]
 * integration: experiments with LLVM/aiT integration [COMPUTING13]
 * wcet: standard compiler/wcet calculation tests
+* stackcache: runs stackcache related analyses in LLVM and Platin
 
 Recommended Benchmark Set for every-day use / regression testing
 

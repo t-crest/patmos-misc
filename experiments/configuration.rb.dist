@@ -20,3 +20,7 @@ $hw_config = "../configurations/config_ait.pml"
 # For development, it is advisable to set a filter selecting a few relevant benchmarks
 $benchfilter = Proc.new { |b| true }
 # $benchfilter = Proc.new { |b| %w{mrtc_bs mrtc_crc mrtc_compress}.include?(b['name']) }
+
+# LLVM stack cache analysis options (optional)
+$lp_solver = "#{$benchsrc}/scripts/solve_ilp_glpk.sh"
+$lp_bounds_file = "bounds.lp"

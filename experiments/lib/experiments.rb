@@ -18,8 +18,12 @@ rescue LoadError => e
   path_to_platin=`which platin 2>/dev/null`.strip
   if File.exist?(path_to_platin)
 
-    libdir = File.join(File.dirname(File.dirname(path_to_platin)),"lib")
-    $:.unshift File.join(libdir,"platin")
+    # look for platin lib directory assuming installed or llvm/tools directory layout
+    if libdir = File.join(File.dirname(File.dirname(path_to_platin)),"lib") and File.directory?(libdir)
+      $:.unshift File.join(libdir,"platin")
+    elsif libdir = File.join(File.dirname(path_to_platin),"lib") and File.directory?(libdir)
+      $:.unshift libdir
+    end
     Gem.clear_paths
     ENV['GEM_PATH'] = File.join(libdir,"platin", "gems") + (ENV['GEM_PATH'] ? ":#{ENV['GEM_PATH']}" : "")
 
@@ -93,6 +97,7 @@ class BenchmarkTool
       $stderr.puts "Config file #{@config.pml_config_file} does not exist. Exit."
       exit 1
     end
+    log("Config file: #{@config.pml_config_file}", :log => @build_log, :console => true)
     # forall benchmarks/buildsettings
     @config.benchmarks.each_with_index { |b,ix| b['index'] = ix }
     errors = 0
@@ -122,6 +127,7 @@ class BenchmarkTool
           options.report=File.join(options.outdir, "report.yml")
           options.analysis_entry = configuration['analysis_entry']
           options.flow_fact_selection = configuration['flow-fact-selection']
+          options.use_sca_graph = configuration['use_sca_graph'] || false
 
           # skip on update and existing report
           next if File.exists?(options.report) && @config.do_update
@@ -193,12 +199,13 @@ private
     # Configure
     build_setting['builddir'] ||= File.join(@config.builddir, build_setting['name'])
     FileUtils.mkdir_p(build_setting['builddir'])
-    hw_flags = `platin tool-config -t clang -i #{@config.pml_config_file}`.chomp
+    hw_flags = `platin tool-config -t clang -i #{@config.pml_config_file} #{@config.platin_tool_config_opts}`.chomp
     cflags = build_setting['cflags']
     cmake_flags = ["-DCMAKE_TOOLCHAIN_FILE=#{File.join(@config.srcdir,"cmake","patmos-clang-toolchain.cmake")}",
                    "-DREQUIRES_PASIM=true",
                    "-DENABLE_CTORTURE=false",
                    "-DENABLE_TESTING=true",
+                   "-DENABLE_EMULATOR=false",
                    "-DCMAKE_C_FLAGS='#{cflags}'",
                    "-DCMAKE_C_LINK_FLAGS='#{hw_flags}'"
                   ].join(" ")
