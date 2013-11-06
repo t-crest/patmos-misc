@@ -23,4 +23,3 @@ $benchfilter = Proc.new { |b| true }
 
 # LLVM stack cache analysis options (optional)
 $lp_solver = "#{$benchsrc}/scripts/solve_ilp_glpk.sh"
-$lp_bounds_file = "bounds.lp"

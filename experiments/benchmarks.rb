@@ -22,12 +22,13 @@ def mrtc_benchmarks
   # all benchmarks
   benchmarks = %w{adpcm bs bsort100 cnt compress cover crc duff
      edn expint fac fdct fft1 fibcall fir insertsort janne_complex jfdctint lcdnum lms loop3
-     ludcmp matmult minmax minver ndes ns nsichneu qsort-exam qurt select sqrt statemate ud}
+     ludcmp matmult minmax minver ndes ns nsichneu qsort-exam qurt recursion select sqrt statemate ud}
   shortname = Hash.new { |ht,k| k }.merge('janne_complex' => 'janne', 'qsort-exam' => 'qsort')
   analyses = [{ 'name' => 'main', 'analysis_entry' => 'main', 'trace_entry' => 'main' }]
   benchmarks.map do |name|
     { 'analyses' => analyses,
       'name' => "mrtc_#{shortname[name]}",
+      'suite' => 'mrtc',
       'path' => File.join("Malardalen","src",name),
       'recursive' => %w{fac recursion}.include?(name), # benchmarks with (direct) recursion
       'irreducible' => %w{duff}.include?(name),   # duff has irreducible loop for -O0

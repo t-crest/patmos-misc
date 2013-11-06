@@ -31,9 +31,6 @@ config.pml_config_file = $hw_config
 config.do_update        = false
 config.keep_trace_files = false
 
-# currently there can be only one bounds file for all the benchmarks
-config.platin_tool_config_opts = "--sca #{$lp_bounds_file}:#{$lp_solver}"
-
 # customized benchmark script
 class BenchTool < WcetTool
   def initialize(pml, options)

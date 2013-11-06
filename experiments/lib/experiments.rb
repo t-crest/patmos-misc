@@ -199,7 +199,7 @@ private
     # Configure
     build_setting['builddir'] ||= File.join(@config.builddir, build_setting['name'])
     FileUtils.mkdir_p(build_setting['builddir'])
-    hw_flags = `platin tool-config -t clang -i #{@config.pml_config_file} #{@config.platin_tool_config_opts}`.chomp
+    hw_flags = `platin tool-config -t clang -i #{@config.pml_config_file} #{build_setting['platin_tool_config_opts']}`.chomp
     cflags = build_setting['cflags']
     cmake_flags = ["-DCMAKE_TOOLCHAIN_FILE=#{File.join(@config.srcdir,"cmake","patmos-clang-toolchain.cmake")}",
                    "-DREQUIRES_PASIM=true",
