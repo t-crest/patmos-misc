@@ -115,6 +115,11 @@ BENCH_REPO_URL="https://github.com/t-crest/patmos-benchmarks.git"
 # URL for repository containing additional non-free benchmarks
 BENCH_NONFREE_REPO_URL=
 
+# Optional path to use for the gcc.c_torture/execute checkout.
+# Set this to somewhere outside the build directory to avoid checking the
+# sources out on clean benchmark builds.
+#BENCH_GCC_C_TORTURE_PATH=
+
 # Set the target architecture for gold
 # auto      use HOST on Linux, 'patmos-unknown-unknown-elf' otherwise
 # none      do not set --target
@@ -918,6 +923,10 @@ if [ ! -z "$CLANG_COMPILER" ]; then
     else 
 	echo "Clang $clang is not executable, igored!"
     fi
+fi
+
+if [ ! -z "$BENCH_GCC_C_TORTURE_PATH" ]; then
+  BENCH_ARGS="-DGCC_C_TORTURE_EXECUTE_PATH='$BENCH_GCC_C_TORTURE_PATH' $BENCH_ARGS"
 fi
 
 if [ "$INSTALL_RPATH" == "build" ]; then
