@@ -1,0 +1,4 @@
+platform.info
+test.c
+test.O*.*
+log.O*.*
