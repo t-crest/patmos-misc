@@ -3,7 +3,7 @@
 CSMITH_HOME=/home/stefan/share/csmith
 
 if [ "$1" == "clean" ]; then
-  rm -f test.c test.O*.* log.O*.*
+  rm -f test.c test.O*.* log.O*.* platform.info
   exit
 fi
 
