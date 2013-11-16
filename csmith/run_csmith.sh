@@ -10,6 +10,8 @@ fi
 # Stop on first error
 set -e
 
+success=0
+
 while true; do
 
   echo "# Generating C program"
@@ -40,10 +42,16 @@ while true; do
   pasim -q test.O0.patmos > log.O2.patmos
   
   echo "# Checking for differences at -O0"
-  diff test.O0.host test.O0.patmos > /dev/null
+  diff log.O0.host log.O0.patmos > /dev/null
 
   echo "# Checking for differences at -O2"
-  diff test.O2.host test.O2.patmos > /dev/null
+  diff log.O2.host log.O2.patmos > /dev/null
+
+  let success=success+1
+
+  echo "# Finished!"
+  echo "Successfull compilations: $success"
+  echo
 
 done
 
