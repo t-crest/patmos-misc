@@ -1,6 +1,15 @@
 #!/bin/bash
-
+#
+# Author: Stefan Hepp <stefan@stefant.org>
+# 
+# Compile and run various benchmarks and collect the pasim statistics.
+# To add new setups, just add new collect_stats lines. Already existing
+# results will be skipped, the script will only evaluate missing configurations.
+# 
 # TODO port this to ruby, integrate with the testing framework
+#
+
+###### Configuration Start #######
 
 BENCH_SRC_DIR=../../../../patmos-benchmarks
 BENCH_BUILD_DIR=build
@@ -8,6 +17,9 @@ WORK_DIR=work
 
 CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=$BENCH_SRC_DIR/cmake/patmos-clang-toolchain.cmake -DENABLE_CTORTURE=false -DENABLE_EMULATOR=false -DENABLE_TESTING=true -DPLATIN_ENABLE_WCET=false -DENABLE_STACK_CACHE_ANALYSIS_TESTING=false -DENABLE_C_TESTS=false -DENABLE_MEDIABENCH=false"
 PASIM_ARGS="-S dcache"
+
+###### Configuration End ########
+
 
 # Exit on first error
 set -e
@@ -39,6 +51,20 @@ function run_bench() {
 last_clang_args="none"
 current_clang_args=
 
+# 
+# Param testname: The Name of the configuration, used as output directory name.
+# Param pasim_args: Arguments to pass to pasim
+# Param clang_args: Arguments to pass to patmos-clang. 
+#
+# If clang_args is empty, the last non-empty clang_args passed to a previous call 
+# to collect_stats will be used, and the benchmarks will only be rebuilt if the 
+# previous calls were skipped.
+#
+# Example (assuming work/ref exists):
+# collect_stats "ref" "-G 0" "--abc"  # Skipped (would rebuild benchmarks with --abc if work/ref does not exist)
+# collect_stats "test1" "-G 6"        # Rebuild benchmarks with --abc since it was skipped
+# collect_stats "test2" "-G 5"        # Only run pasim, reuse existing benchmarks
+# 
 function collect_stats() {
   local testname=$1
   local pasim_args=$2
@@ -57,6 +83,9 @@ function collect_stats() {
     config_bench "$pasim_args" "$current_clang_args"
 
     if [ "$current_clang_args" != "$last_clang_args" ]; then
+      echo
+      echo "# Building with options $current_clang_args"
+      echo 
       build_bench
       last_clang_args="$current_clang_args"
     fi
@@ -101,7 +130,8 @@ for i in 256 1024 512 384 192 32 96 320 64 448; do
     done
 
     # compare with I-cache
-    collect_stats "pref_sf_${i}_ic${j}" "-C icache -K lru2 -m $j"
+    collect_stats "pref_sf_${i}_ic${j}_lru2" "-C icache -K lru2 -m $j"
+    collect_stats "pref_sf_${i}_ic${j}_lru4" "-C icache -K lru4 -m $j"
   done
 
   # Check influence of splitting the call blocks
