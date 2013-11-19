@@ -35,20 +35,30 @@ function run_bench() {
   find $BENCH_BUILD_DIR -iname "*.stats" -exec cp -f {} $WORK_DIR/$testname \;
 }
 
+
+last_clang_args="none"
+current_clang_args=
+
 function collect_stats() {
   local testname=$1
   local pasim_args=$2
   local clang_args=$3
+
+  # Update the clang args that should be used for this benchmark
+  if [ ! -z "$clang_args" ]; then
+    current_clang_args="$clang_args"
+  fi
 
   if [ ! -d $WORK_DIR/$testname ]; then
     echo
     echo "**** Running configuration $testname ****"
     echo
 
-    config_bench "$pasim_args" "$clang_args"
+    config_bench "$pasim_args" "$current_clang_args"
 
-    if [ ! -z "$clang_args" ]; then
+    if [ "$current_clang_args" != "$last_clang_args" ]; then
       build_bench
+      last_clang_args="$current_clang_args"
     fi
 
     run_bench $testname
@@ -60,23 +70,16 @@ function collect_stats() {
 }
 
 
-#for pasim in -G 0 -M fifo -m 8m --mcmethods=512; # ideal cache, determine max. code size, code blocks, overhead of
-#                                                   splitting, utilisation
-#             -G 9 -M fifo -m 4k --mcmethods=512; # ideal assoc, determine preferred size, determine max required assoc
-#             -G 9 -M fifo -m 1k --mcmethods=512; # -- "" --
-#             -G 9 -M fifo -m 4k --mcmethods=4, 8, 16, 32  # Determine cost of lower assoc; fix function splitter setup
-#             -G 9 -M fifo -m 1k --mcmethods=4, 8, 16      # -- "" --
-#  for preferred-subfunction-size=64, 96, 128, 192, 256, 320, 384, 448, 512, max-subfunction-size=1024, -mpatmos-split-call-blocks=true|false;
-#    for bench in .. :
-#      - cached code size: = bytes allocated
-#      - # code blocks: = max methods in cache
-#      - # cache blocks @ 256 B blocks: =
-#      - Cycles: -> up with smaller splitting
-#      - Utilisation: -> down with smaller splitting
-
 
 # Ideal cache, no splitting; determine max. code size, reference for other runs
 collect_stats "ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-disable-function-splitter"
+
+# I-cache without splitting, for comparison
+for j in "8m" "16k" "8k" "4k" "2k" "1k"; do
+  collect_stats "nosplit_ic${j}_lru2" "-G 8 -C icache -K lru2 -m $j"
+  collect_stats "nosplit_ic${j}_lru4" "-G 8 -C icache -K lru4 -m $j"
+done
+
 
 # Check influence of max-SF-size: ideal cache, fixed overhead for regions, split BBs
 for i in 8192 4096 2048 1024 512 256; do
@@ -84,32 +87,36 @@ for i in 8192 4096 2048 1024 512 256; do
 done
 
 # Check influence of function splitter
-for i in 1024 512 384 256 192 96 32 320 64 448; do
+for i in 256 1024 512 384 192 32 96 320 64 448; do
   collect_stats "pref_sf_${i}_ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-split-call-blocks=false -mpatmos-preferred-subfunction-size=$i"
 
-  for j in "4k" "2k" "1k"; do
+  for j in "16k" "8k" "4k" "2k" "1k"; do
 
     # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
     collect_stats "pref_sf_${i}_mc${j}_ideal" "-G 8 -M fifo -m $j --mcmethods=512"
 
     # Determine cost of defined assoc 
-    for k in 4 8 16 32; do
+    for k in 4 8 16 32 64; do
       collect_stats "pref_sf_${i}_mc${j}_$k" "-G 8 -M fifo -m $j --mcmethods=$k"
     done
+
+    # compare with I-cache
+    collect_stats "pref_sf_${i}_ic${j}" "-C icache -K lru2 -m $j"
   done
 
   # Check influence of splitting the call blocks
   collect_stats "pref_sf_${i}_cbb_ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-split-call-blocks=true -mpatmos-preferred-subfunction-size=$i"
 
-  for j in "4k" "2k" "1k"; do
+  for j in "8k" "4k" "2k" "1k"; do
 
     # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
     collect_stats "pref_sf_${i}_cbb_mc${j}_ideal" "-G 8 -M fifo -m $j --mcmethods=512"
 
     # Determine cost of defined assoc 
-    for k in 4 8 16 32; do
+    for k in 4 8 16 32 64; do
       collect_stats "pref_sf_${i}_cbb_mc${j}_$k" "-G 8 -M fifo -m $j --mcmethods=$k"
     done
+    
   done
 
 done
