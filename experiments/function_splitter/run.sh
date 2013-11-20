@@ -15,11 +15,18 @@ BENCH_SRC_DIR=../../../../patmos-benchmarks
 BENCH_BUILD_DIR=build
 WORK_DIR=work
 
+# Quick hack to make the test distributed over multiple hosts
+NUM_HOSTS=1
+HOST_ID=0
+
 CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=$BENCH_SRC_DIR/cmake/patmos-clang-toolchain.cmake -DENABLE_CTORTURE=false -DENABLE_EMULATOR=false -DENABLE_TESTING=true -DPLATIN_ENABLE_WCET=false -DENABLE_STACK_CACHE_ANALYSIS_TESTING=false -DENABLE_C_TESTS=false -DENABLE_MEDIABENCH=false"
 PASIM_ARGS="-S dcache"
 
 ###### Configuration End ########
 
+if [ -f run.cfg ]; then
+  . run.cfg
+fi
 
 # Exit on first error
 set -e
@@ -50,6 +57,7 @@ function run_bench() {
 
 last_clang_args="none"
 current_clang_args=
+host_cnt=0
 
 # 
 # Param testname: The Name of the configuration, used as output directory name.
@@ -75,7 +83,19 @@ function collect_stats() {
     current_clang_args="$clang_args"
   fi
 
-  if [ ! -d $WORK_DIR/$testname ]; then
+  # Round robin distribution of jobs over multiple hosts
+  if [ ! -z $clang_args ]; then
+    let host_cnt=$host_cnt+1
+  fi
+  if [ $host_cnt == $NUM_HOSTS ]; then
+    host_cnt=0
+  fi
+
+  if [ $host_cnt != $HOST_ID ]; then
+    echo 
+    echo "**** Skipping configuration $testname: executed by host $host_cnt *****"
+    echo
+  elif [ ! -d $WORK_DIR/$testname ]; then
     echo
     echo "**** Running configuration $testname ****"
     echo
@@ -93,7 +113,7 @@ function collect_stats() {
     run_bench $testname
   else
     echo
-    echo "**** Skipping configuration $testname ****"
+    echo "**** Skipping configuration $testname: already exists ****"
     echo
   fi
 }
@@ -119,32 +139,51 @@ done
 for i in 256 1024 512 384 192 32 96 320 64 448; do
   collect_stats "pref_sf_${i}_ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-split-call-blocks=false -mpatmos-preferred-subfunction-size=$i"
 
-  for j in "16k" "8k" "4k" "2k" "1k"; do
+  # Size of cache in kb
+  for j in "16" "8" "4" "2" "1"; do
 
     # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
-    collect_stats "pref_sf_${i}_mc${j}_ideal" "-G 8 -M fifo -m $j --mcmethods=512"
+    collect_stats "pref_sf_${i}_mc${j}k_ideal" "-G 8 -M fifo -m ${j}k --mcmethods=512"
 
-    # Determine cost of defined assoc 
+    # Determine cost of predefined assoc
     for k in 4 8 16 32 64; do
-      collect_stats "pref_sf_${i}_mc${j}_$k" "-G 8 -M fifo -m $j --mcmethods=$k"
+      blocksize=`echo "$j*1024/$k" | bc`
+
+      # Compare variable-size, fixed-block, LRU and variable burst, TDM multicore
+      collect_stats "pref_sf_${i}_mc${j}k_${k}"     "-G 8 -M fifo -m ${j}k --mcmethods=$k"
+      collect_stats "pref_sf_${i}_mc${j}k_${k}_fb"  "-G 8 -M fifo -m ${j}k --mcmethods=0 --mbsize=$blocksize"
+      collect_stats "pref_sf_${i}_mc${j}k_${k}_lru" "-G 8 -M lru  -m ${j}k --mcmethods=0 --mbsize=$blocksize"
+
+      collect_stats "pref_sf_${i}_mc${j}k_${k}_vb"  "-G 8 -M fifo -m ${j}k --mcmethods=$k --psize=1k"
+      collect_stats "pref_sf_${i}_mc${j}k_${k}_tdm" "-G 8 -M fifo -m ${j}k --mcmethods=$k -N 16 --tdelay=8"
     done
 
     # compare with I-cache
-    collect_stats "pref_sf_${i}_ic${j}_lru2" "-C icache -K lru2 -m $j"
-    collect_stats "pref_sf_${i}_ic${j}_lru4" "-C icache -K lru4 -m $j"
+    collect_stats "pref_sf_${i}_ic${j}k_lru2"     "-C icache -K lru2 -m ${j}k"
+    collect_stats "pref_sf_${i}_ic${j}k_lru4"     "-C icache -K lru4 -m ${j}k"
+    collect_stats "pref_sf_${i}_ic${j}k_lru2_tdm" "-C icache -K lru2 -m ${j}k -N 16 --tdelay=8"
+    collect_stats "pref_sf_${i}_ic${j}k_lru4_tdm" "-C icache -K lru4 -m ${j}k -N 16 --tdelay=8"
   done
 
   # Check influence of splitting the call blocks
   collect_stats "pref_sf_${i}_cbb_ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-split-call-blocks=true -mpatmos-preferred-subfunction-size=$i"
 
-  for j in "8k" "4k" "2k" "1k"; do
+  # size of cache in kb
+  for j in "8" "4" "2" "1"; do
 
     # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
-    collect_stats "pref_sf_${i}_cbb_mc${j}_ideal" "-G 8 -M fifo -m $j --mcmethods=512"
+    collect_stats "pref_sf_${i}_cbb_mc${j}k_ideal" "-G 8 -M fifo -m ${j}k --mcmethods=512"
 
-    # Determine cost of defined assoc 
+    # Determine cost of predefined assoc 
     for k in 4 8 16 32 64; do
-      collect_stats "pref_sf_${i}_cbb_mc${j}_$k" "-G 8 -M fifo -m $j --mcmethods=$k"
+      blocksize=`echo "$j*1024/$k" | bc`
+
+      collect_stats "pref_sf_${i}_cbb_mc${j}k_$k"       "-G 8 -M fifo -m ${j}k --mcmethods=$k"
+      collect_stats "pref_sf_${i}_cbb_mc${j}k_${k}_fb"  "-G 8 -M fifo -m ${j}k --mcmethods=0 --mbsize=$blocksize"
+      collect_stats "pref_sf_${i}_cbb_mc${j}k_${k}_lru" "-G 8 -M lru  -m ${j}k --mcmethods=0 --mbsize=$blocksize"
+
+      collect_stats "pref_sf_${i}_cbb_mc${j}k_${k}_vb"  "-G 8 -M fifo -m ${j}k --mcmethods=$k --psize=1k"
+      collect_stats "pref_sf_${i}_cbb_mc${j}k_${k}_tdm" "-G 8 -M fifo -m ${j}k --mcmethods=$k -N 16 --tdelay=8"
     done
     
   done
