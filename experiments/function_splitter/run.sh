@@ -84,7 +84,7 @@ function collect_stats() {
   fi
 
   # Round robin distribution of jobs over multiple hosts
-  if [ ! -z $clang_args ]; then
+  if [ ! -z "$clang_args" ]; then
     let host_cnt=$host_cnt+1
   fi
   if [ $host_cnt == $NUM_HOSTS ]; then
