@@ -14,6 +14,7 @@
 BENCH_SRC_DIR=../../../../patmos-benchmarks
 BENCH_BUILD_DIR=build
 WORK_DIR=work
+PARJ=-j4
 
 # Quick hack to make the test distributed over multiple hosts
 NUM_HOSTS=1
@@ -40,13 +41,13 @@ function config_bench() {
 }
 
 function build_bench() {
-  (cd $BENCH_BUILD_DIR && make clean && make -j4)
+  (cd $BENCH_BUILD_DIR && make clean && make $PARJ)
 }
 
 function run_bench() {
   local testname=$1
 
-  (cd $BENCH_BUILD_DIR && make ARGS="-j4" test)
+  (cd $BENCH_BUILD_DIR && make ARGS="$PARJ" test)
 
   mkdir -p $WORK_DIR/$testname
 
