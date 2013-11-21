@@ -156,14 +156,14 @@ for i in 256 1024 512 384 192 32 96 320 64 448; do
       collect_stats "pref_sf_${i}_mc${j}k_${k}_lru" "-G 8 -M lru  -m ${j}k --mcmethods=0 --mbsize=$blocksize"
 
       collect_stats "pref_sf_${i}_mc${j}k_${k}_vb"  "-G 8 -M fifo -m ${j}k --mcmethods=$k --psize=1k"
-      collect_stats "pref_sf_${i}_mc${j}k_${k}_tdm" "-G 8 -M fifo -m ${j}k --mcmethods=$k -N 16 --tdelay=8"
+      collect_stats "pref_sf_${i}_mc${j}k_${k}_tdm" "-G 8 -M fifo -m ${j}k --mcmethods=$k -N 4 --tdelay=8"
     done
 
     # compare with I-cache
     collect_stats "pref_sf_${i}_ic${j}k_lru2"     "-C icache -K lru2 -m ${j}k"
     collect_stats "pref_sf_${i}_ic${j}k_lru4"     "-C icache -K lru4 -m ${j}k"
-    collect_stats "pref_sf_${i}_ic${j}k_lru2_tdm" "-C icache -K lru2 -m ${j}k -N 16 --tdelay=8"
-    collect_stats "pref_sf_${i}_ic${j}k_lru4_tdm" "-C icache -K lru4 -m ${j}k -N 16 --tdelay=8"
+    collect_stats "pref_sf_${i}_ic${j}k_lru2_tdm" "-C icache -K lru2 -m ${j}k -N 4 --tdelay=8"
+    collect_stats "pref_sf_${i}_ic${j}k_lru4_tdm" "-C icache -K lru4 -m ${j}k -N 4 --tdelay=8"
   done
 
   # Check influence of splitting the call blocks
@@ -184,7 +184,7 @@ for i in 256 1024 512 384 192 32 96 320 64 448; do
       collect_stats "pref_sf_${i}_cbb_mc${j}k_${k}_lru" "-G 8 -M lru  -m ${j}k --mcmethods=0 --mbsize=$blocksize"
 
       collect_stats "pref_sf_${i}_cbb_mc${j}k_${k}_vb"  "-G 8 -M fifo -m ${j}k --mcmethods=$k --psize=1k"
-      collect_stats "pref_sf_${i}_cbb_mc${j}k_${k}_tdm" "-G 8 -M fifo -m ${j}k --mcmethods=$k -N 16 --tdelay=8"
+      collect_stats "pref_sf_${i}_cbb_mc${j}k_${k}_tdm" "-G 8 -M fifo -m ${j}k --mcmethods=$k -N 4 --tdelay=8"
     done
     
   done
