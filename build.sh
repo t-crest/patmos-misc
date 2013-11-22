@@ -487,7 +487,7 @@ function usage() {
     -a          Build llvm and do a clean build of newlib, compiler-rt and bench with tests.
 
   Available targets:
-    gold llvm newlib compiler-rt pasim|patmos bench rtems rtems-test rtems-examples rtems-all eclipse
+    gold llvm newlib compiler-rt pasim|patmos bench rtems rtems-test rtems-examples rtems-all eclipse aegean
 
   The command-line options override the user-config read from '$CFGFILE'.
 EOT
@@ -666,6 +666,21 @@ function build_emulator() {
     run popd
 }
 
+function build_aegean() {
+    repo=$1
+    buildpath=$2
+    patmospath=$(abspath $(get_repo_dir patmos))
+    poseidonpath=$(abspath $(get_repo_dir poseidon))
+    argopath=$(abspath $(get_repo_dir argo))
+
+    rootdir=$(abspath $ROOT_DIR/$repo)
+    
+    run pushd "${rootdir}"
+    info "Aegean build not supported yet!"
+    # make $MAKEJ $MAKE_VERBOSE "AEGEAN_PATH=${rootdir}" "BUILD_PATH=${buildpath}" "PATMOS_PATH=${patmospath}" "POSEIDON_PATH=${poseidonpath}" "ARGO_PATH=${argopath}" platform
+    run popd
+}
+
 function run_llvm_build() {
     local eclipse_args=
     local config_args="--with-bug-report-url='https://github.com/t-crest/patmos-llvm/issues'"
@@ -807,8 +822,14 @@ build_target() {
 	info "Skipping patmos-emulator in patmos."
     else
 	info "Building patmos-emulator in patmos .."
-	build_emulator $(get_repo_dir patmos) $(get_build_dir patmos)/tmp
+	build_emulator $(get_repo_dir patmos) $(get_repo_dir patmos)/tmp
     fi
+    ;;
+  'aegean')
+    clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo)
+    clone_update ${GITHUB_BASEURL}/poseidon.git $(get_repo_dir poseidon)
+    clone_update ${GITHUB_BASEURL}/aegean.git $(get_repo_dir aegean)
+    build_aegean $(get_repo_dir aegean) $(get_build_dir aegean)
     ;;
   'bench')
     repo=$(get_repo_dir bench)
