@@ -141,10 +141,11 @@ for i in 256 1024 512 384 192 32 96 320 64 448; do
   collect_stats "pref_sf_${i}_ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-split-call-blocks=false -mpatmos-preferred-subfunction-size=$i"
 
   # Size of cache in kb
-  for j in "16" "8" "4" "2" "1"; do
+  for j in "32" "16" "8" "4" "2" "1"; do
 
     # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
-    collect_stats "pref_sf_${i}_mc${j}k_ideal" "-G 7 -M fifo -m ${j}k --mcmethods=512"
+    collect_stats "pref_sf_${i}_mc${j}k_ideal"    "-G 7 -M fifo -m ${j}k --mcmethods=512"
+    collect_stats "pref_sf_${i}_mc${j}k_ideal_vb" "-G 7 -M fifo -m ${j}k --mcmethods=512 --psize=1k"
 
     # Determine cost of predefined assoc
     for k in 4 8 16 32 64; do
