@@ -20,8 +20,9 @@ PARJ=-j4
 NUM_HOSTS=1
 HOST_ID=0
 
+CLANG_ARGS="-w -mpatmos-disable-stack-cache"
 CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=$BENCH_SRC_DIR/cmake/patmos-clang-toolchain.cmake -DENABLE_CTORTURE=false -DENABLE_EMULATOR=false -DENABLE_TESTING=true -DPLATIN_ENABLE_WCET=false -DENABLE_STACK_CACHE_ANALYSIS_TESTING=false -DENABLE_C_TESTS=false -DENABLE_MEDIABENCH=false"
-PASIM_ARGS="-S dcache -d 4k -D fifo1"
+PASIM_ARGS="-S dcache -d 4k -D fifo1 --mbsize 8"
 
 ###### Configuration End ########
 
@@ -37,7 +38,7 @@ function config_bench() {
   local clang_args=$2
 
   mkdir -p $BENCH_BUILD_DIR
-  (cd $BENCH_BUILD_DIR && cmake $CMAKE_ARGS -DCMAKE_C_FLAGS="-w $clang_args" -DPASIM_OPTIONS="$pasim_args" $BENCH_SRC_DIR)
+  (cd $BENCH_BUILD_DIR && cmake $CMAKE_ARGS -DCMAKE_C_FLAGS="$CLANG_ARGS $clang_args" -DPASIM_OPTIONS="$pasim_args" $BENCH_SRC_DIR)
 }
 
 function build_bench() {
@@ -105,7 +106,7 @@ function collect_stats() {
 
     if [ "$current_clang_args" != "$last_clang_args" ]; then
       echo
-      echo "# Building with options $current_clang_args"
+      echo "# Building with options $CLANG_ARGS $current_clang_args"
       echo 
       build_bench
       last_clang_args="$current_clang_args"
