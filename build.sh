@@ -110,10 +110,20 @@ INSTALL_SYMLINKS=false
 # - 'false'   Do not change rpath on installation
 INSTALL_RPATH=true
 
+# Base URL for checking out new repositories. 'auto' tries to use
+# the same base-url as the patmos-misc repository. Defaults to
+# 'https://github.com/t-crest'
+GITHUB_BASEURL="auto"
+
 # URL for the repository containing the benchmarks
 BENCH_REPO_URL="https://github.com/t-crest/patmos-benchmarks.git"
 # URL for repository containing additional non-free benchmarks
 BENCH_NONFREE_REPO_URL=
+
+# Optional path to use for the gcc.c_torture/execute checkout.
+# Set this to somewhere outside the build directory to avoid checking the
+# sources out on clean benchmark builds.
+#BENCH_GCC_C_TORTURE_PATH=
 
 # Set the target architecture for gold
 # auto      use HOST on Linux, 'patmos-unknown-unknown-elf' otherwise
@@ -153,8 +163,9 @@ CTOOLS_ARGS=
 
 # Additional CFLAGS, LDFLAGS 
 GOLD_CFLAGS=
-# Without this flag gcc throws errors about narrowing conversions
-GOLD_CXXFLAGS="-Wno-narrowing"
+# Use this flag if gcc throws errors about narrowing conversions
+#GOLD_CXXFLAGS="-Wno-narrowing"
+GOLD_CXXFLAGS=
 
 # Disable inline-assembly implementations in compiler-rt
 COMPILER_RT_CFLAGS="-DCRT_NO_INLINE_ASM"
@@ -482,7 +493,7 @@ function usage() {
     -a          Build llvm and do a clean build of newlib, compiler-rt and bench with tests.
 
   Available targets:
-    gold llvm newlib compiler-rt pasim|patmos bench rtems rtems-test rtems-examples rtems-all eclipse
+    gold llvm newlib compiler-rt pasim|patmos bench rtems rtems-test rtems-examples rtems-all eclipse aegean
 
   The command-line options override the user-config read from '$CFGFILE'.
 EOT
@@ -661,6 +672,21 @@ function build_emulator() {
     run popd
 }
 
+function build_aegean() {
+    repo=$1
+    buildpath=$2
+    patmospath=$(abspath $(get_repo_dir patmos))
+    poseidonpath=$(abspath $(get_repo_dir poseidon))
+    argopath=$(abspath $(get_repo_dir argo))
+
+    rootdir=$(abspath $ROOT_DIR/$repo)
+    
+    run pushd "${rootdir}"
+    info "Aegean build not supported yet!"
+    # make $MAKEJ $MAKE_VERBOSE "AEGEAN_PATH=${rootdir}" "BUILD_PATH=${buildpath}" "PATMOS_PATH=${patmospath}" "POSEIDON_PATH=${poseidonpath}" "ARGO_PATH=${argopath}" platform
+    run popd
+}
+
 function run_llvm_build() {
     local eclipse_args=
     local config_args="--with-bug-report-url='https://github.com/t-crest/patmos-llvm/issues'"
@@ -802,8 +828,14 @@ build_target() {
 	info "Skipping patmos-emulator in patmos."
     else
 	info "Building patmos-emulator in patmos .."
-	build_emulator $(get_repo_dir patmos) $(get_build_dir patmos)/tmp
+	build_emulator $(get_repo_dir patmos) $(get_repo_dir patmos)/tmp
     fi
+    ;;
+  'aegean')
+    clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo)
+    clone_update ${GITHUB_BASEURL}/poseidon.git $(get_repo_dir poseidon)
+    clone_update ${GITHUB_BASEURL}/aegean.git $(get_repo_dir aegean)
+    build_aegean $(get_repo_dir aegean) $(get_build_dir aegean)
     ;;
   'bench')
     repo=$(get_repo_dir bench)
@@ -877,9 +909,12 @@ done
 shift $((OPTIND-1))
 
 
-
-# not config'able
-GITHUB_BASEURL=https://github.com/t-crest
+if [ "$GITHUB_BASEURL" == "auto" ]; then
+  GITHUB_BASEURL=$(cd $(dirname $self) && git remote -v  | grep -e "^origin.*/patmos-misc.git (push)" | sed "s/origin\s*\(.*\)\/patmos-misc.git .*/\1/")
+fi
+if [ -z "$GITHUB_BASEURL" ]; then
+  GITHUB_BASEURL="https://github.com/t-crest"
+fi
 
 LIBEXT=so
 if [ "$OS_NAME" == "Darwin" ]; then
@@ -918,6 +953,10 @@ if [ ! -z "$CLANG_COMPILER" ]; then
     else 
 	echo "Clang $clang is not executable, igored!"
     fi
+fi
+
+if [ ! -z "$BENCH_GCC_C_TORTURE_PATH" ]; then
+  BENCH_ARGS="-DGCC_C_TORTURE_EXECUTE_PATH='$BENCH_GCC_C_TORTURE_PATH' $BENCH_ARGS"
 fi
 
 if [ "$INSTALL_RPATH" == "build" ]; then

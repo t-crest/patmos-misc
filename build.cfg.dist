@@ -55,10 +55,20 @@ INSTALL_SYMLINKS=false
 # - 'false'   Do not change rpath on installation
 INSTALL_RPATH=true
 
+# Base URL for checking out new repositories. 'auto' tries to use
+# the same base-url as the patmos-misc repository. Defaults to
+# 'https://github.com/t-crest'
+GITHUB_BASEURL="auto"
+
 # URL for the repository containing the benchmarks
 BENCH_REPO_URL="https://github.com/t-crest/patmos-benchmarks.git"
 # URL for repository containing additional non-free benchmarks
 BENCH_NONFREE_REPO_URL=
+
+# Optional path to use for the gcc.c_torture/execute checkout.
+# Set this to somewhere outside the build directory to avoid checking the
+# sources out on clean benchmark builds.
+#BENCH_GCC_C_TORTURE_PATH=
 
 # Set the target architecture for gold
 # auto      use HOST on Linux, 'patmos-unknown-unknown-elf' otherwise
@@ -98,8 +108,9 @@ CTOOLS_ARGS=
 
 # Additional CFLAGS, LDFLAGS 
 GOLD_CFLAGS=
-# Without this flag gcc throws errors about narrowing conversions
-GOLD_CXXFLAGS="-Wno-narrowing"
+# Use this flag if gcc throws errors about narrowing conversions
+#GOLD_CXXFLAGS="-Wno-narrowing"
+GOLD_CXXFLAGS=
 
 # Disable inline-assembly implementations in compiler-rt
 COMPILER_RT_CFLAGS="-DCRT_NO_INLINE_ASM"

@@ -1,0 +1,8 @@
+library(xtable)
+options("width"=160)
+tab <- read.csv(file="report.csv",head=TRUE,row.names=1,sep=";")
+print(tab)
+print(summary(tab))
+xtab <- xtable(tab)
+print(xtab, file="report.tex")
+print(xtable(summary(tab)), file = "report.tex", append = TRUE)

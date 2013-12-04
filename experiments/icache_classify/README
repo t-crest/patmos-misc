@@ -1,0 +1,18 @@
+# Experiment icache_classify
+Goal: classify benchmarks according to their (set-associative) instruction cache behavior (either using the simulator or platin)
+
+## Goal
+In particular, we are interested in
+* The total number of instruction memory used by the benchmark (with and without compiler runtime functions (softfloats))
+* The performance relative to a very large (=ideal) cache, for different cache sizes
+* The cache size where the cache achieves 95% (99%) percent of the performance of an ideal cache
+
+## Usage
+
+# Configuration
+# vi run_ic_comparsion.rb
+# vi report.rb
+
+ruby run_ic_comparison.rb
+
+# resuls are in results.tex
