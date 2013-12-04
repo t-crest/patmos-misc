@@ -648,7 +648,7 @@ function build_bench() {
 function build_emulator() {
     repo=$1
     tmp=$2
-    ctoolsbuild=$(get_build_dir patmos ctools)
+    ctoolsbuild=$(get_build_dir patmos "tools/c")
     chiselbuild=$(get_build_dir patmos chisel)
     rootdir=$(abspath $ROOT_DIR/$repo)
     ctoolsbuilddir=$(abspath $ROOT_DIR/$ctoolsbuild)
@@ -822,8 +822,8 @@ build_target() {
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
     info "Building simulator in patmos .. "
     build_cmake patmos/simulator build_and_test_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
-    info "Building ctools in patmos .. "
-    build_cmake patmos/ctools    build_default $(get_build_dir patmos ctools) "$CTOOLS_ARGS"
+    info "Building tools/c in patmos .. "
+    build_cmake patmos/tools/c    build_default $(get_build_dir patmos ctools) "$CTOOLS_ARGS"
     if [ "$BUILD_EMULATOR" == "false" ]; then
 	info "Skipping patmos-emulator in patmos."
     else
