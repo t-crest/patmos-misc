@@ -649,15 +649,15 @@ function build_emulator() {
     repo=$1
     tmp=$2
     ctoolsbuild=$(get_build_dir patmos "tools/c")
-    chiselbuild=$(get_build_dir patmos chisel)
+    hwbuild=$(get_build_dir patmos hardware)
     rootdir=$(abspath $ROOT_DIR/$repo)
     ctoolsbuilddir=$(abspath $ROOT_DIR/$ctoolsbuild)
-    chiselbuilddir=$(abspath $ROOT_DIR/$chiselbuild)
+    hwbuilddir=$(abspath $ROOT_DIR/$hwbuild)
     tmpdir=$(abspath $ROOT_DIR/$tmp)
 
-    if [ $DO_CLEAN == true -o ! -e "$chiselbuilddir" ] ; then
-        run rm -rf $chiselbuilddir
-        run mkdir -p $chiselbuilddir
+    if [ $DO_CLEAN == true -o ! -e "$hwbuilddir" ] ; then
+        run rm -rf $hwbuilddir
+        run mkdir -p $hwbuilddir
     fi
     if [ $DO_CLEAN == true -o ! -e "$tmpdir" ] ; then
         run rm -rf $tmpdir
@@ -665,10 +665,10 @@ function build_emulator() {
     fi
 
     run pushd "${rootdir}"
-    run make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${tmpdir}'" "CTOOLSBUILDDIR='${ctoolsbuilddir}'" "CHISELBUILDDIR='${chiselbuilddir}'" "CHISELINSTALLDIR='${tmpdir}'" "INSTALLDIR='${INSTALL_DIR}/bin'" emulator
-    install "${chiselbuilddir}/emulator" "${INSTALL_DIR}/bin/patmos-emulator"
-    install "${rootdir}/chisel/spm.t" "${INSTALL_DIR}/lib/ld-scripts/patmos_spm.t"
-    install "${rootdir}/chisel/ram.t" "${INSTALL_DIR}/lib/ld-scripts/patmos_ram.t"
+    run make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${tmpdir}'" "CTOOLSBUILDDIR='${ctoolsbuilddir}'" "HWBUILDDIR='${hwbuilddir}'" "HWINSTALLDIR='${tmpdir}'" "INSTALLDIR='${INSTALL_DIR}/bin'" emulator
+    install "${hwbuilddir}/emulator" "${INSTALL_DIR}/bin/patmos-emulator"
+    install "${rootdir}/hardware/spm.t" "${INSTALL_DIR}/lib/ld-scripts/patmos_spm.t"
+    install "${rootdir}/hardware/ram.t" "${INSTALL_DIR}/lib/ld-scripts/patmos_ram.t"
     run popd
 }
 
