@@ -110,6 +110,11 @@ INSTALL_SYMLINKS=false
 # - 'false'   Do not change rpath on installation
 INSTALL_RPATH=true
 
+# Base URL for checking out new repositories. 'auto' tries to use
+# the same base-url as the patmos-misc repository. Defaults to
+# 'https://github.com/t-crest'
+GITHUB_BASEURL="auto"
+
 # URL for the repository containing the benchmarks
 BENCH_REPO_URL="https://github.com/t-crest/patmos-benchmarks.git"
 # URL for repository containing additional non-free benchmarks
@@ -158,8 +163,9 @@ CTOOLS_ARGS=
 
 # Additional CFLAGS, LDFLAGS 
 GOLD_CFLAGS=
-# Without this flag gcc throws errors about narrowing conversions
-GOLD_CXXFLAGS="-Wno-narrowing"
+# Use this flag if gcc throws errors about narrowing conversions
+#GOLD_CXXFLAGS="-Wno-narrowing"
+GOLD_CXXFLAGS=
 
 # Disable inline-assembly implementations in compiler-rt
 COMPILER_RT_CFLAGS="-DCRT_NO_INLINE_ASM"
@@ -903,9 +909,12 @@ done
 shift $((OPTIND-1))
 
 
-
-# not config'able
-GITHUB_BASEURL=https://github.com/t-crest
+if [ "$GITHUB_BASEURL" == "auto" ]; then
+  GITHUB_BASEURL=$(cd $(dirname $self) && git remote -v  | grep -e "^origin.*/patmos-misc.git (push)" | sed "s/origin\s*\(.*\)\/patmos-misc.git .*/\1/")
+fi
+if [ -z "$GITHUB_BASEURL" ]; then
+  GITHUB_BASEURL="https://github.com/t-crest"
+fi
 
 LIBEXT=so
 if [ "$OS_NAME" == "Darwin" ]; then
