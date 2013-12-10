@@ -823,7 +823,7 @@ build_target() {
     info "Building simulator in patmos .. "
     build_cmake patmos/simulator build_and_test_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
     info "Building tools/c in patmos .. "
-    build_cmake patmos/tools/c    build_default $(get_build_dir patmos ctools) "$CTOOLS_ARGS"
+    build_cmake patmos/tools/c    build_default $(get_build_dir patmos "tools/c") "$CTOOLS_ARGS"
     if [ "$BUILD_EMULATOR" == "false" ]; then
 	info "Skipping patmos-emulator in patmos."
     else
