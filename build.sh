@@ -493,7 +493,7 @@ function usage() {
     -a          Build llvm and do a clean build of newlib, compiler-rt and bench with tests.
 
   Available targets:
-    gold llvm newlib compiler-rt pasim|patmos bench rtems rtems-test rtems-examples rtems-all eclipse aegean
+    gold llvm newlib compiler-rt pasim|patmos bench rtems rtems-test rtems-examples rtems-all eclipse aegean poseidon
 
   The command-line options override the user-config read from '$CFGFILE'.
 EOT
@@ -687,6 +687,22 @@ function build_aegean() {
     run popd
 }
 
+function build_poseidon() {
+    repo=$1
+    # build path currently unused for Poseidon
+    # buildpath=$2
+
+    rootdir=$(abspath $ROOT_DIR/$repo)
+    
+    run pushd "${rootdir}"
+    if [ $DO_CLEAN == true ] ; then
+        run make $MAKEJ $MAKE_VERBOSE clean
+    fi
+    run make $MAKEJ $MAKE_VERBOSE all
+    install build/Poseidon $INSTALL_DIR/bin/Poseidon
+    run popd
+}
+
 function run_llvm_build() {
     local eclipse_args=
     local config_args="--with-bug-report-url='https://github.com/t-crest/patmos-llvm/issues'"
@@ -833,9 +849,12 @@ build_target() {
     ;;
   'aegean')
     clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo)
-    clone_update ${GITHUB_BASEURL}/poseidon.git $(get_repo_dir poseidon)
     clone_update ${GITHUB_BASEURL}/aegean.git $(get_repo_dir aegean)
     build_aegean $(get_repo_dir aegean) $(get_build_dir aegean)
+    ;;
+  'poseidon')
+    clone_update ${GITHUB_BASEURL}/poseidon.git $(get_repo_dir poseidon)
+    build_poseidon $(get_repo_dir poseidon) $(get_build_dir poseidon)
     ;;
   'bench')
     repo=$(get_repo_dir bench)
