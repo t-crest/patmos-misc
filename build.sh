@@ -161,7 +161,7 @@ CTOOLS_ARGS=
 # Set path to a3, or set to empty string to disable a3
 #BENCH_ARGS="${BENCH_ARGS} -DA3_EXECUTABLE="
 
-# Additional CFLAGS, LDFLAGS 
+# Additional CFLAGS, LDFLAGS
 GOLD_CFLAGS=
 # Use this flag if gcc throws errors about narrowing conversions
 #GOLD_CXXFLAGS="-Wno-narrowing"
@@ -290,11 +290,11 @@ function update_rpath() {
 function get_repo_dir() {
     local repo=$1
 
-    # TODO if subdir is set to empty, we could instead make a flat hierarchy, 
+    # TODO if subdir is set to empty, we could instead make a flat hierarchy,
     #      i.e., check out patmos-rtems, patmos-rtems-examples, patmos-rtems-compiler-rt, ..
     #      Needs to be consistent with get_build_dir.
     if [ ! -z "$RTEMS_SUBDIR_PREFIX" ]; then
-        case $repo in 
+        case $repo in
         rtems/rtems)
 	    repo=rtems/${RTEMS_SUBDIR_PREFIX}
 	    ;;
@@ -418,7 +418,7 @@ function build_cmake() {
     rootdir=$(abspath $root)
     shift 3
 
-    # TODO pass build_flags result to cmake 
+    # TODO pass build_flags result to cmake
     local flags=$(build_flags $repo)
 
     if [ "$DO_SHOW_CONFIGURE" == "true" ]; then
@@ -680,7 +680,7 @@ function build_aegean() {
     argopath=$(abspath $(get_repo_dir argo))
 
     rootdir=$(abspath $ROOT_DIR/$repo)
-    
+
     run pushd "${rootdir}"
     info "Aegean build not supported yet!"
     # make $MAKEJ $MAKE_VERBOSE "AEGEAN_PATH=${rootdir}" "BUILD_PATH=${buildpath}" "PATMOS_PATH=${patmospath}" "POSEIDON_PATH=${poseidonpath}" "ARGO_PATH=${argopath}" platform
@@ -693,13 +693,15 @@ function build_poseidon() {
     # buildpath=$2
 
     rootdir=$(abspath $ROOT_DIR/$repo)
-    
+
     run pushd "${rootdir}"
     if [ $DO_CLEAN == true ] ; then
         run make $MAKEJ $MAKE_VERBOSE clean
     fi
     run make $MAKEJ $MAKE_VERBOSE all
     install build/Poseidon $INSTALL_DIR/bin/Poseidon
+    install Converter/converter.jar $INSTALL_DIR/lib/converter.jar
+    install Converter/script/poseidon_converter.sh $INSTALL_DIR/bin/poseidon_converter.sh
     run popd
 }
 
@@ -767,11 +769,11 @@ function build_rtems() {
     build_autoconf rtems/rtems build_default $(get_build_dir rtems rtems) --target=patmos-unknown-rtems --enable-posix \
          --disable-networking --disable-cxx --enable-rtemsbsp=pasim --disable-tests "${RTEMS_ARGS}"
 
-    
+
     echo
     echo "##### Add the following environment variable #####"
     echo "export RTEMS_MAKEFILE_PATH=${INSTALL_DIR}/patmos-unknown-rtems/pasim"
-    echo 
+    echo
 }
 
 function build_rtems_test() {
@@ -794,7 +796,7 @@ function build_rtems_examples() {
     exampledir="$(get_repo_dir rtems/examples)"
 
     #TODO build all examples (but do not install)
-    
+
     echo
     echo "##### Add the following environment variable #####"
     echo "export RTEMS_MAKEFILE_PATH=${INSTALL_DIR}/patmos-unknown-rtems/pasim"
@@ -910,7 +912,7 @@ while getopts ":chi:j:pudsvxVtae" opt; do
     a) DO_RUN_ALL=true ;;
     x) set -x ;;
     e) # recreate build.cfg.dist
-       cat build.sh | sed -n '/##* Start of user configs/,/##* End of user configs/p' | sed "$ d" | sed "/Start of user configs/d" > build.cfg.dist 
+       cat build.sh | sed -n '/##* Start of user configs/,/##* End of user configs/p' | sed "$ d" | sed "/Start of user configs/d" > build.cfg.dist
        exit
        ;;
     \?)
@@ -969,7 +971,7 @@ if [ ! -z "$CLANG_COMPILER" ]; then
 	    LLVM_CMAKE_ARGS="$LLVM_CMAKE_ARGS -DCMAKE_C_COMPILER=$CLANG_COMPILER -DCMAKE_CXX_COMPILER=$CLANG_COMPILER++"
 	    PASIM_ARGS="$PASIM_ARGS -DCMAKE_C_COMPILER=$CLANG_COMPILER -DCMAKE_CXX_COMPILER=$CLANG_COMPILER++"
 	fi
-    else 
+    else
 	echo "Clang $clang is not executable, igored!"
     fi
 fi
