@@ -350,13 +350,17 @@ function get_build_dir() {
 function clone_update() {
     local srcurl=$1
     local target=$ROOT_DIR/$2
+    local branch=$3
+    if [ "$branch" == "" ]; then
+        branch="master"
+    fi
 
     if [ "$DO_SHOW_CONFIGURE" == "true" ]; then
 	return
     fi
     if [ ! -d "$target" ] ; then
 	info "Cloning from $srcurl"
-	run git clone "$srcurl" "$target"
+	run git clone "$srcurl" "$target" --branch "$branch"
     elif [ ${DO_UPDATE} != false ] ; then
         #TODO find a better way (e.g. stash away only on demand)
 	info "Updating $1"
@@ -850,7 +854,7 @@ build_target() {
     fi
     ;;
   'aegean')
-    clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo)
+    clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo) integration
     clone_update ${GITHUB_BASEURL}/aegean.git $(get_repo_dir aegean)
     build_aegean $(get_repo_dir aegean) $(get_build_dir aegean)
     ;;
