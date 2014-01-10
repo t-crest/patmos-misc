@@ -20,9 +20,9 @@ PARJ=-j4
 NUM_HOSTS=1
 HOST_ID=0
 
-CLANG_ARGS="-w -mpatmos-disable-stack-cache"
+CLANG_ARGS="-w"
 CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=$BENCH_SRC_DIR/cmake/patmos-clang-toolchain.cmake -DENABLE_CTORTURE=false -DENABLE_EMULATOR=false -DENABLE_TESTING=true -DPLATIN_ENABLE_WCET=false -DENABLE_STACK_CACHE_ANALYSIS_TESTING=false -DENABLE_C_TESTS=false -DENABLE_MEDIABENCH=false"
-PASIM_ARGS="-S dcache -d 4k -D fifo1 --mbsize 8"
+PASIM_ARGS="-S block -s 2k -D dm -d 4k --mbsize 8"
 
 ###### Configuration End ########
 
@@ -126,69 +126,75 @@ function collect_stats() {
 collect_stats "ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-disable-function-splitter"
 
 # I-cache without splitting, for comparison
-for j in "8m" "16k" "8k" "4k" "2k" "1k"; do
+for j in "8m" "16k" "8k" "4k" "2k"; do
   collect_stats "nosplit_ic${j}_lru2" "-G 7 -C icache -K lru2 -m $j"
   collect_stats "nosplit_ic${j}_lru4" "-G 7 -C icache -K lru4 -m $j"
 done
 
-
 # Check influence of max-SF-size: ideal cache, fixed overhead for regions, split BBs
 for i in 8192 4096 2048 1024 512 256; do
-  collect_stats "max_sf_$i" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-method-cache-size=$i -mpatmos-split-call-blocks=false -mpatmos-preferred-subfunction-size=256"
+  collect_stats "max_sf_${i}_ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-max-subfunction-size=$i -mpatmos-split-call-blocks=false -mpatmos-preferred-subfunction-size=256"
 done
 
 # Check influence of function splitter
-for i in 256 1024 512 384 192 32 96 320 64 448; do
-  collect_stats "pref_sf_${i}_ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-split-call-blocks=false -mpatmos-preferred-subfunction-size=$i"
+for i in 256 1024 512 384 192 32 96 320 64 448 128; do
+  for s in 1 2 4; do
+    scc=$((i*s))
 
-  # Size of cache in kb
-  for j in "32" "16" "8" "4" "2" "1"; do
+    fsplit_options="-mpatmos-max-subfunction-size=2040 -mpatmos-preferred-subfunction-size=$i -mpatmos-preferred-scc-size=$scc"
 
-    # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
-    collect_stats "pref_sf_${i}_mc${j}k_ideal"    "-G 7 -M fifo -m ${j}k --mcmethods=512"
-    collect_stats "pref_sf_${i}_mc${j}k_ideal_vb" "-G 7 -M fifo -m ${j}k --mcmethods=512 --psize=1k"
+    collect_stats "pref_sf_${i}_scc_${scc}_ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-split-call-blocks=false $fsplit_options"
 
-    # Determine cost of predefined assoc
-    for k in 4 8 16 32 64; do
-      blocksize=`echo "$j*1024/$k" | bc`
+    # Size of cache in kb
+    for j in "32" "16" "8" "4" "2"; do
 
-      # Compare variable-size, fixed-block, LRU and variable burst, TDM multicore
-      collect_stats "pref_sf_${i}_mc${j}k_${k}"     "-G 7 -M fifo -m ${j}k --mcmethods=$k"
-      collect_stats "pref_sf_${i}_mc${j}k_${k}_fb"  "-G 7 -M fifo -m ${j}k --mcmethods=0 --mbsize=$blocksize"
-      collect_stats "pref_sf_${i}_mc${j}k_${k}_lru" "-G 7 -M lru  -m ${j}k --mcmethods=0 --mbsize=$blocksize"
+      # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
+      collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_ideal"    "-G 7 -M fifo -m ${j}k --mcmethods=512"
+      collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_ideal_vb" "-G 7 -M fifo -m ${j}k --mcmethods=512 --psize=1k"
 
-      collect_stats "pref_sf_${i}_mc${j}k_${k}_vb"  "-G 7 -M fifo -m ${j}k --mcmethods=$k --psize=1k"
-      collect_stats "pref_sf_${i}_mc${j}k_${k}_tdm" "-G 7 -M fifo -m ${j}k --mcmethods=$k -N 4 --tdelay=8"
+      # Determine cost of predefined assoc
+      for k in 8 16 32 64 128; do
+	blocksize=`echo "$j*1024/$k" | bc`
+
+	# Compare variable-size, fixed-block, LRU and variable burst, TDM multicore
+	collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}"     "-G 7 -M fifo -m ${j}k --mcmethods=$k"
+	#collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_fb"  "-G 7 -M fifo -m ${j}k --mcmethods=0 --mbsize=$blocksize"
+	#collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_lru" "-G 7 -M lru  -m ${j}k --mcmethods=0 --mbsize=$blocksize"
+
+	collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_vb"  "-G 7 -M fifo -m ${j}k --mcmethods=$k --psize=1k"
+	collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_tdm" "-G 7 -M fifo -m ${j}k --mcmethods=$k -N 4 --tdelay=8"
+      done
+
+      # compare with I-cache
+      collect_stats "pref_sf_${i}_scc_${scc}_ic${j}k_lru2"     "-G 7 -C icache -K lru2 -m ${j}k"
+      collect_stats "pref_sf_${i}_scc_${scc}_ic${j}k_lru4"     "-G 7 -C icache -K lru4 -m ${j}k"
+      #collect_stats "pref_sf_${i}_scc_${scc}_ic${j}k_lru2_tdm" "-G 7 -C icache -K lru2 -m ${j}k -N 4 --tdelay=8"
+      collect_stats "pref_sf_${i}_scc_${scc}_ic${j}k_lru4_tdm" "-G 7 -C icache -K lru4 -m ${j}k -N 4 --tdelay=8"
     done
 
-    # compare with I-cache
-    collect_stats "pref_sf_${i}_ic${j}k_lru2"     "-G 7 -C icache -K lru2 -m ${j}k"
-    collect_stats "pref_sf_${i}_ic${j}k_lru4"     "-G 7 -C icache -K lru4 -m ${j}k"
-    collect_stats "pref_sf_${i}_ic${j}k_lru2_tdm" "-G 7 -C icache -K lru2 -m ${j}k -N 4 --tdelay=8"
-    collect_stats "pref_sf_${i}_ic${j}k_lru4_tdm" "-G 7 -C icache -K lru4 -m ${j}k -N 4 --tdelay=8"
-  done
+    # Check influence of splitting the call blocks
+    collect_stats "pref_sf_${i}_scc_${scc}_cbb_ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-split-call-blocks=true $fsplit_options"
 
-  # Check influence of splitting the call blocks
-  collect_stats "pref_sf_${i}_cbb_ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-split-call-blocks=true -mpatmos-preferred-subfunction-size=$i"
+    # size of cache in kb
+    for j in "16" "8" "4" "2"; do
 
-  # size of cache in kb
-  for j in "8" "4" "2" "1"; do
+      # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
+      collect_stats "pref_sf_${i}_scc_${scc}_cbb_mc${j}k_ideal" "-G 7 -M fifo -m ${j}k --mcmethods=512"
 
-    # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
-    collect_stats "pref_sf_${i}_cbb_mc${j}k_ideal" "-G 7 -M fifo -m ${j}k --mcmethods=512"
+      # Determine cost of predefined assoc 
+      for k in 8 16 32 64; do
+	blocksize=`echo "$j*1024/$k" | bc`
 
-    # Determine cost of predefined assoc 
-    for k in 4 8 16 32 64; do
-      blocksize=`echo "$j*1024/$k" | bc`
+	collect_stats "pref_sf_${i}_scc_${scc}_cbb_mc${j}k_$k"       "-G 7 -M fifo -m ${j}k --mcmethods=$k"
+	#collect_stats "pref_sf_${i}_scc_${scc}_cbb_mc${j}k_${k}_fb"  "-G 7 -M fifo -m ${j}k --mcmethods=0 --mbsize=$blocksize"
+	#collect_stats "pref_sf_${i}_scc_${scc}_cbb_mc${j}k_${k}_lru" "-G 7 -M lru  -m ${j}k --mcmethods=0 --mbsize=$blocksize"
 
-      collect_stats "pref_sf_${i}_cbb_mc${j}k_$k"       "-G 7 -M fifo -m ${j}k --mcmethods=$k"
-      collect_stats "pref_sf_${i}_cbb_mc${j}k_${k}_fb"  "-G 7 -M fifo -m ${j}k --mcmethods=0 --mbsize=$blocksize"
-      collect_stats "pref_sf_${i}_cbb_mc${j}k_${k}_lru" "-G 7 -M lru  -m ${j}k --mcmethods=0 --mbsize=$blocksize"
-
-      collect_stats "pref_sf_${i}_cbb_mc${j}k_${k}_vb"  "-G 7 -M fifo -m ${j}k --mcmethods=$k --psize=1k"
-      collect_stats "pref_sf_${i}_cbb_mc${j}k_${k}_tdm" "-G 7 -M fifo -m ${j}k --mcmethods=$k -N 4 --tdelay=8"
+	collect_stats "pref_sf_${i}_scc_${scc}_cbb_mc${j}k_${k}_vb"  "-G 7 -M fifo -m ${j}k --mcmethods=$k --psize=1k"
+	collect_stats "pref_sf_${i}_scc_${scc}_cbb_mc${j}k_${k}_tdm" "-G 7 -M fifo -m ${j}k --mcmethods=$k -N 4 --tdelay=8"
+      done
+      
     done
-    
+
   done
 
 done
