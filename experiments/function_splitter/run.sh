@@ -127,8 +127,10 @@ collect_stats "ideal" "-G 0 -M fifo -m 8m --mcmethods=512" "-mpatmos-disable-fun
 
 # I-cache without splitting, for comparison
 for j in "8m" "16k" "8k" "4k" "2k"; do
+  collect_stats "nosplit_ic${j}_dm"   "-G 7 -C icache -K dm -m $j"
   collect_stats "nosplit_ic${j}_lru2" "-G 7 -C icache -K lru2 -m $j"
   collect_stats "nosplit_ic${j}_lru4" "-G 7 -C icache -K lru4 -m $j"
+  collect_stats "nosplit_ic${j}_lru"  "-G 7 -C icache -K lru  -m $j"
 done
 
 # Check influence of max-SF-size: ideal cache, fixed overhead for regions, split BBs
@@ -162,14 +164,15 @@ for i in 256 1024 512 384 192 32 96 320 64 448 128; do
 	#collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_lru" "-G 7 -M lru  -m ${j}k --mcmethods=0 --mbsize=$blocksize"
 
 	collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_vb"  "-G 7 -M fifo -m ${j}k --mcmethods=$k --psize=1k"
-	collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_tdm" "-G 7 -M fifo -m ${j}k --mcmethods=$k -N 4 --tdelay=8"
+	#collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_tdm" "-G 7 -M fifo -m ${j}k --mcmethods=$k -N 4 --tdelay=8"
       done
 
       # compare with I-cache
       collect_stats "pref_sf_${i}_scc_${scc}_ic${j}k_lru2"     "-G 7 -C icache -K lru2 -m ${j}k"
       collect_stats "pref_sf_${i}_scc_${scc}_ic${j}k_lru4"     "-G 7 -C icache -K lru4 -m ${j}k"
+      #collect_stats "pref_sf_${i}_scc_${scc}_ic${j}k_lru"      "-G 7 -C icache -K lru  -m ${j}k"
       #collect_stats "pref_sf_${i}_scc_${scc}_ic${j}k_lru2_tdm" "-G 7 -C icache -K lru2 -m ${j}k -N 4 --tdelay=8"
-      collect_stats "pref_sf_${i}_scc_${scc}_ic${j}k_lru4_tdm" "-G 7 -C icache -K lru4 -m ${j}k -N 4 --tdelay=8"
+      #collect_stats "pref_sf_${i}_scc_${scc}_ic${j}k_lru4_tdm" "-G 7 -C icache -K lru4 -m ${j}k -N 4 --tdelay=8"
     done
 
     # Check influence of splitting the call blocks
@@ -190,7 +193,7 @@ for i in 256 1024 512 384 192 32 96 320 64 448 128; do
 	#collect_stats "pref_sf_${i}_scc_${scc}_cbb_mc${j}k_${k}_lru" "-G 7 -M lru  -m ${j}k --mcmethods=0 --mbsize=$blocksize"
 
 	collect_stats "pref_sf_${i}_scc_${scc}_cbb_mc${j}k_${k}_vb"  "-G 7 -M fifo -m ${j}k --mcmethods=$k --psize=1k"
-	collect_stats "pref_sf_${i}_scc_${scc}_cbb_mc${j}k_${k}_tdm" "-G 7 -M fifo -m ${j}k --mcmethods=$k -N 4 --tdelay=8"
+	#collect_stats "pref_sf_${i}_scc_${scc}_cbb_mc${j}k_${k}_tdm" "-G 7 -M fifo -m ${j}k --mcmethods=$k -N 4 --tdelay=8"
       done
       
     done
