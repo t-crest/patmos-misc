@@ -30,6 +30,7 @@ config.nice_pasim      = $nice_pasim
 config.pml_config_file = $hw_config
 config.do_update        = false
 config.keep_trace_files = false
+config.nproc = $nproc
 
 # customized benchmark script
 class BenchTool < WcetTool
@@ -37,10 +38,25 @@ class BenchTool < WcetTool
     super(pml,options)
   end
   def BenchTool.run(options, console_opts)
+    if options.use_sca_graph
+      options.input += [ "#{options.binary_file}.scml" ]
+    end
     redirect_output(console_opts) do
       pml = BenchTool.new(PMLDoc.from_files(options.input), options).run_in_outdir
       pml.dump_to_file(options.output) if options.output
     end
+  end
+  def BenchTool.import_ff(benchmark, options)
+    #$stderr.puts "FF IMPORT: #{benchmark}"
+    print benchmark, "\n"
+    print options, "\n"
+    return [] if options.use_trace_facts
+    ff = benchmark['name'] + '.ff.pml'
+    if not File.exist?(ff)
+      $stderr.puts ("missing FF file: #{ff}") if !File.exist?(ff)
+      return []
+    end
+    [ff]
   end
 end
 
@@ -53,9 +69,9 @@ config.options = default_options(:nice_pasim => config.nice_pasim)
 config.options.enable_sweet = false
 config.options.enable_wca   = true
 config.options.runcheck     = false # true
-config.options.trace_analysis = true
+config.options.trace_analysis = false
 config.options.debug_type   = $debug
-config.options.use_trace_facts = true
+config.options.use_trace_facts = false
 # config.options.compute_criticalities = true
 config.options.disable_ait = true
 

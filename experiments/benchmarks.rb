@@ -94,5 +94,5 @@ def standard_configurations
   [ {'name' => 'blockglobal', 'recorders' => 'g:bcl,f:b', 'flow-fact-selection' => 'all' },
     {'name' => 'blocklocal',  'recorders' => 'g:cil,f:b', 'flow-fact-selection' => 'local' },
     {'name' => 'minimal', 'recorders' => 'g:cil', 'flow-fact-selection' => 'minimal' },
-    {'name' => 'notrace' }]
+    {'name' => 'notrace', 'flow-fact-selection' => 'all'}]
 end

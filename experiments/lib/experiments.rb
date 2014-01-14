@@ -97,13 +97,16 @@ class BenchmarkTool
       $stderr.puts "Config file #{@config.pml_config_file} does not exist. Exit."
       exit 1
     end
-    log("Config file: #{@config.pml_config_file}", :log => @build_log, :console => true)
+    # default parallelity is processor count
+    nproc = @config.nproc.to_i # 0 if not an int
+    nproc = Parallel.processor_count unless nproc > 0
+    log("Running in #{nproc} process(es) w/ config: #{@config.pml_config_file}", :log => @build_log, :console => true)
     # forall benchmarks/buildsettings
     @config.benchmarks.each_with_index { |b,ix| b['index'] = ix }
     errors = 0
     collect_build_settings.each do |build_setting, benchmark_list|
       configure(build_setting)
-      errors += Parallel.map(benchmark_list) { |benchmark|
+      errors += Parallel.map(benchmark_list, :in_processes => nproc) { |benchmark|
 
         # benchmark options
         options = @config.options.dup
@@ -231,6 +234,11 @@ private
 
     log_analysis_opts  = { :log => analysis_log, :console => true, :log_append => true }
     run_analysis_opts = { :log => analysis_log, :log_stderr => true, :log_append => true }
+    if defined?(@analysis_tool.import_ff)
+      flowfact_inputs = @analysis_tool.import_ff(benchmark, options)
+      log("##{benchmark['index']} Adding User Flowfacts: #{flowfact_inputs}", log_analysis_opts)
+      options.input += flowfact_inputs
+    end
     key = "#{benchmark['name']}.#{build_setting['name']}.#{configuration['name']}"
     log("##{benchmark['index']} Analyzing Benchmark #{key}",
         log_analysis_opts)

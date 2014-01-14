@@ -23,6 +23,12 @@ machine-configuration:
      policy: "stack"
      block-size: 4
      size: 128
+   - name: "method-cache"
+     block-size: 64
+     associativity: 32
+     size: 2048
+     policy: "ideal"
+     type: "method-cache"
   memory-areas:
     - name: "code"
       type: "code"
