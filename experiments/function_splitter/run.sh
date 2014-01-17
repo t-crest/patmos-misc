@@ -142,6 +142,10 @@ done
 for i in 256 1024 512 384 192 32 96 320 64 448 128; do
   for s in 1 2 4; do
     scc=$((i*s))
+    
+    if [ $scc -gt 2048 ]; then
+      continue
+    fi
 
     fsplit_options="-mpatmos-max-subfunction-size=2040 -mpatmos-preferred-subfunction-size=$i -mpatmos-preferred-scc-size=$scc"
 
