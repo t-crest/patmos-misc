@@ -23,7 +23,7 @@ HOST_ID=0
 CLANG_ARGS="-w"
 CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=$BENCH_SRC_DIR/cmake/patmos-clang-toolchain.cmake -DENABLE_CTORTURE=false -DENABLE_EMULATOR=false -DENABLE_TESTING=true -DPLATIN_ENABLE_WCET=false -DENABLE_STACK_CACHE_ANALYSIS_TESTING=false -DENABLE_C_TESTS=false -DENABLE_MEDIABENCH=false"
 PASIM_ARGS="-G 7 -S block -s 2k -D dm -d 4k --mbsize 8"
-IDEAL_MCACHE="-M fifo -m 8m --mcmethods=512 --psize=1k"
+MCACHE_IDEAL="-M fifo -m 8m --mcmethods=512 --psize=1k"
 
 ###### Configuration End ########
 
