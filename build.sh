@@ -649,15 +649,30 @@ function build_bench() {
     fi
 }
 
+function build_javatools() {
+    local repo=$1
+    local builddir=$2
+    local rootdir=$(abspath $ROOT_DIR/$repo)
+
+    if [ $DO_CLEAN == true -o ! -e "$builddir" ] ; then
+        run rm -rf $builddir
+        run mkdir -p $builddir
+    fi
+
+    run pushd "${rootdir}" > /dev/null
+    run make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${builddir}'" "INSTALLDIR='${INSTALL_DIR}'" javatools
+    run popd > /dev/null
+}
+
 function build_emulator() {
-    repo=$1
-    tmp=$2
-    ctoolsbuild=$(get_build_dir patmos "tools/c")
-    hwbuild=$(get_build_dir patmos hardware)
-    rootdir=$(abspath $ROOT_DIR/$repo)
-    ctoolsbuilddir=$(abspath $ROOT_DIR/$ctoolsbuild)
-    hwbuilddir=$(abspath $ROOT_DIR/$hwbuild)
-    tmpdir=$(abspath $ROOT_DIR/$tmp)
+    local repo=$1
+    local tmp=$2
+    local ctoolsbuild=$(get_build_dir patmos "tools/c")
+    local hwbuild=$(get_build_dir patmos hardware)
+    local rootdir=$(abspath $ROOT_DIR/$repo)
+    local ctoolsbuilddir=$(abspath $ROOT_DIR/$ctoolsbuild)
+    local hwbuilddir=$(abspath $ROOT_DIR/$hwbuild)
+    local tmpdir=$(abspath $ROOT_DIR/$tmp)
 
     if [ $DO_CLEAN == true -o ! -e "$hwbuilddir" ] ; then
         run rm -rf $hwbuilddir
@@ -668,12 +683,12 @@ function build_emulator() {
         run mkdir -p $tmpdir
     fi
 
-    run pushd "${rootdir}"
-    run make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${tmpdir}'" "CTOOLSBUILDDIR='${ctoolsbuilddir}'" "HWBUILDDIR='${hwbuilddir}'" "HWINSTALLDIR='${tmpdir}'" "INSTALLDIR='${INSTALL_DIR}/bin'" emulator
+    run pushd "${rootdir}" > /dev/null
+    run make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${tmpdir}'" "CTOOLSBUILDDIR='${ctoolsbuilddir}'" "HWBUILDDIR='${hwbuilddir}'" "HWINSTALLDIR='${tmpdir}'" "INSTALLDIR='${INSTALL_DIR}'" emulator
     install "${hwbuilddir}/emulator" "${INSTALL_DIR}/bin/patmos-emulator"
     install "${rootdir}/hardware/spm.t" "${INSTALL_DIR}/lib/ld-scripts/patmos_spm.t"
     install "${rootdir}/hardware/ram.t" "${INSTALL_DIR}/lib/ld-scripts/patmos_ram.t"
-    run popd
+    run popd > /dev/null
 }
 
 function build_aegean() {
@@ -846,6 +861,8 @@ build_target() {
     build_cmake patmos/simulator build_and_test_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
     info "Building tools/c in patmos .. "
     build_cmake patmos/tools/c    build_default $(get_build_dir patmos "tools/c") "$CTOOLS_ARGS"
+    info "Building tools/java in patmos .. "
+    build_javatools $(get_repo_dir patmos) $(get_build_dir patmos "tools/java")
     if [ "$BUILD_EMULATOR" == "false" ]; then
 	info "Skipping patmos-emulator in patmos."
     else
