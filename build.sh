@@ -55,7 +55,7 @@ INSTALL_SH=$(dirname $self)/scripts/install.sh
 ########### Start of user configs, overwrite in build.cfg ##############
 
 # List of targets to build by default
-ALLTARGETS="gold llvm newlib compiler-rt pasim bench"
+ALLTARGETS="gold llvm newlib compiler-rt pasim bench poseidon aegean"
 
 # Root directory for all repositories
 ROOT_DIR=$(pwd)
@@ -415,11 +415,11 @@ function build_flags() {
 }
 
 function build_cmake() {
-    repo=$1
-    root=$ROOT_DIR/$(get_repo_dir $repo)
-    build_call=$2
-    builddir=$ROOT_DIR/$3
-    rootdir=$(abspath $root)
+    local repo=$1
+	local root=$ROOT_DIR/$(get_repo_dir $repo)
+    local build_call=$2
+    local builddir=$ROOT_DIR/$3
+    local rootdir=$(abspath $root)
     shift 3
 
     # TODO pass build_flags result to cmake
@@ -653,15 +653,31 @@ function build_javatools() {
     local repo=$1
     local builddir=$2
     local rootdir=$(abspath $ROOT_DIR/$repo)
-
+	echo $repo $builddir $rootdir
     if [ $DO_CLEAN == true -o ! -e "$builddir" ] ; then
         run rm -rf $builddir
         run mkdir -p $builddir
     fi
-
+	echo $(pwd)
     run pushd "${rootdir}" > /dev/null
+	echo $(pwd)
     run make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${builddir}'" "INSTALLDIR='${INSTALL_DIR}'" javatools
     run popd > /dev/null
+}
+
+function build_tools() {
+	local repo=$1
+	info "Building simulator in patmos .. "
+    build_cmake patmos/simulator build_and_test_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
+    info "Building tools/c in patmos .. "
+    build_cmake patmos/tools/c    build_default $(get_build_dir patmos "tools/c") "$CTOOLS_ARGS"
+    info "Building tools/java in patmos .. "
+    build_javatools $repo $(get_build_dir patmos "tools/java")
+	local rootdir=$(abspath $ROOT_DIR/$repo)
+	info "Building tools in patmos .. "
+	run pushd "${rootdir}" > /dev/null
+	run make $MAKEJ $MAKE_VERBOSE tools
+	run popd > /dev/null
 }
 
 function build_emulator() {
@@ -692,26 +708,26 @@ function build_emulator() {
 }
 
 function build_aegean() {
-    repo=$1
-    buildpath=$2
-    patmospath=$(abspath $(get_repo_dir patmos))
-    poseidonpath=$(abspath $(get_repo_dir poseidon))
-    argopath=$(abspath $(get_repo_dir argo))
+    local repo=$1
+    local buildpath=$2
+    local patmospath=$(abspath $(get_repo_dir patmos))
+    local poseidonpath=$(abspath $(get_repo_dir poseidon))
+    local argopath=$(abspath $(get_repo_dir argo))
 
-    rootdir=$(abspath $ROOT_DIR/$repo)
+    local rootdir=$(abspath $ROOT_DIR/$repo)
 
     run pushd "${rootdir}"
-    info "Aegean build not supported yet!"
+    info "Nothing to build for Aegean."
     # make $MAKEJ $MAKE_VERBOSE "AEGEAN_PATH=${rootdir}" "BUILD_PATH=${buildpath}" "PATMOS_PATH=${patmospath}" "POSEIDON_PATH=${poseidonpath}" "ARGO_PATH=${argopath}" platform
     run popd
 }
 
 function build_poseidon() {
-    repo=$1
+    local repo=$1
     # build path currently unused for Poseidon
     # buildpath=$2
 
-    rootdir=$(abspath $ROOT_DIR/$repo)
+    local rootdir=$(abspath $ROOT_DIR/$repo)
 
     run pushd "${rootdir}"
     if [ $DO_CLEAN == true ] ; then
@@ -729,15 +745,15 @@ function run_llvm_build() {
     local config_args="--with-bug-report-url='https://github.com/t-crest/patmos-llvm/issues'"
     local cmake_args="-DBUG_REPORT_URL='https://github.com/t-crest/patmos-llvm/issues'"
     if [ "$1"  == "eclipse" ]; then
-	cmake_args="$cmake_args -G 'Eclipse CDT4 - Unix Makefiles' -DCMAKE_ECLIPSE_MAKE_ARGUMENTS=$MAKEJ -DCMAKE_ECLIPSE_VERSION='3.7 (Indigo)'"
+	local cmake_args="$cmake_args -G 'Eclipse CDT4 - Unix Makefiles' -DCMAKE_ECLIPSE_MAKE_ARGUMENTS=$MAKEJ -DCMAKE_ECLIPSE_VERSION='3.7 (Indigo)'"
     fi
     if [ "$LLVM_BUILD_SHARED" == "true" ]; then
-	config_args="$config_args --enable-shared"
-	cmake_args="$cmake_args -DBUILD_SHARED_LIBS=ON"
+	local config_args="$config_args --enable-shared"
+	local cmake_args="$cmake_args -DBUILD_SHARED_LIBS=ON"
     fi
 
     if [ "$LLVM_USE_CONFIGURE" == "true" -a "$1" != "eclipse" ]; then
-	targets=$(echo $LLVM_TARGETS | tr '[A-Z;]' '[a-z,]')
+	local targets=$(echo $LLVM_TARGETS | tr '[A-Z;]' '[a-z,]')
 	build_autoconf llvm build_llvm $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $config_args $LLVM_CONFIGURE_ARGS"
     else
 	build_cmake llvm build_llvm $(get_build_dir llvm) "-DCMAKE_BUILD_TYPE=Debug -DLLVM_TARGETS_TO_BUILD='$LLVM_TARGETS' $cmake_args $LLVM_CMAKE_ARGS"
@@ -745,11 +761,11 @@ function run_llvm_build() {
 }
 
 function build_rtems() {
-    repodir=$(get_repo_dir rtems/rtems)
-    srcdir=$(abspath "$ROOT_DIR/${repodir}")
+    local repodir=$(get_repo_dir rtems/rtems)
+    local srcdir=$(abspath "$ROOT_DIR/${repodir}")
 
     # TODO: check we have *all* necessary binaries
-    required="clang ld"
+	local required="clang ld"
     for bin in ${required} ; do
 	if [ ! -e "${INSTALL_DIR}/bin/patmos-${bin}" ] ; then
 	    echo "[rtems] Error: missing binary ${INSTALL_DIR}/bin/patmos-${bin}"
@@ -765,7 +781,7 @@ function build_rtems() {
         echo "# would symlink ${INSTALL_DIR}/bin/patmos-(.*) to ${INSTALL_DIR}/bin/patmos-unknown-rtems-\$1"
     fi
     for f in $(find "${INSTALL_DIR}/bin" -name 'patmos-*' | grep -v unknown-rtems) ; do
-        target="${f/bin\/patmos-/bin/patmos-unknown-rtems-}"
+        local target="${f/bin\/patmos-/bin/patmos-unknown-rtems-}"
         if [ ! -e "${target}" ] ; then
             run ln -s "${f}" "${target}"
         fi
@@ -796,11 +812,11 @@ function build_rtems() {
 }
 
 function build_rtems_test() {
-    repodir=$(get_repo_dir rtems/rtems)
-    builddir=$(get_build_dir rtems rtems-test)
-    srcdir=$(abspath "$ROOT_DIR/${repodir}")
+    local repodir=$(get_repo_dir rtems/rtems)
+    local builddir=$(get_build_dir rtems rtems-test)
+    local srcdir=$(abspath "$ROOT_DIR/${repodir}")
 
-    rtems_testscript=$ROOT_DIR/$repodir/run-testsuite.sh
+    local rtems_testscript=$ROOT_DIR/$repodir/run-testsuite.sh
 
     build_autoconf rtems/rtems build_default $builddir --target=patmos-unknown-rtems --enable-posix \
          --disable-networking --disable-cxx --enable-rtemsbsp=pasim --enable-tests "${RTEMS_ARGS}"
@@ -812,7 +828,7 @@ function build_rtems_test() {
 }
 
 function build_rtems_examples() {
-    exampledir="$(get_repo_dir rtems/examples)"
+    local exampledir="$(get_repo_dir rtems/examples)"
 
     #TODO build all examples (but do not install)
 
@@ -857,12 +873,7 @@ build_target() {
     ;;
   'patmos'|'pasim')
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
-    info "Building simulator in patmos .. "
-    build_cmake patmos/simulator build_and_test_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
-    info "Building tools/c in patmos .. "
-    build_cmake patmos/tools/c    build_default $(get_build_dir patmos "tools/c") "$CTOOLS_ARGS"
-    info "Building tools/java in patmos .. "
-    build_javatools $(get_repo_dir patmos) $(get_build_dir patmos "tools/java")
+	build_tools $(get_repo_dir patmos)
     if [ "$BUILD_EMULATOR" == "false" ]; then
 	info "Skipping patmos-emulator in patmos."
     else
@@ -880,7 +891,7 @@ build_target() {
     build_poseidon $(get_repo_dir poseidon) $(get_build_dir poseidon)
     ;;
   'bench')
-    repo=$(get_repo_dir bench)
+    local repo=$(get_repo_dir bench)
     if [ -z "$BENCH_REPO_URL" ]; then
       if [ -d $ROOT_DIR/$repo ]; then
 	echo "Skipped updating of benchmark repository, BENCH_REPO_URL is not set."
@@ -1019,6 +1030,8 @@ if [ "$DO_RUN_ALL" == "true" ]; then
     build_target compiler-rt
     build_target newlib
     build_target bench
+	build_target poseidon
+	build_target aegean
 else
     TARGETS=${@-$ALLTARGETS}
     for target in $TARGETS; do
