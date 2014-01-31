@@ -863,7 +863,7 @@ build_target() {
     ;;
   'gold')
     clone_update ${GITHUB_BASEURL}/patmos-gold.git $(get_repo_dir gold)
-    build_autoconf gold build_gold $(get_build_dir gold) --program-prefix=patmos- --enable-gold=yes --enable-ld=no "$GOLD_ARGS"
+    build_autoconf gold build_gold $(get_build_dir gold) --program-prefix=patmos- --enable-gold=yes --enable-ld=no --disable-werror "$GOLD_ARGS"
     ;;
   'newlib')
     build_newlib $(get_build_dir newlib) $TARGET
