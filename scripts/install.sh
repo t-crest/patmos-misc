@@ -4,6 +4,7 @@
 
 OS_NAME=$(uname -s)
 MODE=
+UPDATE=
 
 function install() {
     # if $src is a directory, $dst must be the target directory, not the parent directory!
@@ -23,7 +24,7 @@ function install() {
     fi
     
     if [ "$OS_NAME" == "Linux" ]; then
-	cp -fauT $src $dst
+	cp $UPDATE -faT $src $dst
     else
 	if [ -e $dst ]; then
 	    rm -rf $dst
@@ -44,6 +45,8 @@ while [ "$1" != "" ]; do
     if [ "$1" == "-m" ]; then
 	shift
 	MODE=$1
+    elif [ "$1" == "-u" ]; then
+	UPDATE="-u"
     else
 	if [ "$last" != "" ]; then
 	    src="$src $last"
