@@ -5,8 +5,35 @@
 # Author: Stefan Hepp <hepp@complang.tuwien.ac.at>
 #
 
+# Synopsis: fullpath=$(abspath ${relpath})
+# Takes a relative file name and prints the absolute path, with symlinks resolved
+# Note: readlink -f does not work on OS X; this is a portable replacement
+function abspath() {
+    local path=$1
+    local pwd_restore="$(pwd)"
+
+    local dir=$(dirname "$path")
+    if [ -d "$dir" ]; then
+	cd "$dir"
+	path=$(basename "$path")
+	# follow chain of symlinks
+	while [ -L "$path" ]; do
+	    path=$(readlink "$path")
+	    cd $(dirname "$path")
+	    path=$(basename "$path")
+	done
+	echo "$(pwd -P)/$path"
+	cd "$pwd_restore"
+    elif [[ "$BUILDDIR_SUFFIX" =~ ^/ ]]; then
+	echo $path
+    else
+	echo "Trying to resolve non-existent relative path $path, don't want to use PWD."
+	exit 1
+    fi
+}
+
 # TODO alternatively check home for devup.cfg?
-self=`readlink -f $0`
+self=`abspath $0`
 cfgfile=`dirname $self`/devup.cfg
 base=`dirname $self`/..
 
@@ -27,7 +54,7 @@ base=`dirname $self`/..
 GITBASE=$base
 
 # Names of git subdirectories in $GITBASE
-GITREPOS="patmos benchmarks newlib compiler-rt gold clang llvm misc"
+GITREPOS="patmos bench newlib compiler-rt gold llvm/tools/clang llvm misc"
 
 # Color codes
 RED="\033[31m"
