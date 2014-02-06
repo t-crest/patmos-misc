@@ -734,9 +734,9 @@ function build_poseidon() {
         run make $MAKEJ $MAKE_VERBOSE clean
     fi
     run make $MAKEJ $MAKE_VERBOSE all
-    install build/Poseidon $INSTALL_DIR/bin/Poseidon
+    install build/poseidon $INSTALL_DIR/bin/poseidon
     install Converter/converter.jar $INSTALL_DIR/lib/converter.jar
-    install Converter/script/poseidon_converter.sh $INSTALL_DIR/bin/poseidon_converter.sh
+    install Converter/script/poseidon-conv $INSTALL_DIR/bin/poseidon-conv
     run popd
 }
 
