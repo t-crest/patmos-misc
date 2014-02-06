@@ -635,6 +635,7 @@ function build_newlib() {
     NEWLIB_ENVVARS="INSTALL='$INSTALL_SH' $NEWLIB_ENVVARS"
     build_autoconf newlib build_default $builddir --target=$target AR_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_AR \
         RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
+	READELF_FOR_TARGET=${INSTALL_DIR}/bin/patmos-readelf \
         CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target ${target} -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
 }
 
