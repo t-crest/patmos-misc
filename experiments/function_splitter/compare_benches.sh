@@ -21,20 +21,27 @@ function compare_benches() {
 
       cycles=`grep -m 1 "Cyc :" work/$config/$bench | sed "s/Cyc : *\([0-9]*\) */\1/"`
 
-      echo "'$cname', '$suite', '$benchname', $cycles, $refcycles"
+      echo "\"$cname\", \"$suite\", \"$benchname\", $cycles, $refcycles"
     done
 
   done
 }
 
-compare_benches "ideal" "pref_sf_XX_scc_XX_ideal" "XX, SCC XX" "32 128 192 256 512 1024" > results/compare_ideal.csv
-compare_benches "ideal" "pref_sf_XX_scc_2048_ideal" "XX, SCC 2048" "128 256 512" >> results/compare_ideal.csv
+compare_benches "ideal" "pref_sf_XX_scc_XX_ideal" "XX/XX" "32 128 192 256 512 1024" > results/compare_ideal.csv
+compare_benches "ideal" "pref_sf_XX_scc_2048_ideal" "XX/2048" "128 192 256 512" >> results/compare_ideal.csv
 
-compare_benches "nosplit_ic4k_lru4" "pref_sf_XX_scc_XX_mc4k_32" "XX, SCC XX" "32 128 192 256 512 1024"  > results/compare_mc4k_32.csv
-compare_benches "nosplit_ic4k_lru4" "pref_sf_XX_scc_2048_mc4k_32" "XX, SCC 2048" "128 256 512"  >> results/compare_mc4k_32.csv
+compare_benches "nosplit_ic4k_lru4" "pref_sf_XX_scc_XX_mc4k_32" "XX/XX" "32 128 192 256 512 1024"  > results/compare_mc4k_32.csv
+compare_benches "nosplit_ic4k_lru4" "pref_sf_XX_scc_2048_mc4k_32" "XX/2048" "128 192 256 512"  >> results/compare_mc4k_32.csv
 
-compare_benches "nosplit_ic4k_lru4" "pref_sf_XX_scc_XX_mc4k_32_vb" "XX, SCC XX" "32 128 192 256 512 1024"  > results/compare_mc4k_32_vb.csv
-compare_benches "nosplit_ic4k_lru4" "pref_sf_XX_scc_2048_mc4k_32_vb" "XX, SCC 2048" "128 256 512"  >> results/compare_mc4k_32_vb.csv
+compare_benches "nosplit_ic4k_lru4" "pref_sf_XX_scc_XX_mc4k_32_vb" "XX/XX" "32 128 192 256 512 1024"  > results/compare_mc4k_32_vb.csv
+compare_benches "nosplit_ic4k_lru4" "pref_sf_XX_scc_2048_mc4k_32_vb" "XX/2048" "128 192 256 512"  >> results/compare_mc4k_32_vb.csv
+
+compare_benches "nosplit_ic8k_lru4" "pref_sf_XX_scc_XX_mc8k_32" "XX/XX" "32 128 192 256 512 1024"  > results/compare_mc8k_32.csv
+compare_benches "nosplit_ic8k_lru4" "pref_sf_XX_scc_2048_mc8k_32" "XX/2048" "128 192 256 512"  >> results/compare_mc8k_32.csv
+
+compare_benches "nosplit_ic8k_lru4" "pref_sf_XX_scc_XX_mc8k_32_vb" "XX/XX" "32 128 192 256 512 1024"  > results/compare_mc8k_32_vb.csv
+compare_benches "nosplit_ic8k_lru4" "pref_sf_XX_scc_2048_mc8k_32_vb" "XX/2048" "128 192 256 512"  >> results/compare_mc8k_32_vb.csv
+
 
 # Have a lot of different configurations, compare per benchmark
 

@@ -1,531 +1,590 @@
-'32, SCC 32', 'coremark', 'coremark', 7053377, 6063828
-'128, SCC 128', 'coremark', 'coremark', 6796402, 6063828
-'192, SCC 192', 'coremark', 'coremark', 6651580, 6063828
-'256, SCC 256', 'coremark', 'coremark', 6621688, 6063828
-'512, SCC 512', 'coremark', 'coremark', 6720793, 6063828
-'1024, SCC 1024', 'coremark', 'coremark', 6473834, 6063828
-'32, SCC 32', 'mibench', 'basicmath_tiny', 89553193, 38166966
-'128, SCC 128', 'mibench', 'basicmath_tiny', 54198817, 38166966
-'192, SCC 192', 'mibench', 'basicmath_tiny', 53053137, 38166966
-'256, SCC 256', 'mibench', 'basicmath_tiny', 58883715, 38166966
-'512, SCC 512', 'mibench', 'basicmath_tiny', 69406769, 38166966
-'1024, SCC 1024', 'mibench', 'basicmath_tiny', 110605812, 38166966
-'32, SCC 32', 'mibench', 'bitcnts', 56008162, 50949460
-'128, SCC 128', 'mibench', 'bitcnts', 50973733, 50949460
-'192, SCC 192', 'mibench', 'bitcnts', 50978122, 50949460
-'256, SCC 256', 'mibench', 'bitcnts', 50976145, 50949460
-'512, SCC 512', 'mibench', 'bitcnts', 50985952, 50949460
-'1024, SCC 1024', 'mibench', 'bitcnts', 50998988, 50949460
-'32, SCC 32', 'mibench', 'cjpeg_small', 63446003, 58603241
-'128, SCC 128', 'mibench', 'cjpeg_small', 63157920, 58603241
-'192, SCC 192', 'mibench', 'cjpeg_small', 62215219, 58603241
-'256, SCC 256', 'mibench', 'cjpeg_small', 62248040, 58603241
-'512, SCC 512', 'mibench', 'cjpeg_small', 60856200, 58603241
-'1024, SCC 1024', 'mibench', 'cjpeg_small', 59024247, 58603241
-'32, SCC 32', 'mibench', 'crc_32', 24848468, 21737039
-'128, SCC 128', 'mibench', 'crc_32', 24501896, 21737039
-'192, SCC 192', 'mibench', 'crc_32', 24838179, 21737039
-'256, SCC 256', 'mibench', 'crc_32', 24838551, 21737039
-'512, SCC 512', 'mibench', 'crc_32', 22782022, 21737039
-'1024, SCC 1024', 'mibench', 'crc_32', 22439409, 21737039
-'32, SCC 32', 'mibench', 'csusan_small', 5859034, 3354992
-'128, SCC 128', 'mibench', 'csusan_small', 4787895, 3354992
-'192, SCC 192', 'mibench', 'csusan_small', 4583701, 3354992
-'256, SCC 256', 'mibench', 'csusan_small', 4507646, 3354992
-'512, SCC 512', 'mibench', 'csusan_small', 4826293, 3354992
-'1024, SCC 1024', 'mibench', 'csusan_small', 7200683, 3354992
-'32, SCC 32', 'mibench', 'dbf', 89235093, 83010154
-'128, SCC 128', 'mibench', 'dbf', 88281981, 83010154
-'192, SCC 192', 'mibench', 'dbf', 88992109, 83010154
-'256, SCC 256', 'mibench', 'dbf', 87736283, 83010154
-'512, SCC 512', 'mibench', 'dbf', 85861854, 83010154
-'1024, SCC 1024', 'mibench', 'dbf', 84452454, 83010154
-'32, SCC 32', 'mibench', 'dijkstra_small', 104376776, 80760884
-'128, SCC 128', 'mibench', 'dijkstra_small', 87568086, 80760884
-'192, SCC 192', 'mibench', 'dijkstra_small', 87527092, 80760884
-'256, SCC 256', 'mibench', 'dijkstra_small', 87224749, 80760884
-'512, SCC 512', 'mibench', 'dijkstra_small', 87178842, 80760884
-'1024, SCC 1024', 'mibench', 'dijkstra_small', 88120963, 80760884
-'32, SCC 32', 'mibench', 'djpeg_small', 18373968, 16223579
-'128, SCC 128', 'mibench', 'djpeg_small', 17437588, 16223579
-'192, SCC 192', 'mibench', 'djpeg_small', 17982419, 16223579
-'256, SCC 256', 'mibench', 'djpeg_small', 17316598, 16223579
-'512, SCC 512', 'mibench', 'djpeg_small', 17296859, 16223579
-'1024, SCC 1024', 'mibench', 'djpeg_small', 17442629, 16223579
-'32, SCC 32', 'mibench', 'drijndael', 151791958, 130041179
-'128, SCC 128', 'mibench', 'drijndael', 146513320, 130041179
-'192, SCC 192', 'mibench', 'drijndael', 146989004, 130041179
-'256, SCC 256', 'mibench', 'drijndael', 146537646, 130041179
-'512, SCC 512', 'mibench', 'drijndael', 143628084, 130041179
-'1024, SCC 1024', 'mibench', 'drijndael', 154354427, 130041179
-'32, SCC 32', 'mibench', 'ebf', 91660829, 83610988
-'128, SCC 128', 'mibench', 'ebf', 90659624, 83610988
-'192, SCC 192', 'mibench', 'ebf', 91327805, 83610988
-'256, SCC 256', 'mibench', 'ebf', 90053615, 83610988
-'512, SCC 512', 'mibench', 'ebf', 88184976, 83610988
-'1024, SCC 1024', 'mibench', 'ebf', 86954129, 83610988
-'32, SCC 32', 'mibench', 'erijndael', 159669845, 136057403
-'128, SCC 128', 'mibench', 'erijndael', 154141747, 136057403
-'192, SCC 192', 'mibench', 'erijndael', 154366592, 136057403
-'256, SCC 256', 'mibench', 'erijndael', 156622911, 136057403
-'512, SCC 512', 'mibench', 'erijndael', 154374156, 136057403
-'1024, SCC 1024', 'mibench', 'erijndael', 168140905, 136057403
-'32, SCC 32', 'mibench', 'esusan_small', 10221564, 6557356
-'128, SCC 128', 'mibench', 'esusan_small', 8514604, 6557356
-'192, SCC 192', 'mibench', 'esusan_small', 8370752, 6557356
-'256, SCC 256', 'mibench', 'esusan_small', 8167780, 6557356
-'512, SCC 512', 'mibench', 'esusan_small', 9107745, 6557356
-'1024, SCC 1024', 'mibench', 'esusan_small', 11712794, 6557356
-'32, SCC 32', 'mibench', 'fft_tiny', 27820119, 10205207
-'128, SCC 128', 'mibench', 'fft_tiny', 14730689, 10205207
-'192, SCC 192', 'mibench', 'fft_tiny', 14729510, 10205207
-'256, SCC 256', 'mibench', 'fft_tiny', 15466664, 10205207
-'512, SCC 512', 'mibench', 'fft_tiny', 19655429, 10205207
-'1024, SCC 1024', 'mibench', 'fft_tiny', 34306203, 10205207
-'32, SCC 32', 'mibench', 'ifft_tiny', 26813055, 9898104
-'128, SCC 128', 'mibench', 'ifft_tiny', 14419398, 9898104
-'192, SCC 192', 'mibench', 'ifft_tiny', 14440100, 9898104
-'256, SCC 256', 'mibench', 'ifft_tiny', 15229676, 9898104
-'512, SCC 512', 'mibench', 'ifft_tiny', 19211856, 9898104
-'1024, SCC 1024', 'mibench', 'ifft_tiny', 33024513, 9898104
-'32, SCC 32', 'mibench', 'patricia', 346270848, 257824774
-'128, SCC 128', 'mibench', 'patricia', 327995666, 257824774
-'192, SCC 192', 'mibench', 'patricia', 332488489, 257824774
-'256, SCC 256', 'mibench', 'patricia', 316140819, 257824774
-'512, SCC 512', 'mibench', 'patricia', 331484361, 257824774
-'1024, SCC 1024', 'mibench', 'patricia', 363722295, 257824774
-'32, SCC 32', 'mibench', 'qsort_small', 81404020, 55937012
-'128, SCC 128', 'mibench', 'qsort_small', 79005978, 55937012
-'192, SCC 192', 'mibench', 'qsort_small', 81135478, 55937012
-'256, SCC 256', 'mibench', 'qsort_small', 79656533, 55937012
-'512, SCC 512', 'mibench', 'qsort_small', 85640006, 55937012
-'1024, SCC 1024', 'mibench', 'qsort_small', 90820200, 55937012
-'32, SCC 32', 'mibench', 'rawcaudio', 86700297, 73413564
-'128, SCC 128', 'mibench', 'rawcaudio', 86697293, 73413564
-'192, SCC 192', 'mibench', 'rawcaudio', 86697226, 73413564
-'256, SCC 256', 'mibench', 'rawcaudio', 86700238, 73413564
-'512, SCC 512', 'mibench', 'rawcaudio', 86697221, 73413564
-'1024, SCC 1024', 'mibench', 'rawcaudio', 86697144, 73413564
-'32, SCC 32', 'mibench', 'rawdaudio', 65526925, 55339362
-'128, SCC 128', 'mibench', 'rawdaudio', 65526924, 55339362
-'192, SCC 192', 'mibench', 'rawdaudio', 65526857, 55339362
-'256, SCC 256', 'mibench', 'rawdaudio', 65587346, 55339362
-'512, SCC 512', 'mibench', 'rawdaudio', 65526852, 55339362
-'1024, SCC 1024', 'mibench', 'rawdaudio', 65526775, 55339362
-'32, SCC 32', 'mibench', 'rsynth_tiny', 131675592, 58506148
-'128, SCC 128', 'mibench', 'rsynth_tiny', 81089571, 58506148
-'192, SCC 192', 'mibench', 'rsynth_tiny', 77451165, 58506148
-'256, SCC 256', 'mibench', 'rsynth_tiny', 75605169, 58506148
-'512, SCC 512', 'mibench', 'rsynth_tiny', 97656759, 58506148
-'1024, SCC 1024', 'mibench', 'rsynth_tiny', 126220571, 58506148
-'32, SCC 32', 'mibench', 'search_large', 26654289, 16900265
-'128, SCC 128', 'mibench', 'search_large', 25568371, 16900265
-'192, SCC 192', 'mibench', 'search_large', 26416485, 16900265
-'256, SCC 256', 'mibench', 'search_large', 26302405, 16900265
-'512, SCC 512', 'mibench', 'search_large', 29146059, 16900265
-'1024, SCC 1024', 'mibench', 'search_large', 30866594, 16900265
-'32, SCC 32', 'mibench', 'search_small', 1058187, 673686
-'128, SCC 128', 'mibench', 'search_small', 1016593, 673686
-'192, SCC 192', 'mibench', 'search_small', 1052311, 673686
-'256, SCC 256', 'mibench', 'search_small', 1042347, 673686
-'512, SCC 512', 'mibench', 'search_small', 1162064, 673686
-'1024, SCC 1024', 'mibench', 'search_small', 1240425, 673686
-'32, SCC 32', 'mibench', 'sha', 26381142, 24034442
-'128, SCC 128', 'mibench', 'sha', 26374514, 24034442
-'192, SCC 192', 'mibench', 'sha', 26366640, 24034442
-'256, SCC 256', 'mibench', 'sha', 26044336, 24034442
-'512, SCC 512', 'mibench', 'sha', 24134821, 24034442
-'1024, SCC 1024', 'mibench', 'sha', 24203446, 24034442
-'32, SCC 32', 'mibench', 'ssusan_small', 41395775, 34167002
-'128, SCC 128', 'mibench', 'ssusan_small', 36956144, 34167002
-'192, SCC 192', 'mibench', 'ssusan_small', 36709124, 34167002
-'256, SCC 256', 'mibench', 'ssusan_small', 36612306, 34167002
-'512, SCC 512', 'mibench', 'ssusan_small', 37335891, 34167002
-'1024, SCC 1024', 'mibench', 'ssusan_small', 48283062, 34167002
-'32, SCC 32', 'mrtc', 'adpcm', 2243378, 2237731
-'128, SCC 128', 'mrtc', 'adpcm', 2243377, 2237731
-'192, SCC 192', 'mrtc', 'adpcm', 2243317, 2237731
-'256, SCC 256', 'mrtc', 'adpcm', 2243430, 2237731
-'512, SCC 512', 'mrtc', 'adpcm', 2243597, 2237731
-'1024, SCC 1024', 'mrtc', 'adpcm', 2243581, 2237731
-'32, SCC 32', 'mrtc', 'bsort100', 207483, 177370
-'128, SCC 128', 'mrtc', 'bsort100', 207489, 177370
-'192, SCC 192', 'mrtc', 'bsort100', 207429, 177370
-'256, SCC 256', 'mrtc', 'bsort100', 207438, 177370
-'512, SCC 512', 'mrtc', 'bsort100', 177478, 177370
-'1024, SCC 1024', 'mrtc', 'bsort100', 177408, 177370
-'32, SCC 32', 'mrtc', 'bs', 1054, 836
-'128, SCC 128', 'mrtc', 'bs', 1016, 836
-'192, SCC 192', 'mrtc', 'bs', 949, 836
-'256, SCC 256', 'mrtc', 'bs', 958, 836
-'512, SCC 512', 'mrtc', 'bs', 944, 836
-'1024, SCC 1024', 'mrtc', 'bs', 874, 836
-'32, SCC 32', 'mrtc', 'cnt', 4389, 4215
-'128, SCC 128', 'mrtc', 'cnt', 4395, 4215
-'192, SCC 192', 'mrtc', 'cnt', 4335, 4215
-'256, SCC 256', 'mrtc', 'cnt', 4344, 4215
-'512, SCC 512', 'mrtc', 'cnt', 4330, 4215
-'1024, SCC 1024', 'mrtc', 'cnt', 4246, 4215
-'32, SCC 32', 'mrtc', 'compress', 8184, 7314
-'128, SCC 128', 'mrtc', 'compress', 8183, 7314
-'192, SCC 192', 'mrtc', 'compress', 8123, 7314
-'256, SCC 256', 'mrtc', 'compress', 8132, 7314
-'512, SCC 512', 'mrtc', 'compress', 8118, 7314
-'1024, SCC 1024', 'mrtc', 'compress', 8041, 7314
-'32, SCC 32', 'mrtc', 'cover', 2137, 1816
-'128, SCC 128', 'mrtc', 'cover', 2136, 1816
-'192, SCC 192', 'mrtc', 'cover', 2076, 1816
-'256, SCC 256', 'mrtc', 'cover', 2035, 1816
-'512, SCC 512', 'mrtc', 'cover', 1952, 1816
-'1024, SCC 1024', 'mrtc', 'cover', 1875, 1816
-'32, SCC 32', 'mrtc', 'crc', 15706, 15468
-'128, SCC 128', 'mrtc', 'crc', 15710, 15468
-'192, SCC 192', 'mrtc', 'crc', 15623, 15468
-'256, SCC 256', 'mrtc', 'crc', 15632, 15468
-'512, SCC 512', 'mrtc', 'crc', 15597, 15468
-'1024, SCC 1024', 'mrtc', 'crc', 15499, 15468
-'32, SCC 32', 'mrtc', 'duff', 1430, 1249
-'128, SCC 128', 'mrtc', 'duff', 1429, 1249
-'192, SCC 192', 'mrtc', 'duff', 1362, 1249
-'256, SCC 256', 'mrtc', 'duff', 1371, 1249
-'512, SCC 512', 'mrtc', 'duff', 1357, 1249
-'1024, SCC 1024', 'mrtc', 'duff', 1287, 1249
-'32, SCC 32', 'mrtc', 'edn', 49860, 49161
-'128, SCC 128', 'mrtc', 'edn', 49864, 49161
-'192, SCC 192', 'mrtc', 'edn', 49804, 49161
-'256, SCC 256', 'mrtc', 'edn', 49747, 49161
-'512, SCC 512', 'mrtc', 'edn', 49733, 49161
-'1024, SCC 1024', 'mrtc', 'edn', 49666, 49161
-'32, SCC 32', 'mrtc', 'expint', 78166, 77678
-'128, SCC 128', 'mrtc', 'expint', 78165, 77678
-'192, SCC 192', 'mrtc', 'expint', 78105, 77678
-'256, SCC 256', 'mrtc', 'expint', 77800, 77678
-'512, SCC 512', 'mrtc', 'expint', 77786, 77678
-'1024, SCC 1024', 'mrtc', 'expint', 77716, 77678
-'32, SCC 32', 'mrtc', 'fac', 915, 734
-'128, SCC 128', 'mrtc', 'fac', 914, 734
-'192, SCC 192', 'mrtc', 'fac', 847, 734
-'256, SCC 256', 'mrtc', 'fac', 856, 734
-'512, SCC 512', 'mrtc', 'fac', 842, 734
-'1024, SCC 1024', 'mrtc', 'fac', 772, 734
-'32, SCC 32', 'mrtc', 'fdct', 3356, 3182
-'128, SCC 128', 'mrtc', 'fdct', 3369, 3182
-'192, SCC 192', 'mrtc', 'fdct', 3309, 3182
-'256, SCC 256', 'mrtc', 'fdct', 3318, 3182
-'512, SCC 512', 'mrtc', 'fdct', 3304, 3182
-'1024, SCC 1024', 'mrtc', 'fdct', 3213, 3182
-'32, SCC 32', 'mrtc', 'fft1', 200755, 78616
-'128, SCC 128', 'mrtc', 'fft1', 161306, 78616
-'192, SCC 192', 'mrtc', 'fft1', 157084, 78616
-'256, SCC 256', 'mrtc', 'fft1', 153063, 78616
-'512, SCC 512', 'mrtc', 'fft1', 171344, 78616
-'1024, SCC 1024', 'mrtc', 'fft1', 222811, 78616
-'32, SCC 32', 'mrtc', 'fibcall', 915, 734
-'128, SCC 128', 'mrtc', 'fibcall', 914, 734
-'192, SCC 192', 'mrtc', 'fibcall', 847, 734
-'256, SCC 256', 'mrtc', 'fibcall', 856, 734
-'512, SCC 512', 'mrtc', 'fibcall', 842, 734
-'1024, SCC 1024', 'mrtc', 'fibcall', 772, 734
-'32, SCC 32', 'mrtc', 'fir', 3102, 2833
-'128, SCC 128', 'mrtc', 'fir', 3101, 2833
-'192, SCC 192', 'mrtc', 'fir', 3041, 2833
-'256, SCC 256', 'mrtc', 'fir', 3050, 2833
-'512, SCC 512', 'mrtc', 'fir', 2941, 2833
-'1024, SCC 1024', 'mrtc', 'fir', 2864, 2833
-'32, SCC 32', 'mrtc', 'insertsort', 2404, 2117
-'128, SCC 128', 'mrtc', 'insertsort', 2403, 2117
-'192, SCC 192', 'mrtc', 'insertsort', 2343, 2117
-'256, SCC 256', 'mrtc', 'insertsort', 2352, 2117
-'512, SCC 512', 'mrtc', 'insertsort', 2225, 2117
-'1024, SCC 1024', 'mrtc', 'insertsort', 2148, 2117
-'32, SCC 32', 'mrtc', 'janne_complex', 1243, 1020
-'128, SCC 128', 'mrtc', 'janne_complex', 1242, 1020
-'192, SCC 192', 'mrtc', 'janne_complex', 1126, 1020
-'256, SCC 256', 'mrtc', 'janne_complex', 1135, 1020
-'512, SCC 512', 'mrtc', 'janne_complex', 1121, 1020
-'1024, SCC 1024', 'mrtc', 'janne_complex', 1051, 1020
-'32, SCC 32', 'mrtc', 'jfdctint', 5106, 4932
-'128, SCC 128', 'mrtc', 'jfdctint', 5112, 4932
-'192, SCC 192', 'mrtc', 'jfdctint', 5052, 4932
-'256, SCC 256', 'mrtc', 'jfdctint', 5061, 4932
-'512, SCC 512', 'mrtc', 'jfdctint', 5047, 4932
-'1024, SCC 1024', 'mrtc', 'jfdctint', 4963, 4932
-'32, SCC 32', 'mrtc', 'lcdnum', 1400, 1119
-'128, SCC 128', 'mrtc', 'lcdnum', 1399, 1119
-'192, SCC 192', 'mrtc', 'lcdnum', 1339, 1119
-'256, SCC 256', 'mrtc', 'lcdnum', 1348, 1119
-'512, SCC 512', 'mrtc', 'lcdnum', 1269, 1119
-'1024, SCC 1024', 'mrtc', 'lcdnum', 1192, 1119
-'32, SCC 32', 'mrtc', 'lms', 20258251, 9737989
-'128, SCC 128', 'mrtc', 'lms', 16115223, 9737989
-'192, SCC 192', 'mrtc', 'lms', 15709504, 9737989
-'256, SCC 256', 'mrtc', 'lms', 16031713, 9737989
-'512, SCC 512', 'mrtc', 'lms', 17865582, 9737989
-'1024, SCC 1024', 'mrtc', 'lms', 22029672, 9737989
-'32, SCC 32', 'mrtc', 'loop3', 915, 734
-'128, SCC 128', 'mrtc', 'loop3', 914, 734
-'192, SCC 192', 'mrtc', 'loop3', 847, 734
-'256, SCC 256', 'mrtc', 'loop3', 856, 734
-'512, SCC 512', 'mrtc', 'loop3', 842, 734
-'1024, SCC 1024', 'mrtc', 'loop3', 772, 734
-'32, SCC 32', 'mrtc', 'ludcmp', 207720, 59268
-'128, SCC 128', 'mrtc', 'ludcmp', 90883, 59268
-'192, SCC 192', 'mrtc', 'ludcmp', 94961, 59268
-'256, SCC 256', 'mrtc', 'ludcmp', 97445, 59268
-'512, SCC 512', 'mrtc', 'ludcmp', 111415, 59268
-'1024, SCC 1024', 'mrtc', 'ludcmp', 249348, 59268
-'32, SCC 32', 'mrtc', 'matmult', 106613, 104490
-'128, SCC 128', 'mrtc', 'matmult', 106612, 104490
-'192, SCC 192', 'mrtc', 'matmult', 106552, 104490
-'256, SCC 256', 'mrtc', 'matmult', 106561, 104490
-'512, SCC 512', 'mrtc', 'matmult', 104598, 104490
-'1024, SCC 1024', 'mrtc', 'matmult', 104521, 104490
-'32, SCC 32', 'mrtc', 'minmax', 1294, 1032
-'128, SCC 128', 'mrtc', 'minmax', 1261, 1032
-'192, SCC 192', 'mrtc', 'minmax', 1174, 1032
-'256, SCC 256', 'mrtc', 'minmax', 1199, 1032
-'512, SCC 512', 'mrtc', 'minmax', 1154, 1032
-'1024, SCC 1024', 'mrtc', 'minmax', 1077, 1032
-'32, SCC 32', 'mrtc', 'minver', 33821, 17269
-'128, SCC 128', 'mrtc', 'minver', 26976, 17269
-'192, SCC 192', 'mrtc', 'minver', 26658, 17269
-'256, SCC 256', 'mrtc', 'minver', 26210, 17269
-'512, SCC 512', 'mrtc', 'minver', 29081, 17269
-'1024, SCC 1024', 'mrtc', 'minver', 35026, 17269
-'32, SCC 32', 'mrtc', 'ndes', 35484, 34374
-'128, SCC 128', 'mrtc', 'ndes', 35453, 34374
-'192, SCC 192', 'mrtc', 'ndes', 35435, 34374
-'256, SCC 256', 'mrtc', 'ndes', 35349, 34374
-'512, SCC 512', 'mrtc', 'ndes', 35083, 34374
-'1024, SCC 1024', 'mrtc', 'ndes', 35019, 34374
-'32, SCC 32', 'mrtc', 'nsichneu', 48010, 25885
-'128, SCC 128', 'mrtc', 'nsichneu', 38944, 25885
-'192, SCC 192', 'mrtc', 'nsichneu', 42748, 25885
-'256, SCC 256', 'mrtc', 'nsichneu', 30037, 25885
-'512, SCC 512', 'mrtc', 'nsichneu', 39287, 25885
-'1024, SCC 1024', 'mrtc', 'nsichneu', 33938, 25885
-'32, SCC 32', 'mrtc', 'ns', 13255, 9913
-'128, SCC 128', 'mrtc', 'ns', 13254, 9913
-'192, SCC 192', 'mrtc', 'ns', 13194, 9913
-'256, SCC 256', 'mrtc', 'ns', 10035, 9913
-'512, SCC 512', 'mrtc', 'ns', 10021, 9913
-'1024, SCC 1024', 'mrtc', 'ns', 9944, 9913
-'32, SCC 32', 'mrtc', 'exam', 7673, 5492
-'128, SCC 128', 'mrtc', 'exam', 6853, 5492
-'192, SCC 192', 'mrtc', 'exam', 5930, 5492
-'256, SCC 256', 'mrtc', 'exam', 5939, 5492
-'512, SCC 512', 'mrtc', 'exam', 5925, 5492
-'1024, SCC 1024', 'mrtc', 'exam', 5523, 5492
-'32, SCC 32', 'mrtc', 'qurt', 97269, 40065
-'128, SCC 128', 'mrtc', 'qurt', 69988, 40065
-'192, SCC 192', 'mrtc', 'qurt', 67634, 40065
-'256, SCC 256', 'mrtc', 'qurt', 66294, 40065
-'512, SCC 512', 'mrtc', 'qurt', 87722, 40065
-'1024, SCC 1024', 'mrtc', 'qurt', 118981, 40065
-'32, SCC 32', 'mrtc', 'recursion', 4191, 3398
-'128, SCC 128', 'mrtc', 'recursion', 4168, 3398
-'192, SCC 192', 'mrtc', 'recursion', 3518, 3398
-'256, SCC 256', 'mrtc', 'recursion', 3520, 3398
-'512, SCC 512', 'mrtc', 'recursion', 3506, 3398
-'1024, SCC 1024', 'mrtc', 'recursion', 3436, 3398
-'32, SCC 32', 'mrtc', 'select', 7837, 5865
-'128, SCC 128', 'mrtc', 'select', 7025, 5865
-'192, SCC 192', 'mrtc', 'select', 6195, 5865
-'256, SCC 256', 'mrtc', 'select', 6204, 5865
-'512, SCC 512', 'mrtc', 'select', 6190, 5865
-'1024, SCC 1024', 'mrtc', 'select', 5903, 5865
-'32, SCC 32', 'mrtc', 'sqrt', 915, 734
-'128, SCC 128', 'mrtc', 'sqrt', 914, 734
-'192, SCC 192', 'mrtc', 'sqrt', 847, 734
-'256, SCC 256', 'mrtc', 'sqrt', 856, 734
-'512, SCC 512', 'mrtc', 'sqrt', 842, 734
-'1024, SCC 1024', 'mrtc', 'sqrt', 772, 734
-'32, SCC 32', 'mrtc', 'statemate', 624, 624
-'128, SCC 128', 'mrtc', 'statemate', 624, 624
-'192, SCC 192', 'mrtc', 'statemate', 624, 624
-'256, SCC 256', 'mrtc', 'statemate', 1458, 624
-'512, SCC 512', 'mrtc', 'statemate', 624, 624
-'1024, SCC 1024', 'mrtc', 'statemate', 1286, 624
-'32, SCC 32', 'mrtc', 'ud', 15914, 14176
-'128, SCC 128', 'mrtc', 'ud', 15018, 14176
-'192, SCC 192', 'mrtc', 'ud', 14887, 14176
-'256, SCC 256', 'mrtc', 'ud', 15043, 14176
-'512, SCC 512', 'mrtc', 'ud', 15074, 14176
-'1024, SCC 1024', 'mrtc', 'ud', 25107, 14176
-'128, SCC 2048', 'coremark', 'coremark', 6926108, 6063828
-'256, SCC 2048', 'coremark', 'coremark', 6886961, 6063828
-'512, SCC 2048', 'coremark', 'coremark', 6903015, 6063828
-'128, SCC 2048', 'mibench', 'basicmath_tiny', 54199382, 38166966
-'256, SCC 2048', 'mibench', 'basicmath_tiny', 58836710, 38166966
-'512, SCC 2048', 'mibench', 'basicmath_tiny', 69366680, 38166966
-'128, SCC 2048', 'mibench', 'bitcnts', 50973607, 50949460
-'256, SCC 2048', 'mibench', 'bitcnts', 50975942, 50949460
-'512, SCC 2048', 'mibench', 'bitcnts', 50985994, 50949460
-'128, SCC 2048', 'mibench', 'cjpeg_small', 62964479, 58603241
-'256, SCC 2048', 'mibench', 'cjpeg_small', 62258485, 58603241
-'512, SCC 2048', 'mibench', 'cjpeg_small', 60822236, 58603241
-'128, SCC 2048', 'mibench', 'crc_32', 24501602, 21737039
-'256, SCC 2048', 'mibench', 'crc_32', 24840469, 21737039
-'512, SCC 2048', 'mibench', 'crc_32', 22782526, 21737039
-'128, SCC 2048', 'mibench', 'csusan_small', 4787931, 3354992
-'256, SCC 2048', 'mibench', 'csusan_small', 4507765, 3354992
-'512, SCC 2048', 'mibench', 'csusan_small', 4826316, 3354992
-'128, SCC 2048', 'mibench', 'dbf', 88254532, 83010154
-'256, SCC 2048', 'mibench', 'dbf', 87736396, 83010154
-'512, SCC 2048', 'mibench', 'dbf', 85861847, 83010154
-'128, SCC 2048', 'mibench', 'dijkstra_small', 87530226, 80760884
-'256, SCC 2048', 'mibench', 'dijkstra_small', 87230946, 80760884
-'512, SCC 2048', 'mibench', 'dijkstra_small', 87178443, 80760884
-'128, SCC 2048', 'mibench', 'djpeg_small', 17411955, 16223579
-'256, SCC 2048', 'mibench', 'djpeg_small', 17308733, 16223579
-'512, SCC 2048', 'mibench', 'djpeg_small', 17289649, 16223579
-'128, SCC 2048', 'mibench', 'drijndael', 146512417, 130041179
-'256, SCC 2048', 'mibench', 'drijndael', 146541891, 130041179
-'512, SCC 2048', 'mibench', 'drijndael', 143631787, 130041179
-'128, SCC 2048', 'mibench', 'ebf', 90633813, 83610988
-'256, SCC 2048', 'mibench', 'ebf', 90053728, 83610988
-'512, SCC 2048', 'mibench', 'ebf', 88184969, 83610988
-'128, SCC 2048', 'mibench', 'erijndael', 154150763, 136057403
-'256, SCC 2048', 'mibench', 'erijndael', 156623131, 136057403
-'512, SCC 2048', 'mibench', 'erijndael', 154370761, 136057403
-'128, SCC 2048', 'mibench', 'esusan_small', 8515476, 6557356
-'256, SCC 2048', 'mibench', 'esusan_small', 8154560, 6557356
-'512, SCC 2048', 'mibench', 'esusan_small', 9094180, 6557356
-'128, SCC 2048', 'mibench', 'fft_tiny', 15091183, 10205207
-'256, SCC 2048', 'mibench', 'fft_tiny', 15466724, 10205207
-'512, SCC 2048', 'mibench', 'fft_tiny', 19655438, 10205207
-'128, SCC 2048', 'mibench', 'ifft_tiny', 14778470, 9898104
-'256, SCC 2048', 'mibench', 'ifft_tiny', 15229581, 9898104
-'512, SCC 2048', 'mibench', 'ifft_tiny', 19211950, 9898104
-'128, SCC 2048', 'mibench', 'patricia', 328304310, 257824774
-'256, SCC 2048', 'mibench', 'patricia', 315802110, 257824774
-'512, SCC 2048', 'mibench', 'patricia', 331157874, 257824774
-'128, SCC 2048', 'mibench', 'qsort_small', 79066631, 55937012
-'256, SCC 2048', 'mibench', 'qsort_small', 78591785, 55937012
-'512, SCC 2048', 'mibench', 'qsort_small', 85951235, 55937012
-'128, SCC 2048', 'mibench', 'rawcaudio', 86697293, 73413564
-'256, SCC 2048', 'mibench', 'rawcaudio', 86725116, 73413564
-'512, SCC 2048', 'mibench', 'rawcaudio', 86697221, 73413564
-'128, SCC 2048', 'mibench', 'rawdaudio', 65526924, 55339362
-'256, SCC 2048', 'mibench', 'rawdaudio', 65604286, 55339362
-'512, SCC 2048', 'mibench', 'rawdaudio', 65526852, 55339362
-'128, SCC 2048', 'mibench', 'rsynth_tiny', 81090526, 58506148
-'256, SCC 2048', 'mibench', 'rsynth_tiny', 75602621, 58506148
-'512, SCC 2048', 'mibench', 'rsynth_tiny', 97657101, 58506148
-'128, SCC 2048', 'mibench', 'search_large', 25754083, 16900265
-'256, SCC 2048', 'mibench', 'search_large', 26487747, 16900265
-'512, SCC 2048', 'mibench', 'search_large', 29231070, 16900265
-'128, SCC 2048', 'mibench', 'search_small', 1023282, 673686
-'256, SCC 2048', 'mibench', 'search_small', 1048758, 673686
-'512, SCC 2048', 'mibench', 'search_small', 1165166, 673686
-'128, SCC 2048', 'mibench', 'sha', 26376334, 24034442
-'256, SCC 2048', 'mibench', 'sha', 26043776, 24034442
-'512, SCC 2048', 'mibench', 'sha', 24135101, 24034442
-'128, SCC 2048', 'mibench', 'ssusan_small', 36955706, 34167002
-'256, SCC 2048', 'mibench', 'ssusan_small', 36612050, 34167002
-'512, SCC 2048', 'mibench', 'ssusan_small', 37336267, 34167002
-'128, SCC 2048', 'mrtc', 'adpcm', 2243377, 2237731
-'256, SCC 2048', 'mrtc', 'adpcm', 2243430, 2237731
-'512, SCC 2048', 'mrtc', 'adpcm', 2243597, 2237731
-'128, SCC 2048', 'mrtc', 'bsort100', 207489, 177370
-'256, SCC 2048', 'mrtc', 'bsort100', 207438, 177370
-'512, SCC 2048', 'mrtc', 'bsort100', 177478, 177370
-'128, SCC 2048', 'mrtc', 'bs', 1009, 836
-'256, SCC 2048', 'mrtc', 'bs', 958, 836
-'512, SCC 2048', 'mrtc', 'bs', 944, 836
-'128, SCC 2048', 'mrtc', 'cnt', 4395, 4215
-'256, SCC 2048', 'mrtc', 'cnt', 4344, 4215
-'512, SCC 2048', 'mrtc', 'cnt', 4330, 4215
-'128, SCC 2048', 'mrtc', 'compress', 8183, 7314
-'256, SCC 2048', 'mrtc', 'compress', 8132, 7314
-'512, SCC 2048', 'mrtc', 'compress', 8118, 7314
-'128, SCC 2048', 'mrtc', 'cover', 2136, 1816
-'256, SCC 2048', 'mrtc', 'cover', 2035, 1816
-'512, SCC 2048', 'mrtc', 'cover', 1952, 1816
-'128, SCC 2048', 'mrtc', 'crc', 15710, 15468
-'256, SCC 2048', 'mrtc', 'crc', 15632, 15468
-'512, SCC 2048', 'mrtc', 'crc', 15597, 15468
-'128, SCC 2048', 'mrtc', 'duff', 1422, 1249
-'256, SCC 2048', 'mrtc', 'duff', 1371, 1249
-'512, SCC 2048', 'mrtc', 'duff', 1357, 1249
-'128, SCC 2048', 'mrtc', 'edn', 49887, 49161
-'256, SCC 2048', 'mrtc', 'edn', 49770, 49161
-'512, SCC 2048', 'mrtc', 'edn', 49756, 49161
-'128, SCC 2048', 'mrtc', 'expint', 78165, 77678
-'256, SCC 2048', 'mrtc', 'expint', 77800, 77678
-'512, SCC 2048', 'mrtc', 'expint', 77786, 77678
-'128, SCC 2048', 'mrtc', 'fac', 907, 734
-'256, SCC 2048', 'mrtc', 'fac', 856, 734
-'512, SCC 2048', 'mrtc', 'fac', 842, 734
-'128, SCC 2048', 'mrtc', 'fdct', 3369, 3182
-'256, SCC 2048', 'mrtc', 'fdct', 3318, 3182
-'512, SCC 2048', 'mrtc', 'fdct', 3304, 3182
-'128, SCC 2048', 'mrtc', 'fft1', 161306, 78616
-'256, SCC 2048', 'mrtc', 'fft1', 153063, 78616
-'512, SCC 2048', 'mrtc', 'fft1', 171344, 78616
-'128, SCC 2048', 'mrtc', 'fibcall', 907, 734
-'256, SCC 2048', 'mrtc', 'fibcall', 856, 734
-'512, SCC 2048', 'mrtc', 'fibcall', 842, 734
-'128, SCC 2048', 'mrtc', 'fir', 3101, 2833
-'256, SCC 2048', 'mrtc', 'fir', 3050, 2833
-'512, SCC 2048', 'mrtc', 'fir', 2941, 2833
-'128, SCC 2048', 'mrtc', 'insertsort', 2403, 2117
-'256, SCC 2048', 'mrtc', 'insertsort', 2352, 2117
-'512, SCC 2048', 'mrtc', 'insertsort', 2225, 2117
-'128, SCC 2048', 'mrtc', 'janne_complex', 1235, 1020
-'256, SCC 2048', 'mrtc', 'janne_complex', 1135, 1020
-'512, SCC 2048', 'mrtc', 'janne_complex', 1121, 1020
-'128, SCC 2048', 'mrtc', 'jfdctint', 5112, 4932
-'256, SCC 2048', 'mrtc', 'jfdctint', 5061, 4932
-'512, SCC 2048', 'mrtc', 'jfdctint', 5047, 4932
-'128, SCC 2048', 'mrtc', 'lcdnum', 1399, 1119
-'256, SCC 2048', 'mrtc', 'lcdnum', 1348, 1119
-'512, SCC 2048', 'mrtc', 'lcdnum', 1269, 1119
-'128, SCC 2048', 'mrtc', 'lms', 16115223, 9737989
-'256, SCC 2048', 'mrtc', 'lms', 16031713, 9737989
-'512, SCC 2048', 'mrtc', 'lms', 17865582, 9737989
-'128, SCC 2048', 'mrtc', 'loop3', 907, 734
-'256, SCC 2048', 'mrtc', 'loop3', 856, 734
-'512, SCC 2048', 'mrtc', 'loop3', 842, 734
-'128, SCC 2048', 'mrtc', 'ludcmp', 90883, 59268
-'256, SCC 2048', 'mrtc', 'ludcmp', 97445, 59268
-'512, SCC 2048', 'mrtc', 'ludcmp', 111415, 59268
-'128, SCC 2048', 'mrtc', 'matmult', 106612, 104490
-'256, SCC 2048', 'mrtc', 'matmult', 106561, 104490
-'512, SCC 2048', 'mrtc', 'matmult', 104598, 104490
-'128, SCC 2048', 'mrtc', 'minmax', 1261, 1032
-'256, SCC 2048', 'mrtc', 'minmax', 1199, 1032
-'512, SCC 2048', 'mrtc', 'minmax', 1154, 1032
-'128, SCC 2048', 'mrtc', 'minver', 26976, 17269
-'256, SCC 2048', 'mrtc', 'minver', 26210, 17269
-'512, SCC 2048', 'mrtc', 'minver', 29081, 17269
-'128, SCC 2048', 'mrtc', 'ndes', 35683, 34374
-'256, SCC 2048', 'mrtc', 'ndes', 35565, 34374
-'512, SCC 2048', 'mrtc', 'ndes', 35299, 34374
-'128, SCC 2048', 'mrtc', 'nsichneu', 38944, 25885
-'256, SCC 2048', 'mrtc', 'nsichneu', 30037, 25885
-'512, SCC 2048', 'mrtc', 'nsichneu', 39287, 25885
-'128, SCC 2048', 'mrtc', 'ns', 13254, 9913
-'256, SCC 2048', 'mrtc', 'ns', 10035, 9913
-'512, SCC 2048', 'mrtc', 'ns', 10021, 9913
-'128, SCC 2048', 'mrtc', 'exam', 6853, 5492
-'256, SCC 2048', 'mrtc', 'exam', 5939, 5492
-'512, SCC 2048', 'mrtc', 'exam', 5925, 5492
-'128, SCC 2048', 'mrtc', 'qurt', 69988, 40065
-'256, SCC 2048', 'mrtc', 'qurt', 66294, 40065
-'512, SCC 2048', 'mrtc', 'qurt', 87722, 40065
-'128, SCC 2048', 'mrtc', 'recursion', 4168, 3398
-'256, SCC 2048', 'mrtc', 'recursion', 3520, 3398
-'512, SCC 2048', 'mrtc', 'recursion', 3506, 3398
-'128, SCC 2048', 'mrtc', 'select', 7025, 5865
-'256, SCC 2048', 'mrtc', 'select', 6204, 5865
-'512, SCC 2048', 'mrtc', 'select', 6190, 5865
-'128, SCC 2048', 'mrtc', 'sqrt', 907, 734
-'256, SCC 2048', 'mrtc', 'sqrt', 856, 734
-'512, SCC 2048', 'mrtc', 'sqrt', 842, 734
-'128, SCC 2048', 'mrtc', 'statemate', 624, 624
-'256, SCC 2048', 'mrtc', 'statemate', 624, 624
-'512, SCC 2048', 'mrtc', 'statemate', 624, 624
-'128, SCC 2048', 'mrtc', 'ud', 15059, 14176
-'256, SCC 2048', 'mrtc', 'ud', 15097, 14176
-'512, SCC 2048', 'mrtc', 'ud', 15074, 14176
+"32/32", "coremark", "coremark", 7053377, 6063828
+"128/128", "coremark", "coremark", 6796402, 6063828
+"192/192", "coremark", "coremark", 6651580, 6063828
+"256/256", "coremark", "coremark", 6621688, 6063828
+"512/512", "coremark", "coremark", 6720793, 6063828
+"1024/1024", "coremark", "coremark", 6473834, 6063828
+"32/32", "mibench", "basicmath_tiny", 89553193, 38166966
+"128/128", "mibench", "basicmath_tiny", 54198817, 38166966
+"192/192", "mibench", "basicmath_tiny", 53053137, 38166966
+"256/256", "mibench", "basicmath_tiny", 58883715, 38166966
+"512/512", "mibench", "basicmath_tiny", 69406769, 38166966
+"1024/1024", "mibench", "basicmath_tiny", 110605812, 38166966
+"32/32", "mibench", "bitcnts", 56008162, 50949460
+"128/128", "mibench", "bitcnts", 50973733, 50949460
+"192/192", "mibench", "bitcnts", 50978122, 50949460
+"256/256", "mibench", "bitcnts", 50976145, 50949460
+"512/512", "mibench", "bitcnts", 50985952, 50949460
+"1024/1024", "mibench", "bitcnts", 50998988, 50949460
+"32/32", "mibench", "cjpeg_small", 63446003, 58603241
+"128/128", "mibench", "cjpeg_small", 63157920, 58603241
+"192/192", "mibench", "cjpeg_small", 62215219, 58603241
+"256/256", "mibench", "cjpeg_small", 62248040, 58603241
+"512/512", "mibench", "cjpeg_small", 60856200, 58603241
+"1024/1024", "mibench", "cjpeg_small", 59024247, 58603241
+"32/32", "mibench", "crc_32", 24848468, 21737039
+"128/128", "mibench", "crc_32", 24501896, 21737039
+"192/192", "mibench", "crc_32", 24838179, 21737039
+"256/256", "mibench", "crc_32", 24838551, 21737039
+"512/512", "mibench", "crc_32", 22782022, 21737039
+"1024/1024", "mibench", "crc_32", 22439409, 21737039
+"32/32", "mibench", "csusan_small", 5859034, 3354992
+"128/128", "mibench", "csusan_small", 4787895, 3354992
+"192/192", "mibench", "csusan_small", 4583701, 3354992
+"256/256", "mibench", "csusan_small", 4507646, 3354992
+"512/512", "mibench", "csusan_small", 4826293, 3354992
+"1024/1024", "mibench", "csusan_small", 7200683, 3354992
+"32/32", "mibench", "dbf", 89235093, 83010154
+"128/128", "mibench", "dbf", 88281981, 83010154
+"192/192", "mibench", "dbf", 88992109, 83010154
+"256/256", "mibench", "dbf", 87736283, 83010154
+"512/512", "mibench", "dbf", 85861854, 83010154
+"1024/1024", "mibench", "dbf", 84452454, 83010154
+"32/32", "mibench", "dijkstra_small", 104376776, 80760884
+"128/128", "mibench", "dijkstra_small", 87568086, 80760884
+"192/192", "mibench", "dijkstra_small", 87527092, 80760884
+"256/256", "mibench", "dijkstra_small", 87224749, 80760884
+"512/512", "mibench", "dijkstra_small", 87178842, 80760884
+"1024/1024", "mibench", "dijkstra_small", 88120963, 80760884
+"32/32", "mibench", "djpeg_small", 18373968, 16223579
+"128/128", "mibench", "djpeg_small", 17437588, 16223579
+"192/192", "mibench", "djpeg_small", 17982419, 16223579
+"256/256", "mibench", "djpeg_small", 17316598, 16223579
+"512/512", "mibench", "djpeg_small", 17296859, 16223579
+"1024/1024", "mibench", "djpeg_small", 17442629, 16223579
+"32/32", "mibench", "drijndael", 151791958, 130041179
+"128/128", "mibench", "drijndael", 146513320, 130041179
+"192/192", "mibench", "drijndael", 146989004, 130041179
+"256/256", "mibench", "drijndael", 146537646, 130041179
+"512/512", "mibench", "drijndael", 143628084, 130041179
+"1024/1024", "mibench", "drijndael", 154354427, 130041179
+"32/32", "mibench", "ebf", 91660829, 83610988
+"128/128", "mibench", "ebf", 90659624, 83610988
+"192/192", "mibench", "ebf", 91327805, 83610988
+"256/256", "mibench", "ebf", 90053615, 83610988
+"512/512", "mibench", "ebf", 88184976, 83610988
+"1024/1024", "mibench", "ebf", 86954129, 83610988
+"32/32", "mibench", "erijndael", 159669845, 136057403
+"128/128", "mibench", "erijndael", 154141747, 136057403
+"192/192", "mibench", "erijndael", 154366592, 136057403
+"256/256", "mibench", "erijndael", 156622911, 136057403
+"512/512", "mibench", "erijndael", 154374156, 136057403
+"1024/1024", "mibench", "erijndael", 168140905, 136057403
+"32/32", "mibench", "esusan_small", 10221564, 6557356
+"128/128", "mibench", "esusan_small", 8514604, 6557356
+"192/192", "mibench", "esusan_small", 8370752, 6557356
+"256/256", "mibench", "esusan_small", 8167780, 6557356
+"512/512", "mibench", "esusan_small", 9107745, 6557356
+"1024/1024", "mibench", "esusan_small", 11712794, 6557356
+"32/32", "mibench", "fft_tiny", 27820119, 10205207
+"128/128", "mibench", "fft_tiny", 14730689, 10205207
+"192/192", "mibench", "fft_tiny", 14729510, 10205207
+"256/256", "mibench", "fft_tiny", 15466664, 10205207
+"512/512", "mibench", "fft_tiny", 19655429, 10205207
+"1024/1024", "mibench", "fft_tiny", 34306203, 10205207
+"32/32", "mibench", "ifft_tiny", 26813055, 9898104
+"128/128", "mibench", "ifft_tiny", 14419398, 9898104
+"192/192", "mibench", "ifft_tiny", 14440100, 9898104
+"256/256", "mibench", "ifft_tiny", 15229676, 9898104
+"512/512", "mibench", "ifft_tiny", 19211856, 9898104
+"1024/1024", "mibench", "ifft_tiny", 33024513, 9898104
+"32/32", "mibench", "patricia", 346270848, 257824774
+"128/128", "mibench", "patricia", 327995666, 257824774
+"192/192", "mibench", "patricia", 332488489, 257824774
+"256/256", "mibench", "patricia", 316140819, 257824774
+"512/512", "mibench", "patricia", 331484361, 257824774
+"1024/1024", "mibench", "patricia", 363722295, 257824774
+"32/32", "mibench", "qsort_small", 81404020, 55937012
+"128/128", "mibench", "qsort_small", 79005978, 55937012
+"192/192", "mibench", "qsort_small", 81135478, 55937012
+"256/256", "mibench", "qsort_small", 79656533, 55937012
+"512/512", "mibench", "qsort_small", 85640006, 55937012
+"1024/1024", "mibench", "qsort_small", 90820200, 55937012
+"32/32", "mibench", "rawcaudio", 86700297, 73413564
+"128/128", "mibench", "rawcaudio", 86697293, 73413564
+"192/192", "mibench", "rawcaudio", 86697226, 73413564
+"256/256", "mibench", "rawcaudio", 86700238, 73413564
+"512/512", "mibench", "rawcaudio", 86697221, 73413564
+"1024/1024", "mibench", "rawcaudio", 86697144, 73413564
+"32/32", "mibench", "rawdaudio", 65526925, 55339362
+"128/128", "mibench", "rawdaudio", 65526924, 55339362
+"192/192", "mibench", "rawdaudio", 65526857, 55339362
+"256/256", "mibench", "rawdaudio", 65587346, 55339362
+"512/512", "mibench", "rawdaudio", 65526852, 55339362
+"1024/1024", "mibench", "rawdaudio", 65526775, 55339362
+"32/32", "mibench", "rsynth_tiny", 131675592, 58506148
+"128/128", "mibench", "rsynth_tiny", 81089571, 58506148
+"192/192", "mibench", "rsynth_tiny", 77451165, 58506148
+"256/256", "mibench", "rsynth_tiny", 75605169, 58506148
+"512/512", "mibench", "rsynth_tiny", 97656759, 58506148
+"1024/1024", "mibench", "rsynth_tiny", 126220571, 58506148
+"32/32", "mibench", "search_large", 26654289, 16900265
+"128/128", "mibench", "search_large", 25568371, 16900265
+"192/192", "mibench", "search_large", 26416485, 16900265
+"256/256", "mibench", "search_large", 26302405, 16900265
+"512/512", "mibench", "search_large", 29146059, 16900265
+"1024/1024", "mibench", "search_large", 30866594, 16900265
+"32/32", "mibench", "search_small", 1058187, 673686
+"128/128", "mibench", "search_small", 1016593, 673686
+"192/192", "mibench", "search_small", 1052311, 673686
+"256/256", "mibench", "search_small", 1042347, 673686
+"512/512", "mibench", "search_small", 1162064, 673686
+"1024/1024", "mibench", "search_small", 1240425, 673686
+"32/32", "mibench", "sha", 26381142, 24034442
+"128/128", "mibench", "sha", 26374514, 24034442
+"192/192", "mibench", "sha", 26366640, 24034442
+"256/256", "mibench", "sha", 26044336, 24034442
+"512/512", "mibench", "sha", 24134821, 24034442
+"1024/1024", "mibench", "sha", 24203446, 24034442
+"32/32", "mibench", "ssusan_small", 41395775, 34167002
+"128/128", "mibench", "ssusan_small", 36956144, 34167002
+"192/192", "mibench", "ssusan_small", 36709124, 34167002
+"256/256", "mibench", "ssusan_small", 36612306, 34167002
+"512/512", "mibench", "ssusan_small", 37335891, 34167002
+"1024/1024", "mibench", "ssusan_small", 48283062, 34167002
+"32/32", "mrtc", "adpcm", 2243378, 2237731
+"128/128", "mrtc", "adpcm", 2243377, 2237731
+"192/192", "mrtc", "adpcm", 2243317, 2237731
+"256/256", "mrtc", "adpcm", 2243430, 2237731
+"512/512", "mrtc", "adpcm", 2243597, 2237731
+"1024/1024", "mrtc", "adpcm", 2243581, 2237731
+"32/32", "mrtc", "bsort100", 207483, 177370
+"128/128", "mrtc", "bsort100", 207489, 177370
+"192/192", "mrtc", "bsort100", 207429, 177370
+"256/256", "mrtc", "bsort100", 207438, 177370
+"512/512", "mrtc", "bsort100", 177478, 177370
+"1024/1024", "mrtc", "bsort100", 177408, 177370
+"32/32", "mrtc", "bs", 1054, 836
+"128/128", "mrtc", "bs", 1016, 836
+"192/192", "mrtc", "bs", 949, 836
+"256/256", "mrtc", "bs", 958, 836
+"512/512", "mrtc", "bs", 944, 836
+"1024/1024", "mrtc", "bs", 874, 836
+"32/32", "mrtc", "cnt", 4389, 4215
+"128/128", "mrtc", "cnt", 4395, 4215
+"192/192", "mrtc", "cnt", 4335, 4215
+"256/256", "mrtc", "cnt", 4344, 4215
+"512/512", "mrtc", "cnt", 4330, 4215
+"1024/1024", "mrtc", "cnt", 4246, 4215
+"32/32", "mrtc", "compress", 8184, 7314
+"128/128", "mrtc", "compress", 8183, 7314
+"192/192", "mrtc", "compress", 8123, 7314
+"256/256", "mrtc", "compress", 8132, 7314
+"512/512", "mrtc", "compress", 8118, 7314
+"1024/1024", "mrtc", "compress", 8041, 7314
+"32/32", "mrtc", "cover", 2137, 1816
+"128/128", "mrtc", "cover", 2136, 1816
+"192/192", "mrtc", "cover", 2076, 1816
+"256/256", "mrtc", "cover", 2035, 1816
+"512/512", "mrtc", "cover", 1952, 1816
+"1024/1024", "mrtc", "cover", 1875, 1816
+"32/32", "mrtc", "crc", 15706, 15468
+"128/128", "mrtc", "crc", 15710, 15468
+"192/192", "mrtc", "crc", 15623, 15468
+"256/256", "mrtc", "crc", 15632, 15468
+"512/512", "mrtc", "crc", 15597, 15468
+"1024/1024", "mrtc", "crc", 15499, 15468
+"32/32", "mrtc", "duff", 1430, 1249
+"128/128", "mrtc", "duff", 1429, 1249
+"192/192", "mrtc", "duff", 1362, 1249
+"256/256", "mrtc", "duff", 1371, 1249
+"512/512", "mrtc", "duff", 1357, 1249
+"1024/1024", "mrtc", "duff", 1287, 1249
+"32/32", "mrtc", "edn", 49860, 49161
+"128/128", "mrtc", "edn", 49864, 49161
+"192/192", "mrtc", "edn", 49804, 49161
+"256/256", "mrtc", "edn", 49747, 49161
+"512/512", "mrtc", "edn", 49733, 49161
+"1024/1024", "mrtc", "edn", 49666, 49161
+"32/32", "mrtc", "expint", 78166, 77678
+"128/128", "mrtc", "expint", 78165, 77678
+"192/192", "mrtc", "expint", 78105, 77678
+"256/256", "mrtc", "expint", 77800, 77678
+"512/512", "mrtc", "expint", 77786, 77678
+"1024/1024", "mrtc", "expint", 77716, 77678
+"32/32", "mrtc", "fac", 915, 734
+"128/128", "mrtc", "fac", 914, 734
+"192/192", "mrtc", "fac", 847, 734
+"256/256", "mrtc", "fac", 856, 734
+"512/512", "mrtc", "fac", 842, 734
+"1024/1024", "mrtc", "fac", 772, 734
+"32/32", "mrtc", "fdct", 3356, 3182
+"128/128", "mrtc", "fdct", 3369, 3182
+"192/192", "mrtc", "fdct", 3309, 3182
+"256/256", "mrtc", "fdct", 3318, 3182
+"512/512", "mrtc", "fdct", 3304, 3182
+"1024/1024", "mrtc", "fdct", 3213, 3182
+"32/32", "mrtc", "fft1", 200755, 78616
+"128/128", "mrtc", "fft1", 161306, 78616
+"192/192", "mrtc", "fft1", 157084, 78616
+"256/256", "mrtc", "fft1", 153063, 78616
+"512/512", "mrtc", "fft1", 171344, 78616
+"1024/1024", "mrtc", "fft1", 222811, 78616
+"32/32", "mrtc", "fibcall", 915, 734
+"128/128", "mrtc", "fibcall", 914, 734
+"192/192", "mrtc", "fibcall", 847, 734
+"256/256", "mrtc", "fibcall", 856, 734
+"512/512", "mrtc", "fibcall", 842, 734
+"1024/1024", "mrtc", "fibcall", 772, 734
+"32/32", "mrtc", "fir", 3102, 2833
+"128/128", "mrtc", "fir", 3101, 2833
+"192/192", "mrtc", "fir", 3041, 2833
+"256/256", "mrtc", "fir", 3050, 2833
+"512/512", "mrtc", "fir", 2941, 2833
+"1024/1024", "mrtc", "fir", 2864, 2833
+"32/32", "mrtc", "insertsort", 2404, 2117
+"128/128", "mrtc", "insertsort", 2403, 2117
+"192/192", "mrtc", "insertsort", 2343, 2117
+"256/256", "mrtc", "insertsort", 2352, 2117
+"512/512", "mrtc", "insertsort", 2225, 2117
+"1024/1024", "mrtc", "insertsort", 2148, 2117
+"32/32", "mrtc", "janne_complex", 1243, 1020
+"128/128", "mrtc", "janne_complex", 1242, 1020
+"192/192", "mrtc", "janne_complex", 1126, 1020
+"256/256", "mrtc", "janne_complex", 1135, 1020
+"512/512", "mrtc", "janne_complex", 1121, 1020
+"1024/1024", "mrtc", "janne_complex", 1051, 1020
+"32/32", "mrtc", "jfdctint", 5106, 4932
+"128/128", "mrtc", "jfdctint", 5112, 4932
+"192/192", "mrtc", "jfdctint", 5052, 4932
+"256/256", "mrtc", "jfdctint", 5061, 4932
+"512/512", "mrtc", "jfdctint", 5047, 4932
+"1024/1024", "mrtc", "jfdctint", 4963, 4932
+"32/32", "mrtc", "lcdnum", 1400, 1119
+"128/128", "mrtc", "lcdnum", 1399, 1119
+"192/192", "mrtc", "lcdnum", 1339, 1119
+"256/256", "mrtc", "lcdnum", 1348, 1119
+"512/512", "mrtc", "lcdnum", 1269, 1119
+"1024/1024", "mrtc", "lcdnum", 1192, 1119
+"32/32", "mrtc", "lms", 20258251, 9737989
+"128/128", "mrtc", "lms", 16115223, 9737989
+"192/192", "mrtc", "lms", 15709504, 9737989
+"256/256", "mrtc", "lms", 16031713, 9737989
+"512/512", "mrtc", "lms", 17865582, 9737989
+"1024/1024", "mrtc", "lms", 22029672, 9737989
+"32/32", "mrtc", "loop3", 915, 734
+"128/128", "mrtc", "loop3", 914, 734
+"192/192", "mrtc", "loop3", 847, 734
+"256/256", "mrtc", "loop3", 856, 734
+"512/512", "mrtc", "loop3", 842, 734
+"1024/1024", "mrtc", "loop3", 772, 734
+"32/32", "mrtc", "ludcmp", 207720, 59268
+"128/128", "mrtc", "ludcmp", 90883, 59268
+"192/192", "mrtc", "ludcmp", 94961, 59268
+"256/256", "mrtc", "ludcmp", 97445, 59268
+"512/512", "mrtc", "ludcmp", 111415, 59268
+"1024/1024", "mrtc", "ludcmp", 249348, 59268
+"32/32", "mrtc", "matmult", 106613, 104490
+"128/128", "mrtc", "matmult", 106612, 104490
+"192/192", "mrtc", "matmult", 106552, 104490
+"256/256", "mrtc", "matmult", 106561, 104490
+"512/512", "mrtc", "matmult", 104598, 104490
+"1024/1024", "mrtc", "matmult", 104521, 104490
+"32/32", "mrtc", "minmax", 1294, 1032
+"128/128", "mrtc", "minmax", 1261, 1032
+"192/192", "mrtc", "minmax", 1174, 1032
+"256/256", "mrtc", "minmax", 1199, 1032
+"512/512", "mrtc", "minmax", 1154, 1032
+"1024/1024", "mrtc", "minmax", 1077, 1032
+"32/32", "mrtc", "minver", 33821, 17269
+"128/128", "mrtc", "minver", 26976, 17269
+"192/192", "mrtc", "minver", 26658, 17269
+"256/256", "mrtc", "minver", 26210, 17269
+"512/512", "mrtc", "minver", 29081, 17269
+"1024/1024", "mrtc", "minver", 35026, 17269
+"32/32", "mrtc", "ndes", 35484, 34374
+"128/128", "mrtc", "ndes", 35453, 34374
+"192/192", "mrtc", "ndes", 35435, 34374
+"256/256", "mrtc", "ndes", 35349, 34374
+"512/512", "mrtc", "ndes", 35083, 34374
+"1024/1024", "mrtc", "ndes", 35019, 34374
+"32/32", "mrtc", "nsichneu", 48010, 25885
+"128/128", "mrtc", "nsichneu", 38944, 25885
+"192/192", "mrtc", "nsichneu", 42748, 25885
+"256/256", "mrtc", "nsichneu", 30037, 25885
+"512/512", "mrtc", "nsichneu", 39287, 25885
+"1024/1024", "mrtc", "nsichneu", 33938, 25885
+"32/32", "mrtc", "ns", 13255, 9913
+"128/128", "mrtc", "ns", 13254, 9913
+"192/192", "mrtc", "ns", 13194, 9913
+"256/256", "mrtc", "ns", 10035, 9913
+"512/512", "mrtc", "ns", 10021, 9913
+"1024/1024", "mrtc", "ns", 9944, 9913
+"32/32", "mrtc", "exam", 7673, 5492
+"128/128", "mrtc", "exam", 6853, 5492
+"192/192", "mrtc", "exam", 5930, 5492
+"256/256", "mrtc", "exam", 5939, 5492
+"512/512", "mrtc", "exam", 5925, 5492
+"1024/1024", "mrtc", "exam", 5523, 5492
+"32/32", "mrtc", "qurt", 97269, 40065
+"128/128", "mrtc", "qurt", 69988, 40065
+"192/192", "mrtc", "qurt", 67634, 40065
+"256/256", "mrtc", "qurt", 66294, 40065
+"512/512", "mrtc", "qurt", 87722, 40065
+"1024/1024", "mrtc", "qurt", 118981, 40065
+"32/32", "mrtc", "recursion", 4191, 3398
+"128/128", "mrtc", "recursion", 4168, 3398
+"192/192", "mrtc", "recursion", 3518, 3398
+"256/256", "mrtc", "recursion", 3520, 3398
+"512/512", "mrtc", "recursion", 3506, 3398
+"1024/1024", "mrtc", "recursion", 3436, 3398
+"32/32", "mrtc", "select", 7837, 5865
+"128/128", "mrtc", "select", 7025, 5865
+"192/192", "mrtc", "select", 6195, 5865
+"256/256", "mrtc", "select", 6204, 5865
+"512/512", "mrtc", "select", 6190, 5865
+"1024/1024", "mrtc", "select", 5903, 5865
+"32/32", "mrtc", "sqrt", 915, 734
+"128/128", "mrtc", "sqrt", 914, 734
+"192/192", "mrtc", "sqrt", 847, 734
+"256/256", "mrtc", "sqrt", 856, 734
+"512/512", "mrtc", "sqrt", 842, 734
+"1024/1024", "mrtc", "sqrt", 772, 734
+"32/32", "mrtc", "statemate", 624, 624
+"128/128", "mrtc", "statemate", 624, 624
+"192/192", "mrtc", "statemate", 624, 624
+"256/256", "mrtc", "statemate", 1458, 624
+"512/512", "mrtc", "statemate", 624, 624
+"1024/1024", "mrtc", "statemate", 1286, 624
+"32/32", "mrtc", "ud", 15914, 14176
+"128/128", "mrtc", "ud", 15018, 14176
+"192/192", "mrtc", "ud", 14887, 14176
+"256/256", "mrtc", "ud", 15043, 14176
+"512/512", "mrtc", "ud", 15074, 14176
+"1024/1024", "mrtc", "ud", 25107, 14176
+"128/2048", "coremark", "coremark", 6926108, 6063828
+"192/2048", "coremark", "coremark", 6911397, 6063828
+"256/2048", "coremark", "coremark", 6886961, 6063828
+"512/2048", "coremark", "coremark", 6903015, 6063828
+"128/2048", "mibench", "basicmath_tiny", 54199382, 38166966
+"192/2048", "mibench", "basicmath_tiny", 53056854, 38166966
+"256/2048", "mibench", "basicmath_tiny", 58836710, 38166966
+"512/2048", "mibench", "basicmath_tiny", 69366680, 38166966
+"128/2048", "mibench", "bitcnts", 50973607, 50949460
+"192/2048", "mibench", "bitcnts", 50978136, 50949460
+"256/2048", "mibench", "bitcnts", 50975942, 50949460
+"512/2048", "mibench", "bitcnts", 50985994, 50949460
+"128/2048", "mibench", "cjpeg_small", 62964479, 58603241
+"192/2048", "mibench", "cjpeg_small", 62280777, 58603241
+"256/2048", "mibench", "cjpeg_small", 62258485, 58603241
+"512/2048", "mibench", "cjpeg_small", 60822236, 58603241
+"128/2048", "mibench", "crc_32", 24501602, 21737039
+"192/2048", "mibench", "crc_32", 24840146, 21737039
+"256/2048", "mibench", "crc_32", 24840469, 21737039
+"512/2048", "mibench", "crc_32", 22782526, 21737039
+"128/2048", "mibench", "csusan_small", 4787931, 3354992
+"192/2048", "mibench", "csusan_small", 4583802, 3354992
+"256/2048", "mibench", "csusan_small", 4507765, 3354992
+"512/2048", "mibench", "csusan_small", 4826316, 3354992
+"128/2048", "mibench", "dbf", 88254532, 83010154
+"192/2048", "mibench", "dbf", 88992116, 83010154
+"256/2048", "mibench", "dbf", 87736396, 83010154
+"512/2048", "mibench", "dbf", 85861847, 83010154
+"128/2048", "mibench", "dijkstra_small", 87530226, 80760884
+"192/2048", "mibench", "dijkstra_small", 87527362, 80760884
+"256/2048", "mibench", "dijkstra_small", 87230946, 80760884
+"512/2048", "mibench", "dijkstra_small", 87178443, 80760884
+"128/2048", "mibench", "djpeg_small", 17411955, 16223579
+"192/2048", "mibench", "djpeg_small", 17928368, 16223579
+"256/2048", "mibench", "djpeg_small", 17308733, 16223579
+"512/2048", "mibench", "djpeg_small", 17289649, 16223579
+"128/2048", "mibench", "drijndael", 146512417, 130041179
+"192/2048", "mibench", "drijndael", 146989403, 130041179
+"256/2048", "mibench", "drijndael", 146541891, 130041179
+"512/2048", "mibench", "drijndael", 143631787, 130041179
+"128/2048", "mibench", "ebf", 90633813, 83610988
+"192/2048", "mibench", "ebf", 91327812, 83610988
+"256/2048", "mibench", "ebf", 90053728, 83610988
+"512/2048", "mibench", "ebf", 88184969, 83610988
+"128/2048", "mibench", "erijndael", 154150763, 136057403
+"192/2048", "mibench", "erijndael", 154366991, 136057403
+"256/2048", "mibench", "erijndael", 156623131, 136057403
+"512/2048", "mibench", "erijndael", 154370761, 136057403
+"128/2048", "mibench", "esusan_small", 8515476, 6557356
+"192/2048", "mibench", "esusan_small", 8358012, 6557356
+"256/2048", "mibench", "esusan_small", 8154560, 6557356
+"512/2048", "mibench", "esusan_small", 9094180, 6557356
+"128/2048", "mibench", "fft_tiny", 15091183, 10205207
+"192/2048", "mibench", "fft_tiny", 14856242, 10205207
+"256/2048", "mibench", "fft_tiny", 15466724, 10205207
+"512/2048", "mibench", "fft_tiny", 19655438, 10205207
+"128/2048", "mibench", "ifft_tiny", 14778470, 9898104
+"192/2048", "mibench", "ifft_tiny", 14565061, 9898104
+"256/2048", "mibench", "ifft_tiny", 15229581, 9898104
+"512/2048", "mibench", "ifft_tiny", 19211950, 9898104
+"128/2048", "mibench", "patricia", 328304310, 257824774
+"192/2048", "mibench", "patricia", 332292447, 257824774
+"256/2048", "mibench", "patricia", 315802110, 257824774
+"512/2048", "mibench", "patricia", 331157874, 257824774
+"128/2048", "mibench", "qsort_small", 79066631, 55937012
+"192/2048", "mibench", "qsort_small", 80496363, 55937012
+"256/2048", "mibench", "qsort_small", 78591785, 55937012
+"512/2048", "mibench", "qsort_small", 85951235, 55937012
+"128/2048", "mibench", "rawcaudio", 86697293, 73413564
+"192/2048", "mibench", "rawcaudio", 86697226, 73413564
+"256/2048", "mibench", "rawcaudio", 86725116, 73413564
+"512/2048", "mibench", "rawcaudio", 86697221, 73413564
+"128/2048", "mibench", "rawdaudio", 65526924, 55339362
+"192/2048", "mibench", "rawdaudio", 65526857, 55339362
+"256/2048", "mibench", "rawdaudio", 65604286, 55339362
+"512/2048", "mibench", "rawdaudio", 65526852, 55339362
+"128/2048", "mibench", "rsynth_tiny", 81090526, 58506148
+"192/2048", "mibench", "rsynth_tiny", 77449733, 58506148
+"256/2048", "mibench", "rsynth_tiny", 75602621, 58506148
+"512/2048", "mibench", "rsynth_tiny", 97657101, 58506148
+"128/2048", "mibench", "search_large", 25754083, 16900265
+"192/2048", "mibench", "search_large", 26580174, 16900265
+"256/2048", "mibench", "search_large", 26487747, 16900265
+"512/2048", "mibench", "search_large", 29231070, 16900265
+"128/2048", "mibench", "search_small", 1023282, 673686
+"192/2048", "mibench", "search_small", 1058326, 673686
+"256/2048", "mibench", "search_small", 1048758, 673686
+"512/2048", "mibench", "search_small", 1165166, 673686
+"128/2048", "mibench", "sha", 26376334, 24034442
+"192/2048", "mibench", "sha", 26366388, 24034442
+"256/2048", "mibench", "sha", 26043776, 24034442
+"512/2048", "mibench", "sha", 24135101, 24034442
+"128/2048", "mibench", "ssusan_small", 36955706, 34167002
+"192/2048", "mibench", "ssusan_small", 36708980, 34167002
+"256/2048", "mibench", "ssusan_small", 36612050, 34167002
+"512/2048", "mibench", "ssusan_small", 37336267, 34167002
+"128/2048", "mrtc", "adpcm", 2243377, 2237731
+"192/2048", "mrtc", "adpcm", 2243317, 2237731
+"256/2048", "mrtc", "adpcm", 2243430, 2237731
+"512/2048", "mrtc", "adpcm", 2243597, 2237731
+"128/2048", "mrtc", "bsort100", 207489, 177370
+"192/2048", "mrtc", "bsort100", 207429, 177370
+"256/2048", "mrtc", "bsort100", 207438, 177370
+"512/2048", "mrtc", "bsort100", 177478, 177370
+"128/2048", "mrtc", "bs", 1009, 836
+"192/2048", "mrtc", "bs", 949, 836
+"256/2048", "mrtc", "bs", 958, 836
+"512/2048", "mrtc", "bs", 944, 836
+"128/2048", "mrtc", "cnt", 4395, 4215
+"192/2048", "mrtc", "cnt", 4335, 4215
+"256/2048", "mrtc", "cnt", 4344, 4215
+"512/2048", "mrtc", "cnt", 4330, 4215
+"128/2048", "mrtc", "compress", 8183, 7314
+"192/2048", "mrtc", "compress", 8123, 7314
+"256/2048", "mrtc", "compress", 8132, 7314
+"512/2048", "mrtc", "compress", 8118, 7314
+"128/2048", "mrtc", "cover", 2136, 1816
+"192/2048", "mrtc", "cover", 2076, 1816
+"256/2048", "mrtc", "cover", 2035, 1816
+"512/2048", "mrtc", "cover", 1952, 1816
+"128/2048", "mrtc", "crc", 15710, 15468
+"192/2048", "mrtc", "crc", 15623, 15468
+"256/2048", "mrtc", "crc", 15632, 15468
+"512/2048", "mrtc", "crc", 15597, 15468
+"128/2048", "mrtc", "duff", 1422, 1249
+"192/2048", "mrtc", "duff", 1362, 1249
+"256/2048", "mrtc", "duff", 1371, 1249
+"512/2048", "mrtc", "duff", 1357, 1249
+"128/2048", "mrtc", "edn", 49887, 49161
+"192/2048", "mrtc", "edn", 49827, 49161
+"256/2048", "mrtc", "edn", 49770, 49161
+"512/2048", "mrtc", "edn", 49756, 49161
+"128/2048", "mrtc", "expint", 78165, 77678
+"192/2048", "mrtc", "expint", 78105, 77678
+"256/2048", "mrtc", "expint", 77800, 77678
+"512/2048", "mrtc", "expint", 77786, 77678
+"128/2048", "mrtc", "fac", 907, 734
+"192/2048", "mrtc", "fac", 847, 734
+"256/2048", "mrtc", "fac", 856, 734
+"512/2048", "mrtc", "fac", 842, 734
+"128/2048", "mrtc", "fdct", 3369, 3182
+"192/2048", "mrtc", "fdct", 3309, 3182
+"256/2048", "mrtc", "fdct", 3318, 3182
+"512/2048", "mrtc", "fdct", 3304, 3182
+"128/2048", "mrtc", "fft1", 161306, 78616
+"192/2048", "mrtc", "fft1", 157084, 78616
+"256/2048", "mrtc", "fft1", 153063, 78616
+"512/2048", "mrtc", "fft1", 171344, 78616
+"128/2048", "mrtc", "fibcall", 907, 734
+"192/2048", "mrtc", "fibcall", 847, 734
+"256/2048", "mrtc", "fibcall", 856, 734
+"512/2048", "mrtc", "fibcall", 842, 734
+"128/2048", "mrtc", "fir", 3101, 2833
+"192/2048", "mrtc", "fir", 3041, 2833
+"256/2048", "mrtc", "fir", 3050, 2833
+"512/2048", "mrtc", "fir", 2941, 2833
+"128/2048", "mrtc", "insertsort", 2403, 2117
+"192/2048", "mrtc", "insertsort", 2343, 2117
+"256/2048", "mrtc", "insertsort", 2352, 2117
+"512/2048", "mrtc", "insertsort", 2225, 2117
+"128/2048", "mrtc", "janne_complex", 1235, 1020
+"192/2048", "mrtc", "janne_complex", 1126, 1020
+"256/2048", "mrtc", "janne_complex", 1135, 1020
+"512/2048", "mrtc", "janne_complex", 1121, 1020
+"128/2048", "mrtc", "jfdctint", 5112, 4932
+"192/2048", "mrtc", "jfdctint", 5052, 4932
+"256/2048", "mrtc", "jfdctint", 5061, 4932
+"512/2048", "mrtc", "jfdctint", 5047, 4932
+"128/2048", "mrtc", "lcdnum", 1399, 1119
+"192/2048", "mrtc", "lcdnum", 1339, 1119
+"256/2048", "mrtc", "lcdnum", 1348, 1119
+"512/2048", "mrtc", "lcdnum", 1269, 1119
+"128/2048", "mrtc", "lms", 16115223, 9737989
+"192/2048", "mrtc", "lms", 15709504, 9737989
+"256/2048", "mrtc", "lms", 16031713, 9737989
+"512/2048", "mrtc", "lms", 17865582, 9737989
+"128/2048", "mrtc", "loop3", 907, 734
+"192/2048", "mrtc", "loop3", 847, 734
+"256/2048", "mrtc", "loop3", 856, 734
+"512/2048", "mrtc", "loop3", 842, 734
+"128/2048", "mrtc", "ludcmp", 90883, 59268
+"192/2048", "mrtc", "ludcmp", 94961, 59268
+"256/2048", "mrtc", "ludcmp", 97445, 59268
+"512/2048", "mrtc", "ludcmp", 111415, 59268
+"128/2048", "mrtc", "matmult", 106612, 104490
+"192/2048", "mrtc", "matmult", 106552, 104490
+"256/2048", "mrtc", "matmult", 106561, 104490
+"512/2048", "mrtc", "matmult", 104598, 104490
+"128/2048", "mrtc", "minmax", 1261, 1032
+"192/2048", "mrtc", "minmax", 1174, 1032
+"256/2048", "mrtc", "minmax", 1199, 1032
+"512/2048", "mrtc", "minmax", 1154, 1032
+"128/2048", "mrtc", "minver", 26976, 17269
+"192/2048", "mrtc", "minver", 26658, 17269
+"256/2048", "mrtc", "minver", 26210, 17269
+"512/2048", "mrtc", "minver", 29081, 17269
+"128/2048", "mrtc", "ndes", 35683, 34374
+"192/2048", "mrtc", "ndes", 35651, 34374
+"256/2048", "mrtc", "ndes", 35565, 34374
+"512/2048", "mrtc", "ndes", 35299, 34374
+"128/2048", "mrtc", "nsichneu", 38944, 25885
+"192/2048", "mrtc", "nsichneu", 42748, 25885
+"256/2048", "mrtc", "nsichneu", 30037, 25885
+"512/2048", "mrtc", "nsichneu", 39287, 25885
+"128/2048", "mrtc", "ns", 13254, 9913
+"192/2048", "mrtc", "ns", 13194, 9913
+"256/2048", "mrtc", "ns", 10035, 9913
+"512/2048", "mrtc", "ns", 10021, 9913
+"128/2048", "mrtc", "exam", 6853, 5492
+"192/2048", "mrtc", "exam", 5930, 5492
+"256/2048", "mrtc", "exam", 5939, 5492
+"512/2048", "mrtc", "exam", 5925, 5492
+"128/2048", "mrtc", "qurt", 69988, 40065
+"192/2048", "mrtc", "qurt", 67634, 40065
+"256/2048", "mrtc", "qurt", 66294, 40065
+"512/2048", "mrtc", "qurt", 87722, 40065
+"128/2048", "mrtc", "recursion", 4168, 3398
+"192/2048", "mrtc", "recursion", 3518, 3398
+"256/2048", "mrtc", "recursion", 3520, 3398
+"512/2048", "mrtc", "recursion", 3506, 3398
+"128/2048", "mrtc", "select", 7025, 5865
+"192/2048", "mrtc", "select", 6195, 5865
+"256/2048", "mrtc", "select", 6204, 5865
+"512/2048", "mrtc", "select", 6190, 5865
+"128/2048", "mrtc", "sqrt", 907, 734
+"192/2048", "mrtc", "sqrt", 847, 734
+"256/2048", "mrtc", "sqrt", 856, 734
+"512/2048", "mrtc", "sqrt", 842, 734
+"128/2048", "mrtc", "statemate", 624, 624
+"192/2048", "mrtc", "statemate", 624, 624
+"256/2048", "mrtc", "statemate", 624, 624
+"512/2048", "mrtc", "statemate", 624, 624
+"128/2048", "mrtc", "ud", 15059, 14176
+"192/2048", "mrtc", "ud", 14926, 14176
+"256/2048", "mrtc", "ud", 15097, 14176
+"512/2048", "mrtc", "ud", 15074, 14176
