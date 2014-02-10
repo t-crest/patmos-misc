@@ -654,31 +654,26 @@ function build_javatools() {
     local repo=$1
     local builddir=$2
     local rootdir=$(abspath $ROOT_DIR/$repo)
-	echo $repo $builddir $rootdir
+    echo $repo $builddir $rootdir
     if [ $DO_CLEAN == true -o ! -e "$builddir" ] ; then
         run rm -rf $builddir
         run mkdir -p $builddir
     fi
-	echo $(pwd)
+    echo $(pwd)
     run pushd "${rootdir}" > /dev/null
-	echo $(pwd)
+    echo $(pwd)
     run make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${builddir}'" "INSTALLDIR='${INSTALL_DIR}'" javatools
     run popd > /dev/null
 }
 
 function build_tools() {
-	local repo=$1
-	info "Building simulator in patmos .. "
+    local repo=$1
+    info "Building simulator in patmos .. "
     build_cmake patmos/simulator build_and_test_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
     info "Building tools/c in patmos .. "
     build_cmake patmos/tools/c    build_default $(get_build_dir patmos "tools/c") "$CTOOLS_ARGS"
     info "Building tools/java in patmos .. "
     build_javatools $repo $(get_build_dir patmos "tools/java")
-	local rootdir=$(abspath $ROOT_DIR/$repo)
-	info "Building tools in patmos .. "
-	run pushd "${rootdir}" > /dev/null
-	run make $MAKEJ $MAKE_VERBOSE tools
-	run popd > /dev/null
 }
 
 function build_emulator() {
@@ -874,7 +869,7 @@ build_target() {
     ;;
   'patmos'|'pasim')
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
-	build_tools $(get_repo_dir patmos)
+    build_tools $(get_repo_dir patmos)
     if [ "$BUILD_EMULATOR" == "false" ]; then
 	info "Skipping patmos-emulator in patmos."
     else
@@ -1031,8 +1026,8 @@ if [ "$DO_RUN_ALL" == "true" ]; then
     build_target compiler-rt
     build_target newlib
     build_target bench
-	build_target poseidon
-	build_target aegean
+    build_target poseidon
+    build_target aegean
 else
     TARGETS=${@-$ALLTARGETS}
     for target in $TARGETS; do
