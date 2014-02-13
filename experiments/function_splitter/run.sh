@@ -25,6 +25,8 @@ CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=$BENCH_SRC_DIR/cmake/patmos-clang-toolchain.c
 PASIM_ARGS="-G 7 -S block -s 2k -D dm -d 4k --mbsize 8"
 MCACHE_IDEAL="-M fifo -m 8m --mcmethods=512 --psize=1k"
 
+MAX_FUNCTION_SIZE=2040
+
 ###### Configuration End ########
 
 if [ -f run.cfg ]; then
@@ -125,12 +127,20 @@ function eval_caches() {
   local i=$1
   local scc=$2
 
-  fsplit_options="-mpatmos-max-subfunction-size=2040 -mpatmos-preferred-subfunction-size=$i -mpatmos-preferred-scc-size=$scc"
+  if [[ $scc-8 -gt $MAX_FUNCTION_SIZE ]]; then
+    return
+  fi
+
+  fsplit_options="-mpatmos-max-subfunction-size=$MAX_FUNCTION_SIZE -mpatmos-preferred-subfunction-size=$i -mpatmos-preferred-scc-size=$scc"
 
   collect_stats "pref_sf_${i}_scc_${scc}_ideal" "$MCACHE_IDEAL" "-mpatmos-split-call-blocks=false $fsplit_options"
 
   # Size of cache in kb
   for j in "32" "16" "8" "4" "2" "1"; do
+    
+    if [[ $j*1024 -lt $MAX_FUNCTION_SIZE ]]; then
+      break
+    fi
 
     # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
     collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_ideal"    "-M fifo -m ${j}k --mcmethods=512"
@@ -162,6 +172,10 @@ function eval_caches() {
 
   # size of cache in kb
   for j in "32" "16" "8" "4" "2" "1"; do
+
+    if [[ $j*1024 -gt $MAX_FUNCTION_SIZE ]]; then
+      break
+    fi
 
     # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
     collect_stats "pref_sf_${i}_scc_${scc}_cbb_mc${j}k_ideal" "-M fifo -m ${j}k --mcmethods=512"
