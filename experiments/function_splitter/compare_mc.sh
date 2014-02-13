@@ -12,9 +12,9 @@ fi
 for size in 1 4 8 16; do
   echo "    \\hline"
   for fn in 8 16 32 64 "ideal"; do
-    statfile=$WORK_DIR/pref_sf_${PREF_SIZE}_mc${size}k_${fn}/${BENCH}.stats
-    fbfile=$WORK_DIR/pref_sf_${PREF_SIZE}_mc${size}k_${fn}_fb/${BENCH}.stats
-    lrufile=$WORK_DIR/pref_sf_${PREF_SIZE}_mc${size}k_${fn}_lru/${BENCH}.stats
+    statfile=$WORK_DIR/pref_sf_${PREF_SIZE}_scc_${PREF_SIZE}_mc${size}k_${fn}/${BENCH}.stats
+    fbfile=$WORK_DIR/pref_sf_${PREF_SIZE}_scc_${PREF_SIZE}_mc${size}k_${fn}_fb/${BENCH}.stats
+    lrufile=$WORK_DIR/pref_sf_${PREF_SIZE}_scc_${PREF_SIZE}_mc${size}k_${fn}_lru/${BENCH}.stats
 
     if [ ! -e $statfile -o ! -e $fbfile -o ! -e $lrufile ]; then
       continue

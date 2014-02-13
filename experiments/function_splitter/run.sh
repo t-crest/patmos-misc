@@ -130,7 +130,7 @@ function eval_caches() {
   collect_stats "pref_sf_${i}_scc_${scc}_ideal" "$MCACHE_IDEAL" "-mpatmos-split-call-blocks=false $fsplit_options"
 
   # Size of cache in kb
-  for j in "32" "16" "8" "4" "2"; do
+  for j in "32" "16" "8" "4" "2" "1"; do
 
     # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
     collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_ideal"    "-M fifo -m ${j}k --mcmethods=512"
@@ -161,7 +161,7 @@ function eval_caches() {
   collect_stats "pref_sf_${i}_scc_${scc}_cbb_ideal" "$MCACHE_IDEAL" "-mpatmos-split-call-blocks=true $fsplit_options"
 
   # size of cache in kb
-  for j in "32" "16" "8" "4" "2"; do
+  for j in "32" "16" "8" "4" "2" "1"; do
 
     # Determine preferred size, determine max required assoc: use ideal assoc, fixed size cache
     collect_stats "pref_sf_${i}_scc_${scc}_cbb_mc${j}k_ideal" "-M fifo -m ${j}k --mcmethods=512"
@@ -201,16 +201,6 @@ done
 
 # Check influence of function splitter
 for i in 256 1024 512 384 192 32 96 320 64 448 128; do
-  #for s in 1 4 8; do
-  #  scc=$((i*s))
-  #  
-  #  if [ $scc -gt 2048 ]; then
-  #    continue
-  #  fi
-  #
-  #  eval_caches $i $scc
-  #done
-
   eval_caches $i $i
   eval_caches $i 1024
   eval_caches $i 2048
