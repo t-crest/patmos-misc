@@ -152,8 +152,8 @@ function eval_caches() {
 
       # Compare variable-size, fixed-block, LRU and variable burst, TDM multicore
       collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}"     "-M fifo -m ${j}k --mcmethods=$k"
-      #collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_fb"  "-G 7 -M fifo -m ${j}k --mcmethods=0 --mbsize=$blocksize"
-      #collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_lru" "-G 7 -M lru  -m ${j}k --mcmethods=0 --mbsize=$blocksize"
+      collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_fb"  "-G 7 -M fifo -m ${j}k --mcmethods=0 --mbsize=$blocksize"
+      collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_lru" "-G 7 -M lru  -m ${j}k --mcmethods=0 --mbsize=$blocksize"
 
       collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_vb"  "-M fifo -m ${j}k --mcmethods=$k --psize=1k"
       #collect_stats "pref_sf_${i}_scc_${scc}_mc${j}k_${k}_tdm" "-G 7 -M fifo -m ${j}k --mcmethods=$k -N 4 --tdelay=8"

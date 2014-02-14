@@ -3,7 +3,7 @@
 WORK_DIR=work
 RESULT_DIR=results
 BENCH=mrtc-fft1
-PREF_SIZE=1024
+PREF_SIZE=256
 
 if [ ! -z "$1" ]; then
   PREF_SIZE=$1
