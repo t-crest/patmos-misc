@@ -83,7 +83,7 @@ Some useful commands for debugging:
 
 # print out executed instructions and the values of their operands 
 # starting from some cycle 
-pasim -q --debug=<cycle-to-start-printing> --debug-fmt=instr <binary>
+pasim --debug=<cycle-to-start-printing> --debug-fmt=instr <binary>
 
 # show disassembly of binary
 patmos-llvm-objdump -r -d <binary> | less
@@ -102,6 +102,6 @@ COMPILER_RT_CFLAGS="-g"
 patmos-llvm-objdump -r -d <binary> | patmos-dwarfdump <binary> | less
 
 # Annotate simulation trace and stack-trace with line numbers
-pasim -q --debug=<cycle-to-start-printing> --debug-fmt=instr <binary> 2>log.txt
+pasim --debug=<cycle-to-start-printing> --debug-fmt=instr <binary> 2>log.txt
 cat log.txt | patmos-dwarfdump <binary>
 
