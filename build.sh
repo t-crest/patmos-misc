@@ -1126,8 +1126,6 @@ if [ "$DO_RUN_ALL" == "true" ]; then
     build_target compiler-rt
     build_target newlib
     build_target bench
-    build_target poseidon
-    build_target aegean
 else
     TARGETS=${@-$ALLTARGETS}
     for target in $TARGETS; do
