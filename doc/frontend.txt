@@ -109,6 +109,15 @@ assign an input register the same register as the output register.
 
 Please see backend.txt for a description of the Patmos assembler syntax.
 
+You can mark functions as naked to prevent the generation of a prologue, epilogue or any spill code.
+In such functions, effectively only inline assembly is allowed. Note that the compiler will still 
+insert a return instruction.
+
+void foo(int n) __attribute__((naked));
+void foo(int n) {
+    asm("nop");
+}
+
 Known Bugs: 
 
 Clobbering the registers $r30/$r31 is not supported and calls inside inline assembler will not cause the
