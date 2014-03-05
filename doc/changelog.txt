@@ -1,6 +1,16 @@
 Patmos Toolchain Changelog
 ==========================
 
+2014-03-05 LLVM 3.4 upgrade, new paasm implementation
+-----------------------------------------------------
+- Upgraded tool chain to LLVM 3.4
+- Only -m options listed in patmos-clang --help-hidden are passed on to patmos-llc, 
+  other options must be passed with -Xllc -m.
+- Anti-dependency breaker and breaking false dependencies between predicated instructions
+  has been temporarily disabled until the implementation will be fixed.
+- paasm uses a hand-written lexer and parser now, and features better error messages,
+  symbolic expressions, and supports the same opcode mnemonics as pasim uses for printing.
+
 2013-09-03 Libc and Simulator Features
 --------------------------------------
 - Dropped uart_flush and uart_fflush.
