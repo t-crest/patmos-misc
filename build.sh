@@ -61,7 +61,7 @@ function abspath() {
 OS_NAME=$(uname -s)
 
 # physical location of this script, and the config
-self=$(abspath $0)
+self=$(abspath ./$0)
 CFGFILE=$(dirname $self)/build.cfg
 
 # location of the patmos-chrpath script
