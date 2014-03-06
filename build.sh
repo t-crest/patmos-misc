@@ -101,6 +101,8 @@ ECLIPSE_LLVM_TARGETS=Patmos
 
 # build LLVM using configure instead of cmake
 LLVM_USE_CONFIGURE=false
+# Set the build type for LLVM (currently only for cmake builds)
+LLVM_BUILD_TYPE=Debug
 # build LLVM using shared libraries instead of static libs
 LLVM_BUILD_SHARED=true
 # skip checking out clang
@@ -848,7 +850,7 @@ function build_llvm() {
 	local targets=$(echo $LLVM_TARGETS | tr '[A-Z;]' '[a-z,]')
 	build_autoconf llvm make_llvm $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $config_args $LLVM_CONFIGURE_ARGS"
     else
-	build_cmake llvm make_llvm $(get_build_dir llvm) "-DCMAKE_BUILD_TYPE=Debug -DLLVM_TARGETS_TO_BUILD='$LLVM_TARGETS' $cmake_args $LLVM_CMAKE_ARGS"
+	build_cmake llvm make_llvm $(get_build_dir llvm) "-DCMAKE_BUILD_TYPE=$LLVM_BUILD_TYPE -DLLVM_TARGETS_TO_BUILD='$LLVM_TARGETS' $cmake_args $LLVM_CMAKE_ARGS"
     fi
 }
 

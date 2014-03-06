@@ -1,6 +1,6 @@
 
 # List of targets to build by default
-ALLTARGETS="gold llvm newlib compiler-rt pasim bench"
+ALLTARGETS="gold llvm newlib compiler-rt pasim bench poseidon aegean"
 
 # Root directory for all repositories
 ROOT_DIR=$(pwd)
@@ -26,6 +26,8 @@ ECLIPSE_LLVM_TARGETS=Patmos
 
 # build LLVM using configure instead of cmake
 LLVM_USE_CONFIGURE=false
+# Set the build type for LLVM (currently only for cmake builds)
+LLVM_BUILD_TYPE=Debug
 # build LLVM using shared libraries instead of static libs
 LLVM_BUILD_SHARED=true
 # skip checking out clang
@@ -106,7 +108,7 @@ CTOOLS_ARGS=
 # Set path to a3, or set to empty string to disable a3
 #BENCH_ARGS="${BENCH_ARGS} -DA3_EXECUTABLE="
 
-# Additional CFLAGS, LDFLAGS 
+# Additional CFLAGS, LDFLAGS
 GOLD_CFLAGS=
 # Use this flag if gcc throws errors about narrowing conversions
 #GOLD_CXXFLAGS="-Wno-narrowing"
