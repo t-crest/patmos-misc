@@ -39,16 +39,16 @@ function abspath() {
     # readlink -f does not work on OSX, so we do this manually
     local dir=$(dirname "$path")
     if [ -d "$dir" ]; then
-	cd "$dir"
+	cd "$dir" > /dev/null
 	path=$(basename "$path")
 	# follow chain of symlinks
 	while [ -L "$path" ]; do
 	    path=$(readlink "$path")
-	    cd $(dirname "$path")
+	    cd $(dirname "$path") > /dev/null
 	    path=$(basename "$path")
 	done
 	echo "$(pwd -P)/$path"
-	cd "$pwd_restore"
+	cd "$pwd_restore" > /dev/null
     elif [[ "$BUILDDIR_SUFFIX" =~ ^/ ]]; then
 	echo $path
     else
@@ -59,6 +59,8 @@ function abspath() {
 
 
 OS_NAME=$(uname -s)
+# avoid changing into CDPATH directories
+unset CDPATH
 
 # physical location of this script, and the config
 self=$(abspath $0)
