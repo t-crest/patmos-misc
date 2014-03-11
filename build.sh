@@ -890,7 +890,7 @@ function build_rtems() {
     # bootstrap; bit of a hack, we rerun it on clean builds
     # TODO this should be rerun if any new files are added
     run pushd "${srcdir}"
-    if [ "$DO_CLEAN" == "true" ]; then
+    if [ "$DO_CLEAN" == "true" -o ! -f ./configure ]; then
 	run ./bootstrap -p
 	run ./bootstrap
     fi
