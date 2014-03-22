@@ -77,7 +77,7 @@ def load_lineinfo(dwarfinfo):
             # We're interested in those entries where a new state is assigned
             state = entry.state
             if state is None: continue
-            if prevstate and prevstate.address <= state.address and not prevstate.end_sequence:
+            if prevstate and prevstate.address < state.address and not prevstate.end_sequence:
                 file_entry = lineprog['file_entry'][prevstate.file - 1]
                 file_name = bytes2str(file_entry.name)
                 if file_entry.dir_index == 0:
