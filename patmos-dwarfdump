@@ -47,6 +47,8 @@ class IntervalInfo:
 	return self.end
     def get_info(self):
 	return self.info
+    def set_end(self, address):
+	self.end = address
 
 def decode_funcname(funcinfo, address):
     if funcinfo:
@@ -77,6 +79,10 @@ def load_lineinfo(dwarfinfo):
             # We're interested in those entries where a new state is assigned
             state = entry.state
             if state is None: continue
+	    # The last line end address of a CU is too high with DWARF4/LLVM3.4, we 
+	    # need to patch the last line entry with the start value of the next CU.
+	    if not prevstate and lines:
+		lines[-1].set_end(state.address - 1)
             if prevstate and prevstate.address < state.address and not prevstate.end_sequence:
                 file_entry = lineprog['file_entry'][prevstate.file - 1]
                 file_name = bytes2str(file_entry.name)
@@ -85,16 +91,16 @@ def load_lineinfo(dwarfinfo):
                     # TODO get directory of source file and prepend it 
                     filename = './%s' % (file_name)
                 elif file_name[0] == '/':
-                    # This ssems to be a hack.. can we detect somehow else if 
-                    # this is an absolute path, and is include_rirectory the 
+                    # This seems to be a hack.. can we detect somehow else if 
+                    # this is an absolute path, and is include_directory the 
                     # correct path if it is not absolute?
                     filename = file_name
                 else:
                     filename = '%s/%s' % (
                         bytes2str(lineprog['include_directory'][file_entry.dir_index - 1]),
                         file_name)
-		info = filename, prevstate.line
-                lines.append( IntervalInfo(prevstate.address, state.address - 1, info) )
+	        info = filename, prevstate.line
+	        lines.append( IntervalInfo(prevstate.address, state.address - 1, info) )
             prevstate = state
         # Go over all DIEs in the DWARF information. Note that
         # this simplifies things by disregarding subprograms that may have 
