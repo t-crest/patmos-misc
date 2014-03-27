@@ -732,6 +732,28 @@ function build_javatools() {
     run popd > /dev/null
 }
 
+function build_scripttools() {
+    # build directory (might be relative)
+    local builddir=$ROOT_DIR/$1
+
+    # source directory of the main makefile (relative to ROOT_DIR)
+    local root=$(get_repo_dir patmos)
+    # absolute path to the script tools source dir
+    local rootdir=$(abspath $ROOT_DIR/$root)
+
+    if [ $DO_CLEAN == true -o ! -e "$builddir" ] ; then
+        run rm -rf $builddir
+        run mkdir -p $builddir
+    fi
+
+    # We can only safely use abspath once the path has been created.
+    buildpath=$(abspath $builddir)
+
+    run pushd "${rootdir}" > /dev/null
+    run make $MAKEJ $MAKE_VERBOSE "SCRIPTSBUILDDIR='${buildpath}'" "INSTALLDIR='${INSTALL_DIR}'" scripttools
+    run popd > /dev/null
+}
+
 function build_tools() {
     # We need a separate build call per build directory, as the build paths may not have a common prefix!
     # Therefore, for every 'build' directory there must be one build target here, either telling
@@ -743,6 +765,8 @@ function build_tools() {
     build_cmake patmos/tools/c   make_default $(get_build_dir patmos "tools/c") "$CTOOLS_ARGS"
     info "Building tools/java in patmos .. "
     build_javatools $(get_build_dir patmos "tools/java")
+    info "Building tools/scripts in patmos .. "
+    build_scripttools $(get_build_dir patmos "tools/scripts")
 }
 
 function build_emulator() {
