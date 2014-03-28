@@ -169,6 +169,9 @@ NEWLIB_ARGS=
 # Additional RTEMS configure options
 RTEMS_ARGS=
 
+# Whether to use simulator (pasim) of FPGA (patex) for RTEMS tests
+RTEMS_SIM=pasim
+
 # Build simulator in Release mode
 #PASIM_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
 # Use a custom installation of Boost libraries
@@ -946,7 +949,7 @@ function build_rtems_test() {
 
     if [ "$DO_RUN_TESTS" == "true" ]; then
 	echo "Running tests.."
-	run $rtems_testscript -s $ROOT_DIR/$repodir/testsuites -b $ROOT_DIR/$builddir -o $ROOT_DIR/$builddir/results
+	run $rtems_testscript -s $ROOT_DIR/$repodir/testsuites -b $ROOT_DIR/$builddir -o $ROOT_DIR/$builddir/results -m $RTEMS_SIM
     fi
 }
 
