@@ -169,6 +169,9 @@ NEWLIB_ARGS=
 # Additional RTEMS configure options
 RTEMS_ARGS=
 
+# Select BSP for RTEMS build
+RTEMS_BSP=pasim
+
 # Whether to use simulator (pasim) of FPGA (patex) for RTEMS tests
 RTEMS_SIM=pasim
 
@@ -925,12 +928,12 @@ function build_rtems() {
 
     # build with tests disabled here, testing is done using a separate build
     build_autoconf rtems/rtems make_default $(get_build_dir rtems rtems) --target=patmos-unknown-rtems --enable-posix \
-         --disable-networking --disable-cxx --enable-rtemsbsp=pasim --disable-tests "${RTEMS_ARGS}"
+         --disable-networking --disable-cxx --enable-rtemsbsp="${RTEMS_BSP}" --disable-tests "${RTEMS_ARGS}"
 
 
     echo
     echo "##### Add the following environment variable #####"
-    echo "export RTEMS_MAKEFILE_PATH=${INSTALL_DIR}/patmos-unknown-rtems/pasim"
+    echo "export RTEMS_MAKEFILE_PATH=${INSTALL_DIR}/patmos-unknown-rtems/${RTEMS_BSP}"
     echo
 }
 
@@ -945,11 +948,11 @@ function build_rtems_test() {
     local rtems_testscript=$ROOT_DIR/$repodir/run-testsuite.sh
 
     build_autoconf rtems/rtems make_default $builddir --target=patmos-unknown-rtems --enable-posix \
-         --disable-networking --disable-cxx --enable-rtemsbsp=pasim --enable-tests "${RTEMS_ARGS}"
+         --disable-networking --disable-cxx --enable-rtemsbsp="${RTEMS_BSP}" --enable-tests "${RTEMS_ARGS}"
 
     if [ "$DO_RUN_TESTS" == "true" ]; then
 	echo "Running tests.."
-	run $rtems_testscript -s $ROOT_DIR/$repodir/testsuites -b $ROOT_DIR/$builddir -o $ROOT_DIR/$builddir/results -m $RTEMS_SIM
+	run $rtems_testscript -s $ROOT_DIR/$repodir/testsuites -b $ROOT_DIR/$builddir -o $ROOT_DIR/$builddir/results -m $RTEMS_SIM -x $RTEMS_BSP
     fi
 }
 

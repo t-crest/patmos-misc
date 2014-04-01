@@ -94,6 +94,9 @@ NEWLIB_ARGS=
 # Additional RTEMS configure options
 RTEMS_ARGS=
 
+# Select BSP for RTEMS build
+RTEMS_BSP=pasim
+
 # Whether to use simulator (pasim) of FPGA (patex) for RTEMS tests
 RTEMS_SIM=pasim
 
