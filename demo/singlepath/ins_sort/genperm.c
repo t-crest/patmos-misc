@@ -5,7 +5,7 @@
  */
 
 /* stored callback */
-static void (*cb)(int *, int);
+static void (*cb)(const int *, int);
 
 
 /* function to swap array elements */
@@ -42,7 +42,7 @@ static void perm (int v[], int n, int i)
 
 
 
-void genperm(int arr[], int N, void (callback)(int *, int))
+void genperm(int arr[], int N, void (callback)(const int *, int))
 {
   cb = callback;
   perm(arr, N, 0);

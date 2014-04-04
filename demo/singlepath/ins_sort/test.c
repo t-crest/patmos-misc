@@ -24,7 +24,7 @@
 
 static int nfailed;
 
-static void print_arr(int arr[], int n)
+static void print_arr(const int arr[], int n)
 {
   int i;
   for (i = 0; i < n; i++) {
@@ -47,7 +47,7 @@ static int checksorted(int arr[], int n)
 
 
 
-static void call_inssort(int arr[], int n)
+static void call_inssort(const int arr[], int n)
 {
   /* local array for storing the result */
   int res[n];
