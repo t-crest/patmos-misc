@@ -4,31 +4,40 @@
 
 SHELL=/bin/bash
 
-BS ?= bsearch_dep
+
+ALL = bsearch_dep bsearch_ilb bsearch_ilc
+
 
 .PHONY: all clean
 
-all: $(BS).elf $(BS).sp.elf $(BS).host $(BS).trace $(BS).sp.trace
+target_suffixes := host elf sp.elf trace sp.trace dis sp.dis
+targets = $(addprefix $(targ)., $(target_suffixes))
 
+all: $(foreach targ, $(ALL), $(targets))
 
 test.c: bsearch.h
 	touch $@
 
-$(BS).host: test.c $(BS).c
-	gcc -g -DBS=$(BS) -o $@ $^
+%.host: %.c test.c
+	gcc -g -DBS=$* -o $@ $^
 	./$@
 
-$(BS).elf: test.c $(BS).c
-	patmos-clang -DBS=$(BS) -o $@ $^
+%.elf: %.c test.c
+	patmos-clang -DBS=$* -o $@ $^
 
-$(BS).sp.elf: test.c $(BS).c
-	patmos-clang -DBS=$(BS) -mpatmos-singlepath=$(BS) \
-	  -Xllc -debug-only=patmos-singlepath -save-temps -o $@ $^ 2> $(BS).log
+%.sp.elf: %.c test.c
+	patmos-clang -DBS=$* -mpatmos-singlepath=$* \
+	  -Xllc -debug-only=patmos-singlepath -save-temps -o $@ $^ 2> $*.log
 	@# obtain CFG:
 	patmos-opt -analyze -dot-cfg-only $@.opt.bc > /dev/null 2>&1
-	dot -Tpng -o $(BS).png cfg.$(BS).dot
+	dot -Tpng -o $*.png cfg.$*.dot
 	rm *.dot *.i *.o *.bc
 
+
+# target-specific variable BS
+bsearch_dep.trace bsearch_dep.sp.trace : BS = bsearch_dep
+bsearch_ilb.trace bsearch_ilb.sp.trace : BS = bsearch_ilb
+bsearch_ilc.trace bsearch_ilc.sp.trace : BS = bsearch_ilc
 
 %.trace: %.elf
 	pasim --debug=0 --debug-fmt=blocks --debug-file=>(grep '$(BS)' > $@) \
