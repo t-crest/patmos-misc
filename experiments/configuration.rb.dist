@@ -1,6 +1,11 @@
 #
 # Configuration for Experiments
 #
+# These settings are centrally applied by
+#   default_configuration
+#   default_options
+# in lib/experiments.rb.
+#
 
 # path to patmos-benchmarks repository
 $benchsrc = '~/tcrest/patmos-benchmarks'
@@ -23,3 +28,6 @@ $benchfilter = Proc.new { |b| true }
 
 # LLVM stack cache analysis options (optional)
 $lp_solver = "#{$benchsrc}/scripts/solve_ilp_glpk.sh"
+
+# Limit number of parallel processes (defaults to number of CPUs)
+# $nproc = 1

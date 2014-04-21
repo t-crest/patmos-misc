@@ -42,6 +42,12 @@ require 'tools/wcet'
 # local libraries
 require 'lib/console'
 
+def benchfilter_from_arg
+  if ARGV[0]
+    $benchfilter = Proc.new { |b| b['name'].include?(ARGV[0]) }
+  end
+end
+
 def require_configuration(directory)
   # configuration
   begin
@@ -56,6 +62,18 @@ def require_configuration(directory)
   rescue LoadError => e
     die("Failed to load 'benchmarks' => create a file 'benchmarks.rb' to select the benchmarks")
   end
+end
+
+def default_configuration
+  config = OpenStruct.new
+  config.srcdir        = $benchsrc
+  config.builddir      = $builddir
+  config.workdir       = $workdir
+  config.benchmarks    = $benchmarks
+  config.nice_pasim      = $nice_pasim
+  config.pml_config_file = $hw_config
+  config.nproc = $nproc
+  config
 end
 
 def default_options(opts = {})
@@ -77,6 +95,7 @@ def default_options(opts = {})
   options.wca_minimal_cache = false
   options.text_sections=[".text"]
   options.stats = true
+  options.debug_type   = $debug
   options
 end
 
@@ -137,15 +156,15 @@ class BenchmarkTool
           FileUtils.remove_entry_secure(options.outdir) if File.exist?(options.outdir)
           FileUtils.mkdir_p(options.outdir)
 
-          # trace analysis
-          if ! configuration['recorders'] || ! options.trace_analysis
+          # trace analysis: skipped if no recorders and option disabled
+          if ! configuration['recorders'] && ! options.trace_analysis
             options.trace_analysis = false
             options.use_trace_facts = false
             options.runcheck = false
           else
             options.trace_file = File.join(@config.tracedir || @config.workdir, "#{benchmark['name']}.#{build_setting['name']}.#{configuration['trace_entry']}.tar.gz")
             options.trace_entry =  configuration['trace_entry']
-            options.recorders = RecorderSpecification.parse(configuration['recorders'], 0)
+            options.recorders = RecorderSpecification.parse(configuration['recorders'] || 'g:cil', 0)
             generate_trace(options, benchmark)
           end
           reportkeys = { 'benchmark' => benchmark['name'],
@@ -195,6 +214,7 @@ private
         (build_settings[setting]||=[]).push(benchmark)
       end
     end
+    raise Exception.new("No benchmarks specified") if build_settings.empty?
     build_settings
   end
 
@@ -204,13 +224,14 @@ private
     FileUtils.mkdir_p(build_setting['builddir'])
     hw_flags = `platin tool-config -t clang -i #{@config.pml_config_file} #{build_setting['platin_tool_config_opts']}`.chomp
     cflags = build_setting['cflags']
+    ldflags = build_setting['ldflags']
     cmake_flags = ["-DCMAKE_TOOLCHAIN_FILE=#{File.join(@config.srcdir,"cmake","patmos-clang-toolchain.cmake")}",
                    "-DREQUIRES_PASIM=true",
                    "-DENABLE_CTORTURE=false",
                    "-DENABLE_TESTING=true",
                    "-DENABLE_EMULATOR=false",
                    "-DCMAKE_C_FLAGS='#{cflags}'",
-                   "-DCMAKE_C_LINK_FLAGS='#{hw_flags}'"
+                   "-DCMAKE_C_LINK_FLAGS='#{(hw_flags + ' ' + ldflags).chomp()}'"
                   ].join(" ")
     configure_log = File.join(build_setting['builddir'], 'configure.log')
     run("cd #{build_setting['builddir']} && cmake #{@config.srcdir} #{cmake_flags}", :log => configure_log, :console => true, :log_stderr => true)
@@ -223,7 +244,7 @@ private
         build_msg_opts)
     else
       log("##{benchmark['index']} Generating Trace File #{options.trace_file}", build_msg_opts)
-      run("#{options.pasim} `platin tool-config -t simulator -i #{@config.pml_config_file}` -q --flush-caches=#{options.analysis_entry} --debug 0 --debug-fmt trace -b #{options.binary_file} 2>&1 1>/dev/null | " +
+      run("#{options.pasim} `platin tool-config -t simulator -i #{@config.pml_config_file}` --flush-caches=#{options.analysis_entry} --debug 0 --debug-fmt trace -b #{options.binary_file} 2>&1 1>/dev/null | " +
           "#{options.gzip} > #{options.trace_file}", :log => @build_log, :log_stderr => true, :log_append => true)
     end
   end
