@@ -226,6 +226,7 @@ private
     cflags = build_setting['cflags']
     ldflags = build_setting['ldflags']
     cmake_flags = ["-DCMAKE_TOOLCHAIN_FILE=#{File.join(@config.srcdir,"cmake","patmos-clang-toolchain.cmake")}",
+                   "-DTACLE_BENCH=true",
                    "-DREQUIRES_PASIM=true",
                    "-DENABLE_CTORTURE=false",
                    "-DENABLE_TESTING=true",

@@ -1,9 +1,10 @@
 #
 # Benchmark Selection for 'wcet' experiments
 #
+benchfilter_from_arg()
 builds = %w{O1f} # {O0 O1 O1f O2}
-configs = %w{blockglobal} #  {blockglobal blocklocal minimal notrace}
-$benchmarks = all_benchmarks.select { |b|
+configs = %w{notrace} #  {blockglobal blocklocal minimal notrace}
+$benchmarks = mrtc_benchmarks.select { |b|
   if b['irreducible'] || b['recursive']
     false
   elsif b['expensive']

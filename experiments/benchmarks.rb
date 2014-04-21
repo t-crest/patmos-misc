@@ -19,17 +19,25 @@ def mrtc_benchmarks
   disable_sweet = %w{qsort-exam select}
   # long running in decreasing order
   long_running = %w{lms ludcmp minver fft1 qurt nischneu}
-  # all benchmarks
-  benchmarks = %w{adpcm bs bsort100 cnt compress cover crc duff
-     edn expint fac fdct fft1 fibcall fir insertsort janne_complex jfdctint lcdnum lms loop3
-     ludcmp matmult minmax minver ndes ns nsichneu qsort-exam qurt recursion select sqrt statemate ud}
+  # notes: these are the TACLe versions of the MRTC benchmarks, w/ some
+  # exceptions:
+  #   compress - the "original" from patmos-bench, which executes compress()
+  # exluded are:
+  #   edn - unbounded memcpy loops
+  #
+  benchmarks = %w{adpcm_encoder adpcm_decoder binarysearch bsort100 compress countnegative
+    cover crc duff expint fac fdct fft1 fibcall fir insertsort janne_complex jfdctint
+    lcdnum lms ludcmp matmult minver ndes petrinet prime qsort-exam qurt
+    recursion select sqrt statemate st}
+
+
   shortname = Hash.new { |ht,k| k }.merge('janne_complex' => 'janne', 'qsort-exam' => 'qsort')
   analyses = [{ 'name' => 'main', 'analysis_entry' => 'main', 'trace_entry' => 'main' }]
   benchmarks.map do |name|
     { 'analyses' => analyses,
       'name' => "mrtc_#{shortname[name]}",
       'suite' => 'mrtc',
-      'path' => File.join("Malardalen","src",name),
+      'path' => File.join("Malardalen","tacle",name),
       'recursive' => %w{fac recursion}.include?(name), # benchmarks with (direct) recursion
       'irreducible' => %w{duff}.include?(name),   # duff has irreducible loop for -O0
       'expensive' => long_running.include?(name),
@@ -84,7 +92,7 @@ end
 def standard_buildsettings
   [ {'name' => 'O0', 'cflags' => '-O0', 'ldflags' => '' }, # todo: remove empty blocks
     {'name' => 'O1', 'cflags' => '-O1', 'ldflags' => '' },
-    {'name' => 'O1f', 'cflags' => '-O1 -Xopt -disable-inlining', 'ldflags' => '' },
+    {'name' => 'O1f', 'cflags' => '-O1 -g', 'ldflags' => '-Xopt -disable-inlining' },
     {'name' => 'O2', 'cflags' => '-O2', 'ldflags' => '' },
     {'name' => 'Os', 'cflags' => '-Os', 'ldflags' => '-Os'} ]
 end
