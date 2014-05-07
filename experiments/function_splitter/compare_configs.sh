@@ -2,7 +2,7 @@
 
 BASE=nosplit_ic4k_lru4
 
-echo "# Suite, Benchname, Ideal, Size, \"32/32\", \"128/128\", \"192/192\", \"256/256\", \"512/512\", \"1024/1024\""
+echo "# Suite, Benchname, Size, Reference, \"32/32\", \"128/128\", \"192/192\", \"256/256\", \"512/512\", \"1024/1024\""
 
 for bench in `ls work/$BASE`; do
   name=${bench%.stats}
@@ -10,7 +10,7 @@ for bench in `ls work/$BASE`; do
   benchname=`echo "$name" | sed "s/.*-//"`
 
   refcycles=`grep -m 1 "Cyc :" work/$BASE/$bench | sed "s/Cyc : *\([0-9]*\) */\1/"`
-  size=`grep -m 1 "Bytes Transferred" work/$BASE/$bench | sed "s/   Bytes Transferred   : *\([0-9]*\) *\([0-9]\)*/\1/"`
+  size=`grep -m 1 "Bytes Transferred" work/nosplit_ic8m_lru/$bench | sed "s/   Bytes Transferred   : *\([0-9]*\) *\([0-9]\)*/\1/"`
 
 #  if [ "$suite" != "mibench" ]; then
 #    echo -n "# "
