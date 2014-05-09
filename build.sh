@@ -1012,7 +1012,7 @@ build_target() {
     fi
     ;;
   'aegean')
-    clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo) integration
+    clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo)
     clone_update ${GITHUB_BASEURL}/aegean.git $(get_repo_dir aegean)
     build_aegean $(get_build_dir aegean)
     ;;
