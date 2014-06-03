@@ -221,6 +221,7 @@ CTEST_ARGS=
 # Internal options, set by command line
 MAKE_VERBOSE=
 DO_CLEAN=false
+DO_RECONFIGURE=false
 DO_UPDATE=false
 DO_SHOW_CONFIGURE=false
 DO_RUN_TESTS=false
@@ -488,6 +489,9 @@ function build_cmake() {
         run mkdir -p $builddir
         run pushd $builddir ">/dev/null"
         run "$flags" cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
+    elif [ $DO_RECONFIGURE == true ] ; then
+        run pushd $builddir ">/dev/null"
+        run "$flags" cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
     else
         run pushd $builddir ">/dev/null"
     fi
@@ -525,6 +529,9 @@ function build_autoconf() {
     if [ $DO_CLEAN == true -o ! -e "$builddir" ] ; then
         run rm -rf $builddir
         run mkdir -p $builddir
+        run pushd $builddir ">/dev/null"
+	run "$flags" $configscript "$@" --prefix=${INSTALL_DIR}
+    elif [ $DO_RECONFIGURE == true ] ; then
         run pushd $builddir ">/dev/null"
 	run "$flags" $configscript "$@" --prefix=${INSTALL_DIR}
     else
@@ -975,7 +982,7 @@ function build_rtems_examples() {
 build_target() {
   local target=$1
 
-  if [ "$DO_SHOW_CONFIGURE" ]; then
+  if [ "$DO_SHOW_CONFIGURE" == "true" ]; then
     info "Configure for '$target'"
   else
     info "Processing '"$target"'"
@@ -1058,9 +1065,10 @@ build_target() {
 
 
 # one-shot config
-while getopts ":chi:j:pudsvxVtae" opt; do
+while getopts ":crhi:j:pudsvxVtae" opt; do
   case $opt in
     c) DO_CLEAN=true ;;
+    r) DO_RECONFIGURE=true ;;
     h) usage; exit 0 ;;
     i) INSTALL_DIR="$(abspath $OPTARG)" ;;
     j) MAKEJ="-j$OPTARG" ;;
