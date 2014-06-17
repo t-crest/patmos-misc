@@ -108,9 +108,14 @@ RTEMS_SIM=pasim
 # Patmos C-tools cmake options
 CTOOLS_ARGS=
 
-# Overwrite default options for pasim for make test
-#BENCH_ARGS="-DPASIM_OPTIONS='-M fifo -m 4k'"
-
+## Options for the patmos-bench test environment
+# PML architecture files configure clang/llvm, pasim, and platin:
+# PML_CONFIG and PML_CONFIG_HW (for emulated executables)
+#BENCH_ARGS="-DCONFIG_PML=scripts/patmos-config-sim.pml"
+# Add extra options for pasim when executing tests
+#BENCH_ARGS="${BENCH_ARGS} -DPASIM_EXTRA_OPTIONS='--maxc 1000'"
+# Disable gcc torture tests
+#BENCH_ARGS="${BENCH_ARGS} -DENABLE_CTORTURE=false"
 # Set path to a3, or set to empty string to disable a3
 #BENCH_ARGS="${BENCH_ARGS} -DA3_EXECUTABLE="
 
