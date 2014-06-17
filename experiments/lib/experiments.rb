@@ -222,7 +222,6 @@ private
     # Configure
     build_setting['builddir'] ||= File.join(@config.builddir, build_setting['name'])
     FileUtils.mkdir_p(build_setting['builddir'])
-    hw_flags = `platin tool-config -t clang -i #{@config.pml_config_file} #{build_setting['platin_tool_config_opts']}`.chomp
     cflags = build_setting['cflags']
     ldflags = build_setting['ldflags']
     cmake_flags = ["-DCMAKE_TOOLCHAIN_FILE=#{File.join(@config.srcdir,"cmake","patmos-clang-toolchain.cmake")}",
@@ -232,7 +231,7 @@ private
                    "-DENABLE_TESTING=true",
                    "-DENABLE_EMULATOR=false",
                    "-DCMAKE_C_FLAGS='#{cflags}'",
-                   "-DCMAKE_C_LINK_FLAGS='#{(hw_flags + ' ' + ldflags).chomp()}'"
+                   "-DCONFIG_PML='#{File.expand_path(@config.pml_config_file)}'"
                   ].join(" ")
     configure_log = File.join(build_setting['builddir'], 'configure.log')
     run("cd #{build_setting['builddir']} && cmake #{@config.srcdir} #{cmake_flags}", :log => configure_log, :console => true, :log_stderr => true)
