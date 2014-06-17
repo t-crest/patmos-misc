@@ -66,6 +66,39 @@ def papabench
   }
 end
 
+def heli
+  benchmarks = %w{heli}
+  targets = %w{processSensorData fixFilter runFlightPlan}
+  benchmarks = [
+    { 'analyses' => targets.map { |entry|
+        { 'name' => entry,
+          'analysis_entry' => entry
+        }
+      },
+      'name' => "heli",
+      'path' => File.join("Heli","heli")
+    }
+  ]
+end
+
+def tcas
+  benchmarks = %w{tcas-a tcas-b}
+  targets = %w{processSensorData fixFilter runFlightPlan}
+  benchmarks = benchmarks.map { |bench|
+    { 'analyses' =>
+      [{ 'name' => 'main',
+        'analysis_entry' => 'main'
+      }],
+      'name' => bench,
+      'path' => File.join("TCAS",bench)
+    }
+  }
+end
+
+def wtc_benchmarks
+  heli + tcas
+end
+
 def wcet_tests
   benchmarks = %w{triangle1 triangle2 triangle3 lift_cov}
   targets = Hash.new(['run'])
