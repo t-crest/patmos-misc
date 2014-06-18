@@ -232,7 +232,9 @@ private
                    "-DENABLE_EMULATOR=false",
                    "-DCMAKE_C_FLAGS='#{cflags}'",
                    "-DCONFIG_PML='#{File.expand_path(@config.pml_config_file)}'"
-                  ].join(" ")
+                  ]
+    cmake_flags.push("-DBUILD_WCET_ANALYSIS=true") if @config.options.wcet_build
+    cmake_flags = cmake_flags.join(" ")
     configure_log = File.join(build_setting['builddir'], 'configure.log')
     run("cd #{build_setting['builddir']} && cmake #{@config.srcdir} #{cmake_flags}", :log => configure_log, :console => true, :log_stderr => true)
   end
