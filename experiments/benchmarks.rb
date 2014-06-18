@@ -66,6 +66,21 @@ def papabench
   }
 end
 
+def debie1
+  benchmarks = %w{debie1}
+  targets = %w{TC_InterruptService TM_InterruptService HandleHitTrigger HandleTelecommand HandleAcquisition HandleHealthMonitoring}
+  benchmarks = [
+    { 'analyses' => targets.map { |entry|
+        { 'name' => entry,
+          'analysis_entry' => entry
+        }
+      },
+      'name' => "debie1",
+      'path' => File.join("Debie1-e","code","debie1")
+    }
+  ]
+end
+
 def heli
   benchmarks = %w{heli}
   targets = %w{processSensorData fixFilter runFlightPlan}
@@ -96,7 +111,7 @@ def tcas
 end
 
 def wtc_benchmarks
-  heli + tcas
+  heli + tcas + papabench + debie1
 end
 
 def wcet_tests

@@ -57,8 +57,9 @@ config.options.enable_wca   = true
 config.options.runcheck     = false # true
 config.options.trace_analysis = false
 config.options.use_trace_facts = false
-# config.options.compute_criticalities = true
 config.options.disable_ait = false
+# build WCET benchmarks in analysis mode (no printfs)
+config.options.wcet_build = true
 
 # run benchmarks
 build_and_run(config, BenchTool)
