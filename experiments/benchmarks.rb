@@ -138,11 +138,11 @@ end
 
 # Standard Build settings
 def standard_buildsettings
-  [ {'name' => 'O0', 'cflags' => '-O0', 'ldflags' => '' }, # todo: remove empty blocks
-    {'name' => 'O1', 'cflags' => '-O1', 'ldflags' => '' },
+  [ {'name' => 'O0', 'cflags' => '-O0 -g', 'ldflags' => '' }, # todo: remove empty blocks
+    {'name' => 'O1', 'cflags' => '-O1 -g', 'ldflags' => '' },
     {'name' => 'O1f', 'cflags' => '-O1 -g', 'ldflags' => '-Xopt -disable-inlining' },
-    {'name' => 'O2', 'cflags' => '-O2', 'ldflags' => '' },
-    {'name' => 'Os', 'cflags' => '-Os', 'ldflags' => '-Os'} ]
+    {'name' => 'O2', 'cflags' => '-O2 -g', 'ldflags' => '' },
+    {'name' => 'Os', 'cflags' => '-Os -g', 'ldflags' => '-Os'} ]
 end
 
 # Standard Configurations
