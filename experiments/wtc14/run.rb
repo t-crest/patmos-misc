@@ -15,7 +15,7 @@ rescue LoadError => e
   $:.unshift File.join(File.dirname(__FILE__),"..")
   require 'lib/experiments'
 end
-require_configuration 'wct14'
+require_configuration 'wtc14'
 
 
 # configuration
