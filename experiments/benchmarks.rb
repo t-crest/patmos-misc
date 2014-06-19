@@ -98,7 +98,6 @@ end
 
 def tcas
   benchmarks = %w{tcas-a tcas-b}
-  targets = %w{processSensorData fixFilter runFlightPlan}
   benchmarks = benchmarks.map { |bench|
     { 'analyses' =>
       [{ 'name' => 'main',
@@ -110,8 +109,21 @@ def tcas
   }
 end
 
+def wtc_misc
+  benchmarks = %w{wtc-coop wtc-matmul_32x32 wtc-matmul_128x128}
+  benchmarks = benchmarks.map { |bench|
+    { 'analyses' =>
+      [{ 'name' => 'main',
+        'analysis_entry' => 'main'
+      }],
+      'name' => bench,
+      'path' => File.join("WTC14-misc",bench)
+    }
+  }
+end
+
 def wtc_benchmarks
-  heli + tcas + papabench + debie1
+  heli + tcas + papabench + debie1 + wtc_misc
 end
 
 def wcet_tests
