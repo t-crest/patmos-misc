@@ -1,1 +1,0 @@
-config_ic_1024_4_fifo.pml

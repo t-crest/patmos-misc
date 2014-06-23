@@ -231,6 +231,7 @@ private
                    "-DENABLE_TESTING=true",
                    "-DENABLE_EMULATOR=false",
                    "-DCMAKE_C_FLAGS='#{cflags}'",
+                   "-DCMAKE_C_LINK_FLAGS='#{ldflags.chomp()}'",
                    "-DCONFIG_PML='#{File.expand_path(@config.pml_config_file)}'"
                   ]
     cmake_flags.push("-DBUILD_WCET_ANALYSIS=true") if @config.options.wcet_build
