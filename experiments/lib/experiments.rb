@@ -173,6 +173,8 @@ class BenchmarkTool
           options.report_append = reportkeys
           begin
             run_analysis(options, benchmark, build_setting, configuration)
+          rescue MissingToolException => me
+            raise me
           rescue Exception => e
             $stderr.puts "ERROR: Analysis #{reportkeys.inspect} failed: #{e}"
             puts e.backtrace

@@ -32,6 +32,7 @@ config.pml_config_file = File.join(File.dirname(__FILE__),"../configurations/con
 class BenchTool < WcetTool
   def initialize(pml, options)
     super(pml,options)
+    raise MissingToolException.new("a3") unless which(options.a3)
     @testcnt = 0
   end
   def add_timing_info(name, dict, tool = "aiT")
@@ -149,7 +150,11 @@ config.options.trace_analysis = true
 config.options.use_trace_facts = true
 
 # run benchmarks
-build_and_run(config, BenchTool)
+begin
+  build_and_run(config, BenchTool)
+rescue MissingToolException => me
+  die("integration test failed (tool missing): #{me}")
+end
 
 # summarize
 keys = %w{benchmark build  aiT-unknown-loops analysis source analysis-entry cycles tracefacts flowfacts}

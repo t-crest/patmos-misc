@@ -126,7 +126,11 @@ config.options.trace_analysis = true
 config.options.use_trace_facts = true
 
 # run benchmarks
-build_and_run(config, BenchTool)
+begin
+  build_and_run(config, BenchTool)
+rescue MissingToolException => me
+  die("giving up (tool missing): #{me}")
+end
 
 # summarize
 keys = %w{benchmark build analysis source analysis-entry cycles}
