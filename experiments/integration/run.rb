@@ -18,16 +18,14 @@ end
 require_configuration 'integration'
 
 # configuration
-config = OpenStruct.new
-config.srcdir        = $benchsrc
-config.builddir      = $builddir
-config.workdir       = $workdir
-config.benchmarks    = $benchmarks
+config = default_configuration()
 config.build_log     = File.join(config.builddir, 'build.log')
 config.report        = File.join(config.workdir, 'report.yml')
 config.do_update     = true
 config.nice_pasim    = nil # positive integer
 config.pml_config_file = File.join(File.dirname(__FILE__),"../configurations/config_local.pml")
+
+$trace_minimize_limit = 20
 
 class BenchTool < WcetTool
   def initialize(pml, options)
@@ -50,7 +48,7 @@ class BenchTool < WcetTool
     wcet_analysis([])
     add_timing_info("plain", "tracefacts" => 0, "flowfacts" => 0)
 
-    File.readlines(options.ait_report_prefix + ".xml").each do |line|
+    File.readlines(options.ait_report_prefix + ".txt").each do |line|
       # this is no useful metric for comparison (it does not determine whether WCET can be calculated)
       if line =~ /Loop '(.*?)': unknown loop bound/
         ait_unknown_loops.add($1)
@@ -74,10 +72,14 @@ class BenchTool < WcetTool
     end
 
     # find minimal set of trace facts needed to complete aiT analysis
-    plain_tf = minimize_trace_facts([], tracefacts, "plain_tf")
-    ait_problem_name("plaintf")
-    wcet_analysis(["plain_tf"])
-    add_timing_info("plaintf", "tracefacts" => plain_tf.length, "flowfacts" => plain_tf.length)
+    unless pml.timing.by_origin("plain/aiT").first.cycles > 0 || tracefacts.length > $trace_minimize_limit
+      plain_tf = minimize_trace_facts([], tracefacts, "plain_tf")
+      ait_problem_name("plaintf")
+      wcet_analysis(["plain_tf"])
+      add_timing_info("plaintf", "tracefacts" => plain_tf.length, "flowfacts" => plain_tf.length)
+    else
+      info("Skipping plain+trace minimization")
+    end
 
     # wcet analysis using llvm facts
     transform_down(["llvm.bc"],"llvm")
@@ -87,10 +89,14 @@ class BenchTool < WcetTool
     add_timing_info("llvm", "tracefacts" => 0, "flowfacts" => llvm_ff.length)
 
     # wcet analysus using minimal trace facts + llvm trace facts
-    llvm_tf = minimize_trace_facts(["llvm"], tracefacts, "llvm_tf")
-    ait_problem_name("llvmtf")
-    wcet_analysis(["llvm","llvm_tf"])
-    add_timing_info("llvmtf", "tracefacts" => llvm_tf.length, "flowfacts" => llvm_tf.length + llvm_ff.length)
+    unless pml.timing.by_origin("llvm/aiT").first.cycles > 0 || tracefacts.length > $trace_minimize_limit
+      llvm_tf = minimize_trace_facts(["llvm"], tracefacts, "llvm_tf")
+      ait_problem_name("llvmtf")
+      wcet_analysis(["llvm","llvm_tf"])
+      add_timing_info("llvmtf", "tracefacts" => llvm_tf.length, "flowfacts" => llvm_tf.length + llvm_ff.length)
+    else
+      info("Skipping llvm+trace minimization")
+    end
 
     report(additional_report_info)
     pml

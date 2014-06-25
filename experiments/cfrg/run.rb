@@ -19,11 +19,7 @@ end
 require_configuration 'cfrg'
 
 # configuration
-config = OpenStruct.new
-config.srcdir        = $benchsrc
-config.builddir      = $builddir
-config.workdir       = $workdir
-config.benchmarks    = $benchmarks
+config = default_configuration()
 config.build_log     = File.join(config.builddir, 'build.log')
 config.report        = File.join(config.workdir, 'report.yml')
 config.do_update     = true
