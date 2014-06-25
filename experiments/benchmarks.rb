@@ -127,13 +127,12 @@ def wtc_benchmarks
 end
 
 def wcet_tests
-  benchmarks = %w{triangle1 triangle2 triangle3 lift_cov}
+  benchmarks = %w{triangle1 triangle2 triangle3}
   targets = {}
   tri_runs = (0..4).to_a.collect{|i| "run_f#{i}"}
   targets['triangle1'] = tri_runs.values_at(0,1,3)
   targets['triangle2'] = tri_runs.values_at(0,2,3)
   targets['triangle3'] = tri_runs[0..3]
-  targets['lift_cov'] = ['ctrl_init', 'controller']
   benchmarks.map { |bench|
     { 'analyses' => targets[bench].map { |entry|
         { 'name' => entry,
