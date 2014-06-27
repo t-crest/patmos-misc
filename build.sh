@@ -62,6 +62,9 @@ OS_NAME=$(uname -s)
 # avoid changing into CDPATH directories
 unset CDPATH
 
+# Prevent custom GREP options from breaking the build
+unset GREP_OPTIONS
+
 # physical location of this script, and the config
 self=$(abspath $0)
 CFGFILE=$(dirname $self)/build.cfg
