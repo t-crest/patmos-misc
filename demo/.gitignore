@@ -1,6 +1,7 @@
 hello/hello
 jumptable/jumptable
 wcet/test
+wcet/tmp
 *.s
 *.ll
 *.bc

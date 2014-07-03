@@ -17,7 +17,7 @@ function run() {
 }
 
 # Architecture configuration file
-CONFIG_PML=config_ait_mc.pml
+CONFIG_PML=config_ait.pml
 
 # Function to analyse
 ENTRY=measure
@@ -50,5 +50,8 @@ PASIM_OPTS=`platin tool-config -t simulator -i $CONFIG_PML`
 run pasim $PASIM_OPTS test
 
 # - Analyse
-run platin wcet $WCET_OPTS -b test -i $CONFIG_PML -i test.pml -e $ENTRY --report 
+# The --outdir option is optional. If ommited, a temporary directoy will be used. Otherwise, the outdir
+# must exist before the tool executed.
+run mkdir -p tmp
+run platin wcet $WCET_OPTS -b test -i $CONFIG_PML -i test.pml -e $ENTRY --outdir tmp --report
 
