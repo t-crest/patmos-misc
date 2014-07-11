@@ -512,7 +512,8 @@ function build_cmake() {
         run "$flags" cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
     elif [ $DO_RECONFIGURE == true ] ; then
         run pushd $builddir ">/dev/null"
-        run "$flags" cmake $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
+        run rm -f CMakeCache.txt
+        run "$flags" cmake --no-warn-unused-cli $@ -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} $rootdir
     else
         run pushd $builddir ">/dev/null"
     fi
@@ -568,6 +569,7 @@ function usage() {
 
     -a		Build all targets
     -c		Cleanup builds and rerun configure
+    -r          Rerun configure (resetting CMake cache where applicable)
     -j <n> 	Pass -j<n> to make
     -i <dir>	Set the install dir
     -h		Show this help
