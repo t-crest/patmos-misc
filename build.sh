@@ -821,8 +821,6 @@ function build_emulator() {
     run pushd "${rootdir}" > /dev/null
     run make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${tmpdir}'" "CTOOLSBUILDDIR='${ctoolsbuilddir}'" "HWBUILDDIR='${hwbuilddir}'" "HWINSTALLDIR='${tmpdir}'" "INSTALLDIR='${INSTALL_DIR}'" emulator
     install "${hwbuilddir}/emulator" "${INSTALL_DIR}/bin/patmos-emulator"
-    install "${rootdir}/hardware/spm.t" "${INSTALL_DIR}/lib/ld-scripts/patmos_spm.t"
-    install "${rootdir}/hardware/ram.t" "${INSTALL_DIR}/lib/ld-scripts/patmos_ram.t"
     run popd > /dev/null
 }
 
