@@ -48,8 +48,14 @@ channel   = #patmos
 buildbot-slave = changeme
 i686-slave = changeme
 
+# buildbot slave running at DTU
+helena-slave = changeme
+
 [slaves-main]
 buildbot-slave = 1
+
+[slaves-testing]
+helena-slave = 1
 
 [slaves-synth]
 buildbot-slave = 1
