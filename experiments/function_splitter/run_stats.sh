@@ -28,6 +28,9 @@ if [ -f run.cfg ]; then
   . run.cfg
 fi
 
+# only works on single-thread
+PARJ=-j1
+
 # Exit on first error
 set -e
 
@@ -36,7 +39,7 @@ function config_bench() {
   local clang_args=$2
 
   mkdir -p $BENCH_BUILD_DIR
-  (cd $BENCH_BUILD_DIR && cmake $CMAKE_ARGS -DCMAKE_C_FLAGS="$CLANG_ARGS $clang_args" -DPASIM_OPTIONS="$pasim_args" $BENCH_SRC_DIR)
+  (cd $BENCH_BUILD_DIR && cmake $CMAKE_ARGS -DCMAKE_C_FLAGS="$CLANG_ARGS $clang_args" -DPASIM_EXTRA_OPTIONS="$pasim_args" $BENCH_SRC_DIR)
 }
 
 function build_bench() {
@@ -84,15 +87,9 @@ function collect_splitter() {
 
 
 # Check influence of function splitter
-for i in 8 32 256 1024 512 384 192 96 320 64 448 128; do
+for i in 32 64 128 256 512 1024 384 192 96 320 448; do
   #for scc in $i 1024 2048; do
-  for scc in $i 1024; do
-    collect_splitter "pref_sf_${i}_scc_${scc}" $i $scc
-  done
-done
-
-for i in 768 ; do
-  for scc in $i 1024 2048; do
+  for scc in $i 2048; do
     collect_splitter "pref_sf_${i}_scc_${scc}" $i $scc
   done
 done
