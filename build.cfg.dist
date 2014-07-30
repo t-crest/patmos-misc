@@ -146,3 +146,5 @@ MAKEJ=-j2
 # Use "-jN" to enable parallel benchmark testing
 CTEST_ARGS=
 
+# Set nice level for the whole build.sh run. No renice happens if undefined.
+#NICENESS=10

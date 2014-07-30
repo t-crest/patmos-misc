@@ -237,6 +237,10 @@ if [ -f $CFGFILE ]; then
   source $CFGFILE
 fi
 
+# renice if niceness has been set
+if [ -n "$NICENESS" ]; then
+  renice -n $NICENESS $$
+fi
 
 ##################### Helper Functions ######################
 
