@@ -230,7 +230,7 @@ DO_SHOW_CONFIGURE=false
 DO_RUN_TESTS=false
 DRYRUN=false
 VERBOSE=false
-DO_RUN_ALL=false
+DO_TOOLCHAIN_RUN=false
 
 # user config
 if [ -f $CFGFILE ]; then
@@ -563,7 +563,7 @@ function usage() {
     -v		Show command that are executed
     -V		Make make verbosive
     -t		Run tests
-    -a          Build llvm and do a clean build of newlib, compiler-rt and bench with tests.
+    -o          Build toolchain (gold, llvm, patmos) and do clean build of newlib, compiler-rt and bench with tests.
 
   Available targets:
     gold llvm newlib compiler-rt pasim|patmos bench rtems rtems-test rtems-examples rtems-all eclipse aegean poseidon
@@ -1074,7 +1074,7 @@ build_target() {
 
 
 # one-shot config
-while getopts ":crhi:j:pudsvxVtae" opt; do
+while getopts ":crhi:j:pudsvxVtoe" opt; do
   case $opt in
     c) DO_CLEAN=true ;;
     r) DO_RECONFIGURE=true ;;
@@ -1088,7 +1088,7 @@ while getopts ":crhi:j:pudsvxVtae" opt; do
     v) VERBOSE=true ;;
     V) MAKE_VERBOSE="VERBOSE=1" ;;
     t) DO_RUN_TESTS=true ;;
-    a) DO_RUN_ALL=true ;;
+    o) DO_TOOLCHAIN_RUN=true ;;
     x) set -x ;;
     e) # recreate build.cfg.dist
        cat build.sh | sed -n '/##* Start of user configs/,/##* End of user configs/p' | sed "$ d" | sed "/Start of user configs/d" > build.cfg.dist
@@ -1169,7 +1169,8 @@ fi
 
 mkdir -p "${INSTALL_DIR}"
 
-if [ "$DO_RUN_ALL" == "true" ]; then
+if [ "$DO_TOOLCHAIN_RUN" == "true" ]; then
+    build_target gold
     build_target llvm
     build_target patmos
     DO_CLEAN=true
