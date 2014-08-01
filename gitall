@@ -32,6 +32,9 @@ function abspath() {
     fi
 }
 
+# avoid changing into CDPATH directories
+unset CDPATH
+
 # TODO alternatively check home for devup.cfg?
 self=`abspath $0`
 cfgfile=`dirname $self`/devup.cfg
