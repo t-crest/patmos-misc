@@ -75,10 +75,16 @@ CHRPATH=$(dirname $self)/patmos-chrpath
 # location of the custom install script
 INSTALL_SH=$(dirname $self)/scripts/install.sh
 
+# List of available targets
+ALLTARGETS="gold llvm newlib compiler-rt pasim bench poseidon aegean"
+
 ########### Start of user configs, overwrite in build.cfg ##############
 
-# List of targets to build by default
-ALLTARGETS="gold llvm newlib compiler-rt pasim bench poseidon aegean"
+# List of targets to build by default, developers may set this to $ALLTARGETS
+# or a subset of interesting tools
+BUILDSH_TARGETS="gold llvm newlib compiler-rt pasim poseidon aegean"
+#BUILDSH_TARGETS=$ALLTARGETS
+#BUILDSH_TARGETS="llvm pasim"
 
 # Root directory for all repositories
 ROOT_DIR=$(pwd)
@@ -186,9 +192,14 @@ RTEMS_SIM=pasim
 # Patmos C-tools cmake options
 CTOOLS_ARGS=
 
-# Overwrite default options for pasim for make test
-#BENCH_ARGS="-DPASIM_OPTIONS='-M fifo -m 4k'"
-
+## Options for the patmos-bench test environment
+# PML architecture files configure clang/llvm, pasim, and platin:
+# PML_CONFIG and PML_CONFIG_HW (for emulated executables)
+#BENCH_ARGS="-DCONFIG_PML=scripts/patmos-config-sim.pml"
+# Add extra options for pasim when executing tests
+#BENCH_ARGS="${BENCH_ARGS} -DPASIM_EXTRA_OPTIONS='--maxc 1000'"
+# Disable gcc torture tests
+#BENCH_ARGS="${BENCH_ARGS} -DENABLE_CTORTURE=false"
 # Set path to a3, or set to empty string to disable a3
 #BENCH_ARGS="${BENCH_ARGS} -DA3_EXECUTABLE="
 
@@ -219,6 +230,8 @@ MAKEJ=-j2
 # Use "-jN" to enable parallel benchmark testing
 CTEST_ARGS=
 
+# Set nice level for the whole build.sh run. No renice happens if undefined.
+#NICENESS=10
 #################### End of user configs #####################
 
 # Internal options, set by command line
@@ -231,6 +244,7 @@ DO_RUN_TESTS=false
 DRYRUN=false
 VERBOSE=false
 DO_TOOLCHAIN_RUN=false
+DO_RUN_ALL=false
 
 # user config
 if [ -f $CFGFILE ]; then
@@ -550,8 +564,9 @@ function build_autoconf() {
 
 function usage() {
   cat <<EOT
-  Usage: $0 [-c] [-j<n>] [-p] [-i <install_dir>] [-h] [-a|<targets>]
+  Usage: $0 [-c] [-j<n>] [-p] [-i <install_dir>] [-h] [-a|-o|<targets>]
 
+    -a		Build all targets
     -c		Cleanup builds and rerun configure
     -j <n> 	Pass -j<n> to make
     -i <dir>	Set the install dir
@@ -1074,8 +1089,9 @@ build_target() {
 
 
 # one-shot config
-while getopts ":crhi:j:pudsvxVtoe" opt; do
+while getopts ":crhi:j:pudsvxVtoea" opt; do
   case $opt in
+    a) DO_RUN_ALL=true ;;
     c) DO_CLEAN=true ;;
     r) DO_RECONFIGURE=true ;;
     h) usage; exit 0 ;;
@@ -1179,7 +1195,13 @@ if [ "$DO_TOOLCHAIN_RUN" == "true" ]; then
     build_target newlib
     build_target bench
 else
-    TARGETS=${@-$ALLTARGETS}
+    if [ "$DO_RUN_ALL" == "true" ]; then
+        TARGETS=$ALLTARGETS
+        echo "** Building all targets (-a): $TARGETS"
+    else
+        TARGETS=${@-$BUILDSH_TARGETS}
+        echo "** Building targets: $TARGETS"
+    fi
     for target in $TARGETS; do
 	build_target $target
     done
