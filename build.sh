@@ -670,7 +670,11 @@ function make_llvm() {
 
     if [ "$DO_RUN_TESTS" == "true" ]; then
 	echo "Running tests.."
-        run make check-all
+        if [ -e build.ninja ] ; then
+            run ninja check-all
+        else
+            run make check-all
+        fi
     fi
 }
 
