@@ -1,6 +1,9 @@
 
-# List of targets to build by default
-ALLTARGETS="gold llvm newlib compiler-rt pasim bench poseidon aegean"
+# List of targets to build by default, developers may set this to $ALLTARGETS
+# or a subset of interesting tools
+BUILDSH_TARGETS="gold llvm newlib compiler-rt pasim poseidon aegean"
+#BUILDSH_TARGETS=$ALLTARGETS
+#BUILDSH_TARGETS="llvm pasim"
 
 # Root directory for all repositories
 ROOT_DIR=$(pwd)
