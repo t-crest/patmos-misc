@@ -8,7 +8,7 @@ function compare_benches() {
   namepattern=$3
   values=$4
 
-  for bench in `ls work/$base`; do
+  for bench in `ls work/$base | grep ".stats"`; do
     name=${bench%.stats}
     suite=`echo "$name" | sed "s/-.*//"`
     benchname=`echo "$name" | sed "s/.*-//"`
@@ -27,8 +27,8 @@ function compare_benches() {
   done
 }
 
-compare_benches "ideal" "pref_sf_XX_scc_XX_ideal" "XX/XX" "32 128 192 256 512 1024" > results/compare_ideal.csv
-compare_benches "ideal" "pref_sf_XX_scc_2048_ideal" "XX/2048" "128 192 256 512" >> results/compare_ideal.csv
+#compare_benches "ideal" "pref_sf_XX_scc_XX_ideal" "XX/XX" "32 128 192 256 512 1024" > results/compare_ideal.csv
+#compare_benches "ideal" "pref_sf_XX_scc_2048_ideal" "XX/2048" "128 192 256 512" >> results/compare_ideal.csv
 
 # Compare to LRU
 #
@@ -44,20 +44,23 @@ compare_benches "ideal" "pref_sf_XX_scc_2048_ideal" "XX/2048" "128 192 256 512" 
 #compare_benches "nosplit_ic8k_lru4" "pref_sf_XX_scc_XX_mc8k_32_vb" "XX/XX" "32 128 192 256 512 1024"  > results/compare_mc8k_32_vb.csv
 #compare_benches "nosplit_ic8k_lru4" "pref_sf_XX_scc_2048_mc8k_32_vb" "XX/2048" "128 192 256 512"  >> results/compare_mc8k_32_vb.csv
 
-compare_benches "nosplit_ic4k_lru4" "pref_sf_XX_scc_XX_mc4k_32_vb" "XX/XX" "32 128 192 256 512 1024"  > results/compare_mc4k_32_vb.csv
-compare_benches "nosplit_ic4k_lru4" "pref_sf_XX_scc_2048_mc4k_32_vb" "XX/2048" "32 128 192 256 512 1024"  >> results/compare_mc4k_32_vb.csv
+#compare_benches "nosplit_ic4k_lru4" "pref_sf_XX_scc_XX_mc4k_32_vb" "XX/XX" "32 128 192 256 512 1024"  > results/compare_mc4k_32_vb.csv
+#compare_benches "nosplit_ic4k_lru4" "pref_sf_XX_scc_2048_mc4k_32_vb" "XX/2048" "32 128 192 256 512 1024"  >> results/compare_mc4k_32_vb.csv
 
 
 # Compare setups only
 
-compare_benches "pref_sf_1024_scc_2048_mc4k_32_vb" "pref_sf_XX_scc_XX_mc4k_32_vb" "XX/XX" "32 128 192 256 512"      > results/compare_mc_mc4k_32_vb.csv
-compare_benches "pref_sf_1024_scc_2048_mc4k_32_vb" "pref_sf_XX_scc_2048_mc4k_32_vb" "XX/2048" "32 128 192 256 512" >> results/compare_mc_mc4k_32_vb.csv
+#compare_benches "pref_sf_1024_scc_2048_mc4k_32_vb" "pref_sf_XX_scc_XX_mc4k_32_vb" "XX/XX" "32 128 192 256 512"      > results/compare_mc_mc4k_32_vb.csv
+#compare_benches "pref_sf_1024_scc_2048_mc4k_32_vb" "pref_sf_XX_scc_2048_mc4k_32_vb" "XX/2048" "32 128 192 256 512" >> results/compare_mc_mc4k_32_vb.csv
 
-compare_benches "pref_sf_1024_scc_2048_mc8k_32_vb" "pref_sf_XX_scc_XX_mc8k_32_vb" "XX/XX" "32 128 192 256 512"      > results/compare_mc_mc8k_32_vb.csv
-compare_benches "pref_sf_1024_scc_2048_mc8k_32_vb" "pref_sf_XX_scc_2048_mc8k_32_vb" "XX/2048" "32 128 192 256 512" >> results/compare_mc_mc8k_32_vb.csv
+compare_benches "pref_sf_1024_scc_2048_mc4k_16_vb" "pref_sf_XX_scc_XX_mc4k_16_vb" "XX/XX" "32 128 192 256 512"      > results/compare_mc_mc4k_16_vb.csv
+compare_benches "pref_sf_1024_scc_2048_mc4k_16_vb" "pref_sf_XX_scc_2048_mc4k_16_vb" "XX/2048" "32 128 192 256 512" >> results/compare_mc_mc4k_16_vb.csv
 
-compare_benches "pref_sf_1024_scc_2048_mc4k_64_vb" "pref_sf_XX_scc_XX_mc4k_64_vb" "XX/XX" "32 128 192 256 512"      > results/compare_mc_mc4k_64_vb.csv
-compare_benches "pref_sf_1024_scc_2048_mc4k_64_vb" "pref_sf_XX_scc_2048_mc4k_64_vb" "XX/2048" "32 128 192 256 512" >> results/compare_mc_mc4k_64_vb.csv
+#compare_benches "pref_sf_1024_scc_2048_mc8k_32_vb" "pref_sf_XX_scc_XX_mc8k_32_vb" "XX/XX" "32 128 192 256 512"      > results/compare_mc_mc8k_32_vb.csv
+#compare_benches "pref_sf_1024_scc_2048_mc8k_32_vb" "pref_sf_XX_scc_2048_mc8k_32_vb" "XX/2048" "32 128 192 256 512" >> results/compare_mc_mc8k_32_vb.csv
+
+#compare_benches "pref_sf_1024_scc_2048_mc4k_64_vb" "pref_sf_XX_scc_XX_mc4k_64_vb" "XX/XX" "32 128 192 256 512"      > results/compare_mc_mc4k_64_vb.csv
+#compare_benches "pref_sf_1024_scc_2048_mc4k_64_vb" "pref_sf_XX_scc_2048_mc4k_64_vb" "XX/2048" "32 128 192 256 512" >> results/compare_mc_mc4k_64_vb.csv
 
 
 
