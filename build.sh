@@ -581,7 +581,7 @@ function usage() {
     -o          Build toolchain (gold, llvm, patmos) and do clean build of newlib, compiler-rt and bench with tests.
 
   Available targets:
-    gold llvm newlib compiler-rt pasim|patmos bench rtems rtems-test rtems-examples rtems-all eclipse aegean poseidon
+    gold llvm newlib compiler-rt pasim|patmos bench rtems rtems-test rtems-examples eclipse aegean poseidon
 
   The command-line options override the user-config read from '$CFGFILE'.
 EOT
