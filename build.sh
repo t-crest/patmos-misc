@@ -631,7 +631,7 @@ function make_llvm() {
     local builddir=$2
 
     if [ -e build.ninja ] ; then
-        run ninja
+        run ninja $MAKEJ
     else
         run make $MAKEJ $MAKE_VERBOSE all
     fi
