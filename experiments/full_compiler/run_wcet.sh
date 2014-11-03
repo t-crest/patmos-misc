@@ -145,8 +145,9 @@ collect_stats "default_O0" "default" "-O0"
 # TODO fixme (compress, duff, lms, ns, matmult, ndes, adpcm, lcdnum, ..)
 collect_stats "default_O1" "default" "-O1"
 collect_stats "default_O3" "default" "-O3"
+collect_stats "default_none" "default" "-O0 -mpatmos-disable-stack-cache -mpatmos-disable-vliw -Xllc -mpatmos-cfl=delayed"
 # no-link-opts
-collect_stats "default_nolinkopts" "default" "-O0 -Xclang -O2 -Xllc -O2"
+collect_stats "default_nolinkopts" "default" "-fpatmos-skip-opt"
 
 # Compare split-cache (-O2) vs. splitcache + bypass, no stackcache
 collect_stats "default_nostackcache" "default" "-mpatmos-disable-stack-cache"
@@ -155,7 +156,7 @@ collect_stats "dc4k_nostackcache"    "dc4k"    "-mpatmos-disable-stack-cache"
 # Compare dual-issue (-O2) vs. single-issue
 collect_stats "default_singleissue" "default" "-mpatmos-disable-vliw"
 #collect_stats "default_singleissue_nopostra" "default" "-mpatmos-disable-vliw -mpatmos-disable-post-ra"
-collect_stats "default_nopostra"    "default" "-mpatmos-disable-post-ra"
+#collect_stats "default_nopostra"    "default" "-mpatmos-disable-post-ra"
 
 
 # Compare mixed-delayed branches (-O2) vs. non-delayed / delayed
