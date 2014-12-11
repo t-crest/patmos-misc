@@ -26,7 +26,7 @@ def mrtc_benchmarks
   #   edn - unbounded memcpy loops
   #
   benchmarks = %w{adpcm_encoder adpcm_decoder binarysearch bsort100 compress countnegative
-    cover crc duff expint fac fdct fft1 fibcall fir insertsort janne_complex jfdctint
+    cover crc duff edn expint fac fdct fft1 fibcall fir insertsort janne_complex jfdctint
     lcdnum lms ludcmp matmult minver ndes petrinet prime qsort-exam qurt
     recursion select sqrt statemate st}
 
@@ -157,7 +157,10 @@ def standard_buildsettings
     {'name' => 'O1', 'cflags' => '-O1 -g', 'ldflags' => '' },
     {'name' => 'O1f', 'cflags' => '-O1 -g', 'ldflags' => '-Xopt -disable-inlining' },
     {'name' => 'O2', 'cflags' => '-O2 -g', 'ldflags' => '' },
-    {'name' => 'Os', 'cflags' => '-Os -g', 'ldflags' => '-Os'} ]
+    {'name' => 'Os', 'cflags' => '-Os -g', 'ldflags' => '-Os'},
+    {'name' => 'del', 'cflags' => '-O2 -g', 'ldflags' => '-Xllc -mpatmos-cfl=delayed' },
+    {'name' => 'nd',  'cflags' => '-O2 -g', 'ldflags' => '-Xllc -mpatmos-cfl=non-delayed' },
+    {'name' => 'mix', 'cflags' => '-O2 -g', 'ldflags' => '-Xllc -mpatmos-cfl=mixed' } ]
 end
 
 # Standard Configurations

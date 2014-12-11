@@ -1,0 +1,38 @@
+#
+# Configuration for Experiments
+#
+# These settings are centrally applied by
+#   default_configuration
+#   default_options
+# in lib/experiments.rb.
+#
+
+# path to patmos-benchmarks repository
+$benchsrc = '/mnt/work/t-crest/bench'
+
+# directory for CMake build of patmos-benchmarks
+# relative to the directory of the experiment (e.g., experiments/wcet)
+$builddir = 'build'
+
+# working directory
+# relative to the directory of the experiment (e.g., experiments/wcet)
+$workdir  = '%DIR%'
+
+# branch prediction
+$prediction = '%PRED%'
+
+# patmos HW configuration
+# either absolute or relative to the directory of the experiment
+$hw_config = "%CONF%"
+
+# For development, it is advisable to set a filter selecting a few relevant benchmarks
+$benchfilter = Proc.new { |b| true }
+# $benchfilter = Proc.new { |b| %w{mrtc_bs mrtc_crc mrtc_compress}.include?(b['name']) }
+
+# LLVM stack cache analysis options (optional)
+$lp_solver = "#{$benchsrc}/scripts/solve_ilp_glpk.sh"
+
+# Limit number of parallel processes (defaults to number of CPUs)
+$nproc = 8
+
+$debug = :all
