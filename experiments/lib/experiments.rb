@@ -115,6 +115,9 @@ class BenchmarkTool
     elsif ! File.exist?(@config.pml_config_file)
       $stderr.puts "Config file #{@config.pml_config_file} does not exist. Exit."
       exit 1
+    elsif ! @config.options.disable_ait && ! which(@config.options.a3)
+      $stderr.puts "ait enabaled, but #{@config.options.a3} not found. Exit"
+      exit 1
     end
     # default parallelity is processor count
     nproc = @config.nproc.to_i # 0 if not an int
@@ -259,7 +262,10 @@ private
     FileUtils.remove_entry_secure(analysis_log) if File.exist?(analysis_log)
 
     log_analysis_opts  = { :log => analysis_log, :console => true, :log_append => true }
-    run_analysis_opts = { :log => analysis_log, :log_stderr => true, :log_append => true }
+    run_analysis_opts = { :log => analysis_log,
+                          :log_stderr => true,
+                          :log_append => true,
+                          :config => configuration}
     if defined?(@analysis_tool.import_ff)
       flowfact_inputs = @analysis_tool.import_ff(benchmark, options)
       log("##{benchmark['index']} Adding User Flowfacts: #{flowfact_inputs}", log_analysis_opts)
