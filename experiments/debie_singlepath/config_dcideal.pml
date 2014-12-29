@@ -4,12 +4,19 @@ triple: patmos-unknown-unknown-elf
 machine-configuration:
   memories:
     - name: "main"
-      size: 0x200000
-      transfer-size: 8
+      size: 0x2000000
+      transfer-size: 16
       read-latency: 3
-      read-transfer-time: 2
+      read-transfer-time: 4
       write-latency: 3
-      write-transfer-time: 2
+      write-transfer-time: 4
+    - name: "ideal"
+      size: 0x2000000
+      transfer-size: 4
+      read-latency: 0
+      read-transfer-time: 0
+      write-latency: 0
+      write-transfer-time: 0
     - name: "local"
       size: 2048
       transfer-size: 4
@@ -22,11 +29,11 @@ machine-configuration:
       block-size: 8
       associativity: 1
       size: 2048
-      policy: "lru"
+      policy: "ideal"
       type: "set-associative"
     - name: "method-cache"
-      block-size: 512
-      associativity: 8
+      block-size: 8
+      associativity: 16
       size: 4096
       policy: "fifo"
       type: "method-cache"
@@ -44,18 +51,15 @@ machine-configuration:
         max: 0x200000
     - name: "data"
       type: "data"
-      memory: "main"
+      memory: "ideal"
       cache: "data-cache"
       address-range:
         min: 0
-        max: 0x200000
+        max: 0x2000000
       attributes:
         - key: "heap-end"
-          value: 0x100000
+          value: 0x1000000
         - key: "stack-base"
-          value: 0x200000
+          value: 0x2000000
         - key: "shadow-stack-base"
-          value: 0x1f8000
-tool-configurations:
-  - name: "clang"
-    options: ["-mpatmos-disable-vliw"]                  
+          value: 0x1f80000

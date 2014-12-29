@@ -14,7 +14,8 @@ if [ ! -f $BINFILE ]; then
   exit 2
 fi
 
-ARCHPML=config_default.pml
+ARCHPML=config_dcideal.pml
+#ARCHPML=config_default.pml
 
 #SPROOTS="TC_InterruptService,TM_InterruptService,HandleHitTrigger,HandleTelecommand,HandleAcquisition,HandleHealthMonitoring"
 SPROOTS="TC_InterruptService TM_InterruptService HandleHitTrigger HandleTelecommand HandleAcquisition"
@@ -71,7 +72,7 @@ function run_wcet() {
     echo "**** Running platin wcet on $binfile for $root ****"
     echo
 
-    platin wcet -i ${binfile}.pml -i ${ARCHPML} -b ${binfile} -e $root --outdir tmp --report $reportfile --append-report
+    platin wcet -i ${binfile}.pml -i ${ARCHPML} -b ${binfile} -e $root --outdir tmp --report $reportfile --append-report --enable-wca
   done
 }
 
@@ -90,13 +91,14 @@ function print_wcet() {
     return
   fi
 
-  echo -e "  Function         \t\tWCET"
-  echo "  --------------------------------------------"
+  echo -e "  Function         \t\tWCET (aiT)\tWCET (platin)"
+  echo "  ------------------------------------------------------------"
 
   for root in $SPROOTS; do
-    cycles=`grep -A 6 "$root" $reportfile | grep "cycles:" | sed "s/.*: \([0-9]*\).*/\1/"`
+    cycles_wca=`grep -A 4 "$root" $reportfile | grep -A 3 "platin" | grep "cycles:" | sed "s/.*: \([-0-9]*\).*/\1/"`
+    cycles_ait=`grep -A 4 "$root" $reportfile | grep -A 3 "aiT"    | grep "cycles:" | sed "s/.*: \([-0-9]*\).*/\1/"`
     
-    echo -e "  $root\t\t$cycles"
+    echo -e "  $root\t\t$cycles_ait\t\t$cycles_wca"
   done
   
 }
