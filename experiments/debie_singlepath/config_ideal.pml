@@ -5,11 +5,11 @@ machine-configuration:
   memories:
     - name: "main"
       size: 0x2000000
-      transfer-size: 16
-      read-latency: 3
-      read-transfer-time: 4
-      write-latency: 3
-      write-transfer-time: 4
+      transfer-size: 4
+      read-latency: 0
+      read-transfer-time: 0
+      write-latency: 0
+      write-transfer-time: 0
     - name: "local"
       size: 2048
       transfer-size: 4
@@ -18,12 +18,6 @@ machine-configuration:
       write-latency: 0
       write-transfer-time: 0
   caches:
-    - name: "data-cache"
-      block-size: 8
-      associativity: 1
-      size: 2048
-      policy: "dm"
-      type: "set-associative"
     - name: "method-cache"
       block-size: 8
       associativity: 16
@@ -45,7 +39,6 @@ machine-configuration:
     - name: "data"
       type: "data"
       memory: "main"
-      cache: "data-cache"
       address-range:
         min: 0
         max: 0x2000000

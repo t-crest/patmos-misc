@@ -9,11 +9,11 @@
   cache-cycles: 290.0
 - analysis-entry: TC_InterruptService
   source: aiT
-  cycles: 655
+  cycles: 682
   cache-misses-icache: 6
-  cache-misses-dcache: 10
-  cache-hits-icache: 141
-  cache-hits-dcache: 13
+  cache-misses-dcache: 14
+  cache-hits-icache: 139
+  cache-hits-dcache: 0
 ---
 - analysis-entry: TM_InterruptService
   source: platin
@@ -25,11 +25,11 @@
   cache-cycles: 115.0
 - analysis-entry: TM_InterruptService
   source: aiT
-  cycles: 234
+  cycles: 241
   cache-misses-icache: 3
-  cache-misses-dcache: 5
+  cache-misses-dcache: 6
   cache-hits-icache: 49
-  cache-hits-dcache: 6
+  cache-hits-dcache: 0
 ---
 - analysis-entry: HandleHitTrigger
   source: platin
@@ -41,11 +41,11 @@
   cache-cycles: 659.0
 - analysis-entry: HandleHitTrigger
   source: aiT
-  cycles: 30087
+  cycles: 32397
   cache-misses-icache: 20
-  cache-misses-dcache: 1001
+  cache-misses-dcache: 1331
   cache-hits-icache: 10639
-  cache-hits-dcache: 1331
+  cache-hits-dcache: 0
 ---
 - analysis-entry: HandleTelecommand
   source: platin
@@ -57,11 +57,11 @@
   cache-cycles: 297.0
 - analysis-entry: HandleTelecommand
   source: aiT
-  cycles: 4118
+  cycles: 4174
   cache-misses-icache: 20
-  cache-misses-dcache: 143
+  cache-misses-dcache: 152
   cache-hits-icache: 891
-  cache-hits-dcache: 152
+  cache-hits-dcache: 0
 ---
 - analysis-entry: HandleAcquisition
   source: platin
@@ -73,8 +73,8 @@
   cache-cycles: 6901.0
 - analysis-entry: HandleAcquisition
   source: aiT
-  cycles: 760181
+  cycles: 760356
   cache-misses-icache: 1386
-  cache-misses-dcache: 8926
+  cache-misses-dcache: 8950
   cache-hits-icache: 53600
-  cache-hits-dcache: 8950
+  cache-hits-dcache: 0

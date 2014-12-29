@@ -1,7 +1,11 @@
 #!/bin/bash
 
 if [ "$1" != "wcet" -a "$1" != "pasim" -a "$1" != "print" ] || [ "$2" == "" ]; then
-  echo "Usage: $0 wcet|pasim|print <binary>"
+  echo "Usage: $0 wcet|pasim|print <binary> [<configname>]"
+  echo
+  echo "If a configname (like 'nodc' or 'ideal') is given, 'print' will use"
+  echo "the results of the corresponding result dir."
+  echo 
   exit 1
 fi
 
@@ -14,8 +18,11 @@ if [ ! -f $BINFILE ]; then
   exit 2
 fi
 
-ARCHPML=config_dcideal.pml
-#ARCHPML=config_default.pml
+ARCHPML=config_default.pml
+
+if [ "$3" != "" ]; then
+  ARCHPML="config_${3}.pml"
+fi
 
 #SPROOTS="TC_InterruptService,TM_InterruptService,HandleHitTrigger,HandleTelecommand,HandleAcquisition,HandleHealthMonitoring"
 SPROOTS="TC_InterruptService TM_InterruptService HandleHitTrigger HandleTelecommand HandleAcquisition"
@@ -38,6 +45,10 @@ function run_pasim() {
 
 function print_pasim() {
   binfile=$1
+  resultdir=$2
+  if [ -z $resultdir ]; then
+    resultdir="."
+  fi
 
   echo
   echo "**** Simulation Results for $binfile using $ARCHPML ****"
@@ -48,7 +59,7 @@ function print_pasim() {
 
   for root in $SPROOTS; do
 
-    line=`grep -A 2 "$root" pasim.${binfile}.${root}.log | tail -n 1`
+    line=`grep -A 2 "$root" $resultdir/pasim.${binfile}.${root}.log | tail -n 1`
 
     min=`echo $line | awk '{print $2}'`
     max=`echo $line | awk '{print $3}'`
@@ -78,12 +89,16 @@ function run_wcet() {
 
 function print_wcet() {
   binfile=$1
+  resultdir=$2
+  if [ -z $resultdir ]; then
+    resultdir="."
+  fi
 
   echo
   echo "**** WCET Results for $binfile using $ARCHPML ****"
   echo
 
-  reportfile="wcet.${binfile}.pml"
+  reportfile="$resultdir/wcet.${binfile}.pml"
 
   if [ ! -f $reportfile ]; then
     echo "Report file not found!"
@@ -114,6 +129,10 @@ if [ "$MODE" == "wcet" ]; then
 fi
 
 if [ "$MODE" == "print" ]; then
-  print_pasim $BINFILE
-  print_wcet $BINFILE
+  if [ "$3" != "" ]; then
+    resultdir="results/$3"
+  fi
+
+  print_pasim $BINFILE $resultdir
+  print_wcet $BINFILE $resultdir
 fi

@@ -18,12 +18,6 @@ machine-configuration:
       write-latency: 0
       write-transfer-time: 0
   caches:
-    - name: "data-cache"
-      block-size: 8
-      associativity: 1
-      size: 2048
-      policy: "dm"
-      type: "set-associative"
     - name: "method-cache"
       block-size: 8
       associativity: 16
@@ -45,7 +39,6 @@ machine-configuration:
     - name: "data"
       type: "data"
       memory: "main"
-      cache: "data-cache"
       address-range:
         min: 0
         max: 0x2000000

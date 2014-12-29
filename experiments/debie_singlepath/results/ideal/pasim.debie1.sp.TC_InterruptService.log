@@ -1,5 +1,5 @@
 
-Cyc : 502160630
+Cyc : 434093620
  PRR: 00000101  BASE: 0005ab44   PC : 0005ab8c   <_exit:.Ltmp25171>
  r0 : 00000000   r1 : 00000000   r2 : 00000000   r3 : 00000000   r4 : 00000001   r5 : f0000100   r6 : 00000040   r7 : 00000040
  r8 : 00067410   r9 : 00000005   r10: 00000007   r11: 6f777320   r12: 01f7ffe3   r13: 00000058   r14: 01f7ff48   r15: 00000003
@@ -127,18 +127,18 @@ Stall Cycles:
    IF: 0
    DR: 0
    EX: 0
-   MW: 68067010
+   MW: 0
 
-Cycles per Instruction (w/  NOPs):   1.1568
-Cycles per Operation   (w/  NOPs):   0.8979
-Cycles per Instruction (w/o NOPs):   1.2811
-Cycles per Operation   (w/o NOPs):   0.9709
+Cycles per Instruction (w/  NOPs):   1.0000
+Cycles per Operation   (w/  NOPs):   0.7761
+Cycles per Instruction (w/o NOPs):   1.1074
+Cycles per Operation   (w/o NOPs):   0.8393
 
                    total     % cycles
-Cycles:        502160630
-Instructions:  391986658       78.06%
-NOPs:           42106959        8.39%
-Stalls:         68067010       13.55%
+Cycles:        434093620
+Instructions:  391986658       90.30%
+NOPs:           42106959        9.70%
+Stalls:                0        0.00%
 
                    total        % ops
 Operations:    517184940       92.47%
@@ -151,22 +151,22 @@ Slot utilization (w/ NOPs):      100.00%      28.84%
 
 Instruction Cache Statistics:
                               total        max.
-   Blocks Allocated    :   14181659         126
-   Bytes Transferred   :  114683604        1012
-   Bytes Allocated     :  112623328        1008
-   Bytes Used          :  105242960
-   Block Utilization   :      92.76%
+   Blocks Allocated    :   14227254         126
+   Bytes Transferred   :  115049684        1012
+   Bytes Allocated     :  112985664        1008
+   Bytes Used          :  105262068
+   Block Utilization   :      92.48%
    Int. Fragmentation  :       0.73%
-   Bytes Freed         :   39144648         984
-   Ext. Fragmentation  :      34.50%
+   Bytes Freed         :   39125536         984
+   Ext. Fragmentation  :      34.38%
    Max Methods in Cache:         16
-   Cache Hits          :    2642401       83.69%
-   Cache Misses        :     515069       16.31%
-   Cache Misses Returns:      38615        7.50%
-   Evictions Capacity  :     241124       47.12%
-   Evictions Tag       :     270547       52.88%
+   Cache Hits          :    2641465       83.66%
+   Cache Misses        :     516005       16.34%
+   Cache Misses Returns:      39016        7.56%
+   Evictions Capacity  :     242424       47.27%
+   Evictions Tag       :     270372       52.73%
    Transfer Ratio      :      0.033
-   Miss Stall Cycles   :   30995059        6.17%
+   Miss Stall Cycles   :          0        0.00%
 
        Method:        #hits     #misses  methodsize      blocks    min-util    max-util
    0x00020084:            2           1         184          23      26.09%      73.91%    <.Ltmp2:.Lfunc_begin0:.LBB0_0:_start:.Ltmp1>
@@ -330,8 +330,8 @@ Instruction Cache Statistics:
    0x00026fd4:            0          14          44           6     100.00%     100.00%    <SetSensorUnitOff:.LBB83_9:.Ltmp2885 + 0x4>
    0x00027024:            6          50         168          21     100.00%     100.00%    <SetSensorUnitOff:.LBB83_12:.Ltmp2894>
    0x00027304:           11         390         968         121     100.00%     100.00%    <.Lfunc_begin87:.Ltmp2980:TC_InterruptService:.LBB87_0>
-   0x000276d4:           11         390         884         111     100.00%     100.00%    <TC_InterruptService:.LBB87_1:.Ltmp2979 + 0x8>
-   0x000298a4:         1523         447         868         109      16.13%     100.00%    <.LBB95_0:.Ltmp3810:.Ltmp3811:HandleTelecommand:.Lfunc_begin95>
+   0x000276d4:            0         401         884         111     100.00%     100.00%    <TC_InterruptService:.LBB87_1:.Ltmp2979 + 0x8>
+   0x000298a4:         1186         784         868         109      16.13%     100.00%    <.LBB95_0:.Ltmp3810:.Ltmp3811:HandleTelecommand:.Lfunc_begin95>
    0x00029e64:        17778          17         472          59     100.00%     100.00%    <.LBB98_0:.Lfunc_begin98:.Ltmp3937:TM_InterruptService:.Ltmp3938>
    0x0002a5a4:            0           1         148          19     100.00%     100.00%    <.Lfunc_begin103:.LBB103_0:ClearEvents:.Ltmp4115>
    0x0002a644:            0           1         208          26      36.54%      36.54%    <ClearEvents:.LBB103_7:.Ltmp4138>
@@ -347,7 +347,7 @@ Instruction Cache Statistics:
    0x0002b474:         3917        2038         124          16      67.74%     100.00%    <End_Of_ADC:.Ltmp4677:.LBB140_2:.Ltmp4676>
    0x0002b4f4:         3087        5385          20           3     100.00%     100.00%    <End_Of_ADC:.LBB140_4:.Ltmp4689 + 0x4>
    0x0002b514:         9316        5385           8           1     100.00%     100.00%    <End_Of_ADC:.LBB140_5:.Ltmp4692>
-   0x0002ba84:           61          61         152          19     100.00%     100.00%    <.Lfunc_begin163:.LBB163_0:.Ltmp4897:Clear_Errors:.Ltmp4898>
+   0x0002ba84:            0         122         152          19      34.21%      68.42%    <.Lfunc_begin163:.LBB163_0:.Ltmp4897:Clear_Errors:.Ltmp4898>
    0x0002bb44:            0         122          44           6      45.45%      90.91%    <Clear_Errors:.LBB163_2:.Ltmp4921>
    0x0002bb94:            0          61         168          21      76.19%      76.19%    <Clear_Errors:.LBB163_4:.Ltmp4930>
    0x0002bcc4:            1           1         452          57     100.00%     100.00%    <.LBB165_0:.Lfunc_begin165:.Ltmp4964:Monitoring_Task_Tests:.Ltmp4965>
@@ -377,23 +377,23 @@ Instruction Cache Statistics:
    0x0002c8f4:            0          64          40           5     100.00%     100.00%    <Monitoring_Task_Tests:.LBB165_83:.Ltmp5388>
    0x0002c924:            0          40          32           4      50.00%      62.50%    <Monitoring_Task_Tests:.Ltmp5390:.LBB165_85:.Ltmp5391>
    0x0002c954:            0          64         144          18      19.44%      86.11%    <Monitoring_Task_Tests:.LBB165_86:.Ltmp5396>
-   0x0002c9f4:            1           1         156          20     100.00%     100.00%    <.Lfunc_begin166:.Ltmp5408:.Ltmp5409:TM_Tests:.LBB166_0>
+   0x0002c9f4:            0           2         156          20      33.33%      69.23%    <.Lfunc_begin166:.Ltmp5408:.Ltmp5409:TM_Tests:.LBB166_0>
    0x0002cab4:            0           1         128          16      65.62%      65.62%    <TM_Tests:.LBB166_2:.Ltmp5427>
    0x0002cb44:            0           2          44           6      45.45%      90.91%    <TM_Tests:.LBB166_6:.Ltmp5440>
    0x0002cb94:            0           1          80          10      65.00%      65.00%    <TM_Tests:.LBB166_8:.Ltmp5449>
    0x0002cbf4:          119           1          44           6     100.00%     100.00%    <TM_Tests:.LBB166_10:.Ltmp5456>
    0x0002cc44:           59           1          20           3     100.00%     100.00%    <TM_Tests:.LBB166_12:.Ltmp5461 + 0x4>
-   0x0002cc64:            1           1         116          15     100.00%     100.00%    <TM_Tests:.LBB166_13:.Ltmp5468 + 0xc>
+   0x0002cc64:            0           2         116          15      44.83%      72.41%    <TM_Tests:.LBB166_13:.Ltmp5468 + 0xc>
    0x0002cd04:            0           1         128          16      65.62%      65.62%    <TM_Tests:.LBB166_15:.Ltmp5485>
    0x0002cd94:            0           2          44           6      45.45%      90.91%    <TM_Tests:.LBB166_19:.Ltmp5498>
    0x0002cde4:            0           1          80          10      65.00%      65.00%    <TM_Tests:.LBB166_21:.Ltmp5507>
    0x0002ce44:           39           1          44           6     100.00%     100.00%    <TM_Tests:.LBB166_23:.Ltmp5514>
    0x0002ce94:           19           1          20           3     100.00%     100.00%    <TM_Tests:.LBB166_25:.Ltmp5522 + 0x4>
-   0x0002ceb4:            1           1         116          15     100.00%     100.00%    <TM_Tests:.LBB166_26:.Ltmp5523 + 0xc>
+   0x0002ceb4:            0           2         116          15      44.83%      72.41%    <TM_Tests:.LBB166_26:.Ltmp5523 + 0xc>
    0x0002cf54:            0           1          64           8      62.50%      62.50%    <TM_Tests:.LBB166_28:.Ltmp5543>
    0x0002cfa4:            0           2          48           6      41.67%      91.67%    <TM_Tests:.LBB166_30:.Ltmp5550>
    0x0002d004:            0           1          64           8      62.50%      62.50%    <TM_Tests:.LBB166_32:.Ltmp5559>
-   0x0002d054:            1           1         108          14     100.00%     100.00%    <TM_Tests:.LBB166_34:.Ltmp5565 + 0x10>
+   0x0002d054:            0           2         108          14      40.74%      74.07%    <TM_Tests:.LBB166_34:.Ltmp5565 + 0x10>
    0x0002d0e4:            0           1         128          16      65.62%      65.62%    <TM_Tests:.LBB166_36:.Ltmp5582>
    0x0002d174:            0           2          44           6      45.45%      90.91%    <TM_Tests:.LBB166_40:.Ltmp5595>
    0x0002d1c4:            0           1         108          14      81.48%      81.48%    <TM_Tests:.LBB166_42:.Ltmp5604>
@@ -411,13 +411,13 @@ Instruction Cache Statistics:
    0x0002d734:            1           1          92          12     100.00%     100.00%    <SU_Self_Test_Tests:.LBB168_16:.Ltmp5774>
    0x0002d7b4:            0           1         108          14      85.19%      85.19%    <SU_Self_Test_Tests:.LBB168_18:.Ltmp5797>
    0x0002d844:            0           1         124          16      64.52%      64.52%    <SU_Self_Test_Tests:.LBB168_24:.Ltmp5811>
-   0x0002d8c4:            1           1         120          15     100.00%     100.00%    <SU_Self_Test_Tests:.LBB168_28:.Ltmp5825 + 0x4>
+   0x0002d8c4:            0           2         120          15      43.33%      73.33%    <SU_Self_Test_Tests:.LBB168_28:.Ltmp5825 + 0x4>
    0x0002d964:            0           2          44           6      45.45%      90.91%    <SU_Self_Test_Tests:.LBB168_30:.Ltmp5844>
    0x0002d9b4:            0           1         168          21      76.19%      76.19%    <SU_Self_Test_Tests:.LBB168_32:.Ltmp5853>
-   0x0002da84:            1           1         116          15     100.00%     100.00%    <SU_Self_Test_Tests:.LBB168_38:.Ltmp5872 + 0x4>
+   0x0002da84:            0           2         116          15      41.38%      75.86%    <SU_Self_Test_Tests:.LBB168_38:.Ltmp5872 + 0x4>
    0x0002db24:            0           2          48           6      41.67%      91.67%    <SU_Self_Test_Tests:.LBB168_40:.Ltmp5891>
    0x0002db84:            0           1          64           8      62.50%      62.50%    <SU_Self_Test_Tests:.LBB168_42:.Ltmp5900>
-   0x0002dbd4:            1           1         116          15     100.00%     100.00%    <SU_Self_Test_Tests:.LBB168_44:.Ltmp5906 + 0x10>
+   0x0002dbd4:            0           2         116          15      44.83%      72.41%    <SU_Self_Test_Tests:.LBB168_44:.Ltmp5906 + 0x10>
    0x0002dc74:            0           2          44           6      45.45%      90.91%    <SU_Self_Test_Tests:.LBB168_46:.Ltmp5925>
    0x0002dcc4:            0           1         152          19      73.68%      73.68%    <SU_Self_Test_Tests:.LBB168_48:.Ltmp5934>
    0x0002dd84:            0           1          48           6     100.00%     100.00%    <SU_Self_Test_Tests:.LBB168_54:.Ltmp5955>
@@ -429,7 +429,7 @@ Instruction Cache Statistics:
    0x0002dfb4:            0           2          80          10      60.00%      65.00%    <SU_Self_Test_Tests:.LBB168_68:.Ltmp6020>
    0x0002e034:            0           1         152          19      81.58%      81.58%    <SU_Self_Test_Tests:.LBB168_70:.Ltmp6040>
    0x0002e0f4:            0           1          48           6      83.33%      83.33%    <SU_Self_Test_Tests:.LBB168_76:.Ltmp6062>
-   0x0002e134:            1           1         120          15     100.00%     100.00%    <SU_Self_Test_Tests:.LBB168_78:.Ltmp6065 + 0x10>
+   0x0002e134:            0           2         120          15      43.33%      73.33%    <SU_Self_Test_Tests:.LBB168_78:.Ltmp6065 + 0x10>
    0x0002e1d4:            0           2          44           6      45.45%      90.91%    <SU_Self_Test_Tests:.LBB168_80:.Ltmp6084>
    0x0002e224:            0           1         168          21      76.19%      76.19%    <SU_Self_Test_Tests:.LBB168_82:.Ltmp6093>
    0x0002e2f4:            0           1          60           8     100.00%     100.00%    <SU_Self_Test_Tests:.LBB168_88:.Ltmp6109 + 0x4>
@@ -459,21 +459,21 @@ Instruction Cache Statistics:
    0x0002ee24:            0           1          64           8      62.50%      62.50%    <SU_Self_Test_Tests:.LBB168_154:.Ltmp6465>
    0x0002ee74:            0           2          72           9      55.56%      72.22%    <SU_Self_Test_Tests:.LBB168_156:.Ltmp6472>
    0x0002eee4:            0           1         128          16      84.38%      84.38%    <SU_Self_Test_Tests:.LBB168_158:.Ltmp6482>
-   0x0002ef74:            7           2         428          54      47.66%      57.01%    <.Lfunc_begin169:.Ltmp6492:.Ltmp6493:StartSystem:.LBB169_0>
-   0x0002f144:            1           1          68           9     100.00%     100.00%    <StartSystem:.LBB169_2:.Ltmp6566>
-   0x0002f1b4:            1           1         116          15     100.00%     100.00%    <StartSystem:.LBB169_4:.Ltmp6581 + 0x4>
+   0x0002ef74:            3           6         428          54      10.28%      47.66%    <.Lfunc_begin169:.Ltmp6492:.Ltmp6493:StartSystem:.LBB169_0>
+   0x0002f144:            0           2          68           9      58.82%      64.71%    <StartSystem:.LBB169_2:.Ltmp6566>
+   0x0002f1b4:            0           2         116          15      44.83%      72.41%    <StartSystem:.LBB169_4:.Ltmp6581 + 0x4>
    0x0002f254:            0           1          64           8      62.50%      62.50%    <StartSystem:.LBB169_6:.Ltmp6599>
-   0x0002f2a4:            1           1         136          17     100.00%     100.00%    <StartSystem:.LBB169_8:.Ltmp6607>
+   0x0002f2a4:            0           2         136          17      29.41%      82.35%    <StartSystem:.LBB169_8:.Ltmp6607>
    0x0002f354:            0           1         128          16      65.62%      65.62%    <StartSystem:.LBB169_10:.Ltmp6631>
-   0x0002f3e4:            1           1         116          15     100.00%     100.00%    <StartSystem:.LBB169_14:.Ltmp6648>
+   0x0002f3e4:            0           2         116          15      41.38%      75.86%    <StartSystem:.LBB169_14:.Ltmp6648>
    0x0002f484:            0           1          72           9      66.67%      66.67%    <StartSystem:.LBB169_16:.Ltmp6665>
-   0x0002f4d4:            1           1         116          15     100.00%     100.00%    <StartSystem:.LBB169_18:.Ltmp6664 + 0x8>
+   0x0002f4d4:            0           2         116          15      34.48%      79.31%    <StartSystem:.LBB169_18:.Ltmp6664 + 0x8>
    0x0002f574:            0           1          72           9      66.67%      66.67%    <StartSystem:.LBB169_20:.Ltmp6691>
-   0x0002f5c4:            1           1         120          15     100.00%     100.00%    <StartSystem:.LBB169_22:.Ltmp6696 + 0x8>
+   0x0002f5c4:            0           2         120          15      33.33%      80.00%    <StartSystem:.LBB169_22:.Ltmp6696 + 0x8>
    0x0002f664:            0           1          72           9      66.67%      66.67%    <StartSystem:.LBB169_24:.Ltmp6717>
-   0x0002f6b4:            1           1         124          16     100.00%     100.00%    <StartSystem:.LBB169_26:.Ltmp6716 + 0x8>
+   0x0002f6b4:            0           2         124          16      38.71%      77.42%    <StartSystem:.LBB169_26:.Ltmp6716 + 0x8>
    0x0002f754:            0           1         120          15      63.33%      63.33%    <StartSystem:.LBB169_28:.Ltmp6743>
-   0x0002f7d4:            1           1         128          16     100.00%     100.00%    <StartSystem:.LBB169_32:.Ltmp6757 + 0x8>
+   0x0002f7d4:            0           2         128          16      40.62%      75.00%    <StartSystem:.LBB169_32:.Ltmp6757 + 0x8>
    0x0002f884:            0           1         116          15      72.41%      72.41%    <StartSystem:.LBB169_34:.Ltmp6778>
    0x0002f904:            0           8         224          28      10.71%      35.71%    <StartSystem:.LBB169_38:.Ltmp6802>
    0x0002fa14:            1           1          56           7     100.00%     100.00%    <StartSystem:.LBB169_40:.Ltmp6837>
@@ -522,18 +522,18 @@ Instruction Cache Statistics:
    0x00031244:            0           1         116          15      86.21%      86.21%    <StartSystem:.LBB169_156:.Ltmp7666>
    0x000312e4:            1           1          84          11     100.00%     100.00%    <StartSystem:.LBB169_162:.Ltmp7684>
    0x00031364:            0           1         116          15      86.21%      86.21%    <StartSystem:.LBB169_164:.Ltmp7708>
-   0x00031404:            1           1         132          17     100.00%     100.00%    <StartSystem:.LBB169_170:.Ltmp7726>
+   0x00031404:            0           2         132          17      36.36%      78.79%    <StartSystem:.LBB169_170:.Ltmp7726>
    0x000314b4:            0           2          44           6      45.45%      90.91%    <StartSystem:.LBB169_172:.Ltmp7746>
    0x00031504:            0           1         128          16      65.62%      65.62%    <StartSystem:.LBB169_174:.Ltmp7757>
    0x00031594:            0           2          60           8      40.00%      93.33%    <StartSystem:.LBB169_178:.Ltmp7773>
-   0x000315f4:            1           1         112          14     100.00%     100.00%    <StartSystem:.LBB169_180:.Ltmp7785 + 0x4>
+   0x000315f4:            0           2         112          14      42.86%      75.00%    <StartSystem:.LBB169_180:.Ltmp7785 + 0x4>
    0x00031694:            0           2          48           6      41.67%      91.67%    <StartSystem:.LBB169_182:.Ltmp7804>
    0x000316f4:            0           1         136          17      79.41%      79.41%    <StartSystem:.LBB169_184:.Ltmp7814>
    0x000317a4:            0           1         108          14      85.19%      85.19%    <StartSystem:.LBB169_190:.Ltmp7838>
-   0x00031834:            1           1         132          17     100.00%     100.00%    <StartSystem:.LBB169_196:.Ltmp7856>
+   0x00031834:            0           2         132          17      36.36%      78.79%    <StartSystem:.LBB169_196:.Ltmp7856>
    0x000318e4:            0           2          44           6      45.45%      90.91%    <StartSystem:.LBB169_198:.Ltmp7876>
    0x00031934:            0           1          72           9      66.67%      66.67%    <StartSystem:.LBB169_200:.Ltmp7887>
-   0x00031984:            1           2         120          15      23.33%      96.67%    <StartSystem:.LBB169_202:.Ltmp7894>
+   0x00031984:            0           3         120          15      23.33%      73.33%    <StartSystem:.LBB169_202:.Ltmp7894>
    0x00031a24:            0           2          48           6      41.67%      91.67%    <StartSystem:.LBB169_204:.Ltmp7913>
    0x00031a84:            0           1         120          15      86.67%      86.67%    <StartSystem:.LBB169_206:.Ltmp7923>
    0x00031b04:            0           2          84          11      33.33%      95.24%    <StartSystem:.LBB169_210:.Ltmp7941>
@@ -544,7 +544,7 @@ Instruction Cache Statistics:
    0x00031d64:            0        2625         104          13      53.85%     100.00%    <StartSystem:.LBB169_216:.Ltmp8028>
    0x00031dd4:            0        2625         348          44     100.00%     100.00%    <StartSystem:.LBB169_219:.Ltmp8041>
    0x00031f54:         2625        2625          28           4     100.00%     100.00%    <StartSystem:.LBB169_221:.Ltmp8095>
-   0x00031f74:            1           1         116          15     100.00%     100.00%    <StartSystem:.LBB169_222:.Ltmp8098 + 0x4>
+   0x00031f74:            0           2         116          15      44.83%      72.41%    <StartSystem:.LBB169_222:.Ltmp8098 + 0x4>
    0x00032014:            0           1         128          16      65.62%      65.62%    <StartSystem:.LBB169_224:.Ltmp8116>
    0x000320a4:            0           2          44           6      45.45%      90.91%    <StartSystem:.LBB169_228:.Ltmp8131>
    0x000320f4:            0           1         144          18      72.22%      72.22%    <StartSystem:.LBB169_230:.Ltmp8141>
@@ -563,13 +563,13 @@ Instruction Cache Statistics:
    0x000325f4:            0           1         160          20      75.00%      75.00%    <StartSystem:.LBB169_259:.Ltmp8314>
    0x000326a4:            0           1          28           4     100.00%     100.00%    <StartSystem:.Ltmp8336:.LBB169_264:.Ltmp8337>
    0x000326c4:            0           1         124          16      64.52%      64.52%    <StartSystem:.LBB169_265:.Ltmp8341>
-   0x00032744:            1           1         120          15     100.00%     100.00%    <StartSystem:.LBB169_269:.Ltmp8340 + 0x4>
+   0x00032744:            0           2         120          15      43.33%      73.33%    <StartSystem:.LBB169_269:.Ltmp8340 + 0x4>
    0x000327e4:            0           2          44           6      45.45%      90.91%    <StartSystem:.LBB169_271:.Ltmp8375>
    0x00032834:            0           1          72           9      66.67%      66.67%    <StartSystem:.LBB169_273:.Ltmp8386>
-   0x00032884:            1           1         112          14     100.00%     100.00%    <StartSystem:.LBB169_275:.Ltmp8385 + 0x8>
+   0x00032884:            0           2         112          14      42.86%      75.00%    <StartSystem:.LBB169_275:.Ltmp8385 + 0x8>
    0x00032924:            0           2          48           6      41.67%      91.67%    <StartSystem:.LBB169_277:.Ltmp8411>
    0x00032984:            0           1          64           8      62.50%      62.50%    <StartSystem:.LBB169_279:.Ltmp8422>
-   0x000329d4:            1           1         116          15     100.00%     100.00%    <StartSystem:.LBB169_281:.Ltmp8429 + 0x10>
+   0x000329d4:            0           2         116          15      44.83%      72.41%    <StartSystem:.LBB169_281:.Ltmp8429 + 0x10>
    0x00032a74:            0           2          44           6      45.45%      90.91%    <StartSystem:.LBB169_283:.Ltmp8448>
    0x00032ac4:            0           1         136          17      79.41%      79.41%    <StartSystem:.LBB169_285:.Ltmp8459>
    0x00032b74:            0           1         108          14      85.19%      85.19%    <StartSystem:.LBB169_291:.Ltmp8483>
@@ -582,197 +582,197 @@ Instruction Cache Statistics:
    0x00032e54:            0           2          72           9      55.56%      72.22%    <StartSystem:.LBB169_309:.Ltmp8564>
    0x00032ec4:            0           1          64           8      81.25%      81.25%    <StartSystem:.LBB169_311:.Ltmp8576>
    0x00032f14:            0           5         124          16      12.90%      45.16%    <StartSystem:.LBB169_313:.Ltmp8589>
-   0x00032f94:           38          38         200          25     100.00%     100.00%    <.Ltmp8607:.LBB170_0:.Lfunc_begin170:Exec_TC:.Ltmp8606>
-   0x00033084:           23          53          44           6      45.45%     100.00%    <Exec_TC:.LBB170_2:.Ltmp8635>
+   0x00032f94:            0          76         200          25      26.00%      76.00%    <.Ltmp8607:.LBB170_0:.Lfunc_begin170:Exec_TC:.Ltmp8606>
+   0x00033084:            0          76          44           6      45.45%      90.91%    <Exec_TC:.LBB170_2:.Ltmp8635>
    0x000330d4:            0          38          48           6     100.00%     100.00%    <Exec_TC:.LBB170_4:.Ltmp8644>
-   0x00033114:            1           1         180          23     100.00%     100.00%    <.Lfunc_begin171:.LBB171_0:TC_Task_Tests:.Ltmp8648>
+   0x00033114:            0           2         180          23      24.44%      75.56%    <.Lfunc_begin171:.LBB171_0:TC_Task_Tests:.Ltmp8648>
    0x000331f4:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_2:.Ltmp8667>
    0x00033244:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_4:.Ltmp8674>
    0x000332a4:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_6:.Ltmp8683>
-   0x000332f4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_8:.Ltmp8689 + 0x10>
+   0x000332f4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_8:.Ltmp8689 + 0x10>
    0x00033394:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_10:.Ltmp8708>
-   0x000333e4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_12:.Ltmp8715 + 0x4>
+   0x000333e4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_12:.Ltmp8715 + 0x4>
    0x00033484:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_14:.Ltmp8734>
-   0x000334d4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_16:.Ltmp8741 + 0x4>
+   0x000334d4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_16:.Ltmp8741 + 0x4>
    0x00033574:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_18:.Ltmp8760>
-   0x000335c4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_20:.Ltmp8767 + 0x4>
+   0x000335c4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_20:.Ltmp8767 + 0x4>
    0x00033664:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_22:.Ltmp8786>
    0x000336b4:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_24:.Ltmp8795>
-   0x00033704:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_26:.Ltmp8801 + 0x8>
+   0x00033704:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_26:.Ltmp8801 + 0x8>
    0x000337a4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_28:.Ltmp8820>
-   0x00033804:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_30:.Ltmp8824 + 0x4>
+   0x00033804:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_30:.Ltmp8824 + 0x4>
    0x000338a4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_32:.Ltmp8846>
-   0x00033904:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_34:.Ltmp8853 + 0x4>
+   0x00033904:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_34:.Ltmp8853 + 0x4>
    0x000339a4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_36:.Ltmp8872>
-   0x00033a04:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_38:.Ltmp8876 + 0x4>
+   0x00033a04:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_38:.Ltmp8876 + 0x4>
    0x00033aa4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_40:.Ltmp8898>
    0x00033b04:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_42:.Ltmp8907>
-   0x00033b54:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_44:.Ltmp8913 + 0x10>
+   0x00033b54:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_44:.Ltmp8913 + 0x10>
    0x00033bf4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_46:.Ltmp8932>
-   0x00033c44:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_48:.Ltmp8939 + 0x4>
+   0x00033c44:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_48:.Ltmp8939 + 0x4>
    0x00033ce4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_50:.Ltmp8958>
-   0x00033d34:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_52:.Ltmp8965 + 0x4>
+   0x00033d34:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_52:.Ltmp8965 + 0x4>
    0x00033dd4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_54:.Ltmp8984>
-   0x00033e24:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_56:.Ltmp8991 + 0x4>
+   0x00033e24:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_56:.Ltmp8991 + 0x4>
    0x00033ec4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_58:.Ltmp9010>
    0x00033f14:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_60:.Ltmp9019>
-   0x00033f64:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_62:.Ltmp9018 + 0x8>
+   0x00033f64:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_62:.Ltmp9018 + 0x8>
    0x00034004:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_64:.Ltmp9044>
-   0x00034064:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_66:.Ltmp9048 + 0x4>
+   0x00034064:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_66:.Ltmp9048 + 0x4>
    0x00034104:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_68:.Ltmp9070>
-   0x00034164:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_70:.Ltmp9077 + 0x4>
+   0x00034164:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_70:.Ltmp9077 + 0x4>
    0x00034204:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_72:.Ltmp9096>
-   0x00034264:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_74:.Ltmp9100 + 0x4>
+   0x00034264:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_74:.Ltmp9100 + 0x4>
    0x00034304:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_76:.Ltmp9122>
    0x00034364:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_78:.Ltmp9131>
-   0x000343b4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_80:.Ltmp9130 + 0x10>
+   0x000343b4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_80:.Ltmp9130 + 0x10>
    0x00034454:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_82:.Ltmp9156>
-   0x000344a4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_84:.Ltmp9163 + 0x4>
+   0x000344a4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_84:.Ltmp9163 + 0x4>
    0x00034544:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_86:.Ltmp9182>
-   0x00034594:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_88:.Ltmp9186 + 0x4>
+   0x00034594:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_88:.Ltmp9186 + 0x4>
    0x00034634:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_90:.Ltmp9208>
-   0x00034684:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_92:.Ltmp9215 + 0x4>
+   0x00034684:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_92:.Ltmp9215 + 0x4>
    0x00034724:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_94:.Ltmp9234>
    0x00034774:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_96:.Ltmp9243>
-   0x000347c4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_98:.Ltmp9242 + 0x8>
+   0x000347c4:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_98:.Ltmp9242 + 0x8>
    0x00034864:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_100:.Ltmp9268>
-   0x000348c4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_102:.Ltmp9272 + 0x4>
+   0x000348c4:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_102:.Ltmp9272 + 0x4>
    0x00034964:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_104:.Ltmp9294>
-   0x000349c4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_106:.Ltmp9301 + 0x4>
+   0x000349c4:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_106:.Ltmp9301 + 0x4>
    0x00034a64:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_108:.Ltmp9320>
-   0x00034ac4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_110:.Ltmp9324 + 0x4>
+   0x00034ac4:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_110:.Ltmp9324 + 0x4>
    0x00034b64:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_112:.Ltmp9346>
    0x00034bc4:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_114:.Ltmp9355>
-   0x00034c14:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_116:.Ltmp9354 + 0x10>
+   0x00034c14:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_116:.Ltmp9354 + 0x10>
    0x00034cb4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_118:.Ltmp9380>
-   0x00034d04:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_120:.Ltmp9387 + 0x4>
+   0x00034d04:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_120:.Ltmp9387 + 0x4>
    0x00034da4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_122:.Ltmp9406>
-   0x00034df4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_124:.Ltmp9413 + 0x4>
+   0x00034df4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_124:.Ltmp9413 + 0x4>
    0x00034e94:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_126:.Ltmp9432>
-   0x00034ee4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_128:.Ltmp9439 + 0x4>
+   0x00034ee4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_128:.Ltmp9439 + 0x4>
    0x00034f84:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_130:.Ltmp9458>
    0x00034fd4:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_132:.Ltmp9467>
-   0x00035024:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_134:.Ltmp9466 + 0x8>
+   0x00035024:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_134:.Ltmp9466 + 0x8>
    0x000350c4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_136:.Ltmp9492>
-   0x00035124:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_138:.Ltmp9499 + 0x4>
+   0x00035124:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_138:.Ltmp9499 + 0x4>
    0x000351c4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_140:.Ltmp9518>
-   0x00035224:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_142:.Ltmp9522 + 0x4>
+   0x00035224:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_142:.Ltmp9522 + 0x4>
    0x000352c4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_144:.Ltmp9544>
-   0x00035324:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_146:.Ltmp9551 + 0x4>
+   0x00035324:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_146:.Ltmp9551 + 0x4>
    0x000353c4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_148:.Ltmp9570>
    0x00035424:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_150:.Ltmp9579>
-   0x00035474:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_152:.Ltmp9585 + 0x10>
+   0x00035474:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_152:.Ltmp9585 + 0x10>
    0x00035514:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_154:.Ltmp9604>
-   0x00035564:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_156:.Ltmp9611 + 0x4>
+   0x00035564:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_156:.Ltmp9611 + 0x4>
    0x00035604:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_158:.Ltmp9630>
-   0x00035654:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_160:.Ltmp9637 + 0x4>
+   0x00035654:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_160:.Ltmp9637 + 0x4>
    0x000356f4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_162:.Ltmp9656>
-   0x00035744:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_164:.Ltmp9660 + 0x4>
+   0x00035744:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_164:.Ltmp9660 + 0x4>
    0x000357e4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_166:.Ltmp9682>
    0x00035834:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_168:.Ltmp9691>
-   0x00035884:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_170:.Ltmp9690 + 0x8>
+   0x00035884:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_170:.Ltmp9690 + 0x8>
    0x00035924:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_172:.Ltmp9716>
-   0x00035984:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_174:.Ltmp9723 + 0x4>
+   0x00035984:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_174:.Ltmp9723 + 0x4>
    0x00035a24:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_176:.Ltmp9742>
-   0x00035a84:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_178:.Ltmp9749 + 0x4>
+   0x00035a84:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_178:.Ltmp9749 + 0x4>
    0x00035b24:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_180:.Ltmp9768>
-   0x00035b84:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_182:.Ltmp9772 + 0x4>
+   0x00035b84:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_182:.Ltmp9772 + 0x4>
    0x00035c24:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_184:.Ltmp9794>
    0x00035c84:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_186:.Ltmp9803>
-   0x00035cd4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_188:.Ltmp9809 + 0x10>
+   0x00035cd4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_188:.Ltmp9809 + 0x10>
    0x00035d74:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_190:.Ltmp9828>
-   0x00035dc4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_192:.Ltmp9835 + 0x4>
+   0x00035dc4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_192:.Ltmp9835 + 0x4>
    0x00035e64:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_194:.Ltmp9854>
-   0x00035eb4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_196:.Ltmp9858 + 0x4>
+   0x00035eb4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_196:.Ltmp9858 + 0x4>
    0x00035f54:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_198:.Ltmp9880>
-   0x00035fa4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_200:.Ltmp9887 + 0x4>
+   0x00035fa4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_200:.Ltmp9887 + 0x4>
    0x00036044:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_202:.Ltmp9906>
    0x00036094:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_204:.Ltmp9915>
-   0x000360e4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_206:.Ltmp9914 + 0x8>
+   0x000360e4:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_206:.Ltmp9914 + 0x8>
    0x00036184:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_208:.Ltmp9940>
-   0x000361e4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_210:.Ltmp9947 + 0x4>
+   0x000361e4:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_210:.Ltmp9947 + 0x4>
    0x00036284:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_212:.Ltmp9966>
-   0x000362e4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_214:.Ltmp9970 + 0x4>
+   0x000362e4:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_214:.Ltmp9970 + 0x4>
    0x00036384:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_216:.Ltmp9992>
-   0x000363e4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_218:.Ltmp9999 + 0x4>
+   0x000363e4:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_218:.Ltmp9999 + 0x4>
    0x00036484:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_220:.Ltmp10018>
    0x000364e4:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_222:.Ltmp10027>
-   0x00036534:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_224:.Ltmp10026 + 0x10>
+   0x00036534:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_224:.Ltmp10026 + 0x10>
    0x000365d4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_226:.Ltmp10052>
-   0x00036624:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_228:.Ltmp10059 + 0x4>
+   0x00036624:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_228:.Ltmp10059 + 0x4>
    0x000366c4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_230:.Ltmp10078>
-   0x00036714:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_232:.Ltmp10085 + 0x4>
+   0x00036714:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_232:.Ltmp10085 + 0x4>
    0x000367b4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_234:.Ltmp10104>
-   0x00036804:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_236:.Ltmp10111 + 0x4>
+   0x00036804:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_236:.Ltmp10111 + 0x4>
    0x000368a4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_238:.Ltmp10130>
    0x000368f4:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_240:.Ltmp10139>
-   0x00036944:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_242:.Ltmp10138 + 0x8>
+   0x00036944:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_242:.Ltmp10138 + 0x8>
    0x000369e4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_244:.Ltmp10164>
-   0x00036a44:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_246:.Ltmp10168 + 0x4>
+   0x00036a44:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_246:.Ltmp10168 + 0x4>
    0x00036ae4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_248:.Ltmp10190>
-   0x00036b44:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_250:.Ltmp10197 + 0x4>
+   0x00036b44:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_250:.Ltmp10197 + 0x4>
    0x00036be4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_252:.Ltmp10216>
-   0x00036c44:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_254:.Ltmp10223 + 0x4>
+   0x00036c44:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_254:.Ltmp10223 + 0x4>
    0x00036ce4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_256:.Ltmp10242>
-   0x00036d44:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_258:.Ltmp10246 + 0x4>
+   0x00036d44:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_258:.Ltmp10246 + 0x4>
    0x00036de4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_260:.Ltmp10268>
    0x00036e44:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_262:.Ltmp10277>
    0x00036e94:            0           2          80          10      30.00%      75.00%    <TC_Task_Tests:.LBB171_264:.Ltmp10285>
-   0x00036f14:            1           1         112          14     100.00%     100.00%    <TC_Task_Tests:.LBB171_266:.Ltmp10298 + 0x4>
+   0x00036f14:            0           2         112          14      42.86%      75.00%    <TC_Task_Tests:.LBB171_266:.Ltmp10298 + 0x4>
    0x00036fb4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_268:.Ltmp10323>
    0x00037014:            0           1         152          19      81.58%      81.58%    <TC_Task_Tests:.LBB171_270:.Ltmp10332>
    0x000370d4:            0           2          76          10      31.58%      73.68%    <TC_Task_Tests:.LBB171_276:.Ltmp10354>
-   0x00037144:            1           1         104          13     100.00%     100.00%    <TC_Task_Tests:.LBB171_278:.Ltmp10365>
+   0x00037144:            0           2         104          13      46.15%      73.08%    <TC_Task_Tests:.LBB171_278:.Ltmp10365>
    0x000371d4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_280:.Ltmp10384>
    0x00037234:            0           1         152          19      81.58%      81.58%    <TC_Task_Tests:.LBB171_282:.Ltmp10393>
    0x000372f4:            0           2          88          11      27.27%      77.27%    <TC_Task_Tests:.LBB171_288:.Ltmp10415>
-   0x00037374:            1           1         108          14     100.00%     100.00%    <TC_Task_Tests:.LBB171_290:.Ltmp10426 + 0x4>
+   0x00037374:            0           2         108          14      44.44%      74.07%    <TC_Task_Tests:.LBB171_290:.Ltmp10426 + 0x4>
    0x00037404:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_292:.Ltmp10452>
    0x00037464:            0           1         152          19      81.58%      81.58%    <TC_Task_Tests:.LBB171_294:.Ltmp10461>
    0x00037524:            0           2          88          11      27.27%      77.27%    <TC_Task_Tests:.LBB171_300:.Ltmp10483>
-   0x000375a4:            1           1         112          14     100.00%     100.00%    <TC_Task_Tests:.LBB171_302:.Ltmp10494 + 0x4>
+   0x000375a4:            0           2         112          14      42.86%      75.00%    <TC_Task_Tests:.LBB171_302:.Ltmp10494 + 0x4>
    0x00037644:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_304:.Ltmp10520>
    0x000376a4:            0           1         152          19      81.58%      81.58%    <TC_Task_Tests:.LBB171_306:.Ltmp10529>
    0x00037764:            0           2          88          11      27.27%      77.27%    <TC_Task_Tests:.LBB171_312:.Ltmp10551>
-   0x000377e4:            1           1         112          14     100.00%     100.00%    <TC_Task_Tests:.LBB171_314:.Ltmp10565 + 0x4>
+   0x000377e4:            0           2         112          14      42.86%      75.00%    <TC_Task_Tests:.LBB171_314:.Ltmp10565 + 0x4>
    0x00037884:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_316:.Ltmp10588>
    0x000378e4:            0           1         120          15      86.67%      86.67%    <TC_Task_Tests:.LBB171_318:.Ltmp10597>
    0x00037964:            0           3          80          10      25.00%      65.00%    <TC_Task_Tests:.LBB171_322:.Ltmp10611>
-   0x000379e4:            1           1         108          14     100.00%     100.00%    <TC_Task_Tests:.LBB171_324:.Ltmp10622>
+   0x000379e4:            0           2         108          14      48.15%      70.37%    <TC_Task_Tests:.LBB171_324:.Ltmp10622>
    0x00037a74:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_326:.Ltmp10641>
    0x00037ac4:            0           1         120          15      86.67%      86.67%    <TC_Task_Tests:.LBB171_328:.Ltmp10650>
    0x00037b44:            0           3          96          12      20.83%      70.83%    <TC_Task_Tests:.LBB171_332:.Ltmp10668>
-   0x00037bd4:            1           1         112          14     100.00%     100.00%    <TC_Task_Tests:.LBB171_334:.Ltmp10680 + 0x4>
+   0x00037bd4:            0           2         112          14      42.86%      75.00%    <TC_Task_Tests:.LBB171_334:.Ltmp10680 + 0x4>
    0x00037c74:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_336:.Ltmp10706>
    0x00037cd4:            0           1         128          16      65.62%      65.62%    <TC_Task_Tests:.LBB171_338:.Ltmp10715>
-   0x00037d64:            1           2         124          16      22.58%      96.77%    <TC_Task_Tests:.LBB171_342:.Ltmp10729>
+   0x00037d64:            0           3         124          16      22.58%      74.19%    <TC_Task_Tests:.LBB171_342:.Ltmp10729>
    0x00037e04:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_344:.Ltmp10747>
    0x00037e64:            0           1         120          15      86.67%      86.67%    <TC_Task_Tests:.LBB171_346:.Ltmp10756>
-   0x00037ee4:            1           2         124          16      22.58%      96.77%    <TC_Task_Tests:.LBB171_350:.Ltmp10770>
+   0x00037ee4:            0           3         124          16      22.58%      74.19%    <TC_Task_Tests:.LBB171_350:.Ltmp10770>
    0x00037f84:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_352:.Ltmp10788>
    0x00037fe4:            0           1         128          16      65.62%      65.62%    <TC_Task_Tests:.LBB171_354:.Ltmp10797>
-   0x00038074:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_358:.Ltmp10809 + 0x10>
+   0x00038074:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_358:.Ltmp10809 + 0x10>
    0x00038114:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_360:.Ltmp10828>
    0x00038174:            0           1         120          15      86.67%      86.67%    <TC_Task_Tests:.LBB171_362:.Ltmp10837>
    0x000381f4:            0           3          92          12      21.74%      69.57%    <TC_Task_Tests:.LBB171_366:.Ltmp10851>
-   0x00038274:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_368:.Ltmp10865 + 0x4>
+   0x00038274:            0           2         116          15      44.83%      72.41%    <TC_Task_Tests:.LBB171_368:.Ltmp10865 + 0x4>
    0x00038314:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_370:.Ltmp10888>
    0x00038364:            0           1         164          21      75.61%      75.61%    <TC_Task_Tests:.LBB171_372:.Ltmp10897>
    0x00038434:            0           2          84          11      28.57%      76.19%    <TC_Task_Tests:.LBB171_378:.Ltmp10919>
-   0x000384b4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_380:.Ltmp10932 + 0x4>
+   0x000384b4:            0           2         116          15      44.83%      72.41%    <TC_Task_Tests:.LBB171_380:.Ltmp10932 + 0x4>
    0x00038554:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_382:.Ltmp10955>
    0x000385a4:            0           1         120          15      86.67%      86.67%    <TC_Task_Tests:.LBB171_384:.Ltmp10964>
-   0x00038624:            1           2         128          16      21.88%      96.88%    <TC_Task_Tests:.LBB171_388:.Ltmp10982>
+   0x00038624:            0           3         128          16      21.88%      71.88%    <TC_Task_Tests:.LBB171_388:.Ltmp10982>
    0x000386d4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_390:.Ltmp11000>
    0x00038724:            0           1         120          15      86.67%      86.67%    <TC_Task_Tests:.LBB171_392:.Ltmp11009>
-   0x000387a4:            1           2         128          16      21.88%      96.88%    <TC_Task_Tests:.LBB171_396:.Ltmp11027>
+   0x000387a4:            0           3         128          16      21.88%      71.88%    <TC_Task_Tests:.LBB171_396:.Ltmp11027>
    0x00038854:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_398:.Ltmp11045>
    0x000388a4:            0           1         128          16      65.62%      65.62%    <TC_Task_Tests:.LBB171_400:.Ltmp11054>
-   0x00038934:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_404:.Ltmp11053 + 0x10>
+   0x00038934:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_404:.Ltmp11053 + 0x10>
    0x000389d4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_406:.Ltmp11085>
    0x00038a24:            0           1         120          15      86.67%      86.67%    <TC_Task_Tests:.LBB171_408:.Ltmp11094>
    0x00038aa4:            0           3          96          12      20.83%      70.83%    <TC_Task_Tests:.LBB171_412:.Ltmp11112>
-   0x00038b34:            1           1         112          14     100.00%     100.00%    <TC_Task_Tests:.LBB171_414:.Ltmp11124 + 0x4>
+   0x00038b34:            0           2         112          14      42.86%      75.00%    <TC_Task_Tests:.LBB171_414:.Ltmp11124 + 0x4>
    0x00038bd4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_416:.Ltmp11150>
    0x00038c34:            0           1         128          16      65.62%      65.62%    <TC_Task_Tests:.LBB171_418:.Ltmp11159>
    0x00038cc4:            0           3          80          10      25.00%      65.00%    <TC_Task_Tests:.LBB171_422:.Ltmp11173>
@@ -782,10 +782,10 @@ Instruction Cache Statistics:
    0x00038e84:            0           2          56           7      42.86%      92.86%    <TC_Task_Tests:.LBB171_432:.Ltmp11215>
    0x00038ee4:            0           2          52           7      46.15%      92.31%    <TC_Task_Tests:.LBB171_434:.Ltmp11224>
    0x00038f44:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_436:.Ltmp11233>
-   0x00038f94:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_438:.Ltmp11239 + 0x8>
+   0x00038f94:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_438:.Ltmp11239 + 0x8>
    0x00039034:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_440:.Ltmp11258>
    0x00039094:            0           1         128          16      65.62%      65.62%    <TC_Task_Tests:.LBB171_442:.Ltmp11267>
-   0x00039124:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_446:.Ltmp11266 + 0x10>
+   0x00039124:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_446:.Ltmp11266 + 0x10>
    0x000391c4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_448:.Ltmp11298>
    0x00039224:            0           1         160          20      75.00%      75.00%    <TC_Task_Tests:.LBB171_450:.Ltmp11307>
    0x000392d4:           15           1          40           5      60.00%      60.00%    <TC_Task_Tests:.LBB171_455:.Ltmp11325>
@@ -794,70 +794,70 @@ Instruction Cache Statistics:
    0x000393b4:            1           1          52           7     100.00%     100.00%    <TC_Task_Tests:.LBB171_462:.Ltmp11350>
    0x00039414:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_464:.Ltmp11362>
    0x00039474:            0           1         128          16      65.62%      65.62%    <TC_Task_Tests:.LBB171_466:.Ltmp11371>
-   0x00039504:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_470:.Ltmp11383 + 0x10>
+   0x00039504:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_470:.Ltmp11383 + 0x10>
    0x000395a4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_472:.Ltmp11402>
    0x00039604:            0           1         128          16      65.62%      65.62%    <TC_Task_Tests:.LBB171_474:.Ltmp11411>
-   0x00039694:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_478:.Ltmp11423 + 0x10>
+   0x00039694:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_478:.Ltmp11423 + 0x10>
    0x00039734:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_480:.Ltmp11442>
    0x00039794:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_482:.Ltmp11451>
-   0x000397e4:            1           2         128          16      21.88%      96.88%    <TC_Task_Tests:.LBB171_484:.Ltmp11458>
+   0x000397e4:            0           3         128          16      21.88%      71.88%    <TC_Task_Tests:.LBB171_484:.Ltmp11458>
    0x00039894:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_486:.Ltmp11476>
    0x000398e4:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_488:.Ltmp11485>
-   0x00039934:            1           2         124          16      22.58%      96.77%    <TC_Task_Tests:.LBB171_490:.Ltmp11492>
+   0x00039934:            0           3         124          16      22.58%      74.19%    <TC_Task_Tests:.LBB171_490:.Ltmp11492>
    0x000399d4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_492:.Ltmp11510>
    0x00039a34:            0           1         128          16      65.62%      65.62%    <TC_Task_Tests:.LBB171_494:.Ltmp11519>
-   0x00039ac4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_498:.Ltmp11518 + 0x10>
+   0x00039ac4:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_498:.Ltmp11518 + 0x10>
    0x00039b64:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_500:.Ltmp11550>
    0x00039bc4:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_502:.Ltmp11559>
-   0x00039c14:            1           2         136          17      17.65%      97.06%    <TC_Task_Tests:.LBB171_504:.Ltmp11566>
+   0x00039c14:            0           3         136          17      17.65%      73.53%    <TC_Task_Tests:.LBB171_504:.Ltmp11566>
    0x00039cc4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_506:.Ltmp11586>
    0x00039d14:            0           1         120          15      63.33%      63.33%    <TC_Task_Tests:.LBB171_508:.Ltmp11595>
-   0x00039d94:            1           1         136          17     100.00%     100.00%    <TC_Task_Tests:.LBB171_512:.Ltmp11594 + 0x8>
+   0x00039d94:            0           2         136          17      38.24%      76.47%    <TC_Task_Tests:.LBB171_512:.Ltmp11594 + 0x8>
    0x00039e44:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_514:.Ltmp11628>
    0x00039e94:            0           1         120          15      63.33%      63.33%    <TC_Task_Tests:.LBB171_516:.Ltmp11637>
-   0x00039f14:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_520:.Ltmp11650 + 0x8>
+   0x00039f14:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_520:.Ltmp11650 + 0x8>
    0x00039fb4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_522:.Ltmp11669>
    0x0003a004:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_524:.Ltmp11678>
-   0x0003a054:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_526:.Ltmp11684 + 0x8>
+   0x0003a054:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_526:.Ltmp11684 + 0x8>
    0x0003a0f4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_528:.Ltmp11703>
    0x0003a154:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_530:.Ltmp11712>
-   0x0003a1a4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_532:.Ltmp11718 + 0x10>
+   0x0003a1a4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_532:.Ltmp11718 + 0x10>
    0x0003a244:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_534:.Ltmp11737>
    0x0003a294:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_536:.Ltmp11746>
-   0x0003a2e4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_538:.Ltmp11745 + 0x8>
+   0x0003a2e4:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_538:.Ltmp11745 + 0x8>
    0x0003a384:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_540:.Ltmp11771>
    0x0003a3e4:            0           1         128          16      78.12%      78.12%    <TC_Task_Tests:.LBB171_542:.Ltmp11780>
-   0x0003a474:            1           1         128          16     100.00%     100.00%    <TC_Task_Tests:.LBB171_546:.Ltmp11792 + 0x10>
+   0x0003a474:            0           2         128          16      37.50%      78.12%    <TC_Task_Tests:.LBB171_546:.Ltmp11792 + 0x10>
    0x0003a524:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_548:.Ltmp11812>
    0x0003a584:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_550:.Ltmp11821>
-   0x0003a5d4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_552:.Ltmp11820 + 0x10>
+   0x0003a5d4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_552:.Ltmp11820 + 0x10>
    0x0003a674:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_554:.Ltmp11846>
    0x0003a6c4:            0           1         128          16      78.12%      78.12%    <TC_Task_Tests:.LBB171_556:.Ltmp11855>
-   0x0003a754:            1           2         140          18      17.14%      97.14%    <TC_Task_Tests:.LBB171_560:.Ltmp11868>
+   0x0003a754:            0           3         140          18      17.14%      74.29%    <TC_Task_Tests:.LBB171_560:.Ltmp11868>
    0x0003a804:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_562:.Ltmp11888>
    0x0003a854:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_564:.Ltmp11897>
-   0x0003a8a4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_566:.Ltmp11903 + 0x8>
+   0x0003a8a4:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_566:.Ltmp11903 + 0x8>
    0x0003a944:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_568:.Ltmp11922>
    0x0003a9a4:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_570:.Ltmp11931>
-   0x0003a9f4:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_572:.Ltmp11937 + 0x10>
+   0x0003a9f4:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_572:.Ltmp11937 + 0x10>
    0x0003aa94:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_574:.Ltmp11956>
    0x0003aae4:            0           1         128          16      78.12%      78.12%    <TC_Task_Tests:.LBB171_576:.Ltmp11965>
-   0x0003ab74:            1           2         140          18      17.14%      97.14%    <TC_Task_Tests:.LBB171_580:.Ltmp11978>
+   0x0003ab74:            0           3         140          18      17.14%      74.29%    <TC_Task_Tests:.LBB171_580:.Ltmp11978>
    0x0003ac24:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_582:.Ltmp11998>
    0x0003ac74:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_584:.Ltmp12007>
-   0x0003acc4:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_586:.Ltmp12013 + 0x8>
+   0x0003acc4:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_586:.Ltmp12013 + 0x8>
    0x0003ad64:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_588:.Ltmp12032>
    0x0003adc4:            0           1          64           8      62.50%      62.50%    <TC_Task_Tests:.LBB171_590:.Ltmp12041>
-   0x0003ae14:            1           1         120          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_592:.Ltmp12047 + 0x10>
+   0x0003ae14:            0           2         120          15      43.33%      73.33%    <TC_Task_Tests:.LBB171_592:.Ltmp12047 + 0x10>
    0x0003aeb4:            0           2          44           6      45.45%      90.91%    <TC_Task_Tests:.LBB171_594:.Ltmp12066>
    0x0003af04:            0           1          72           9      66.67%      66.67%    <TC_Task_Tests:.LBB171_596:.Ltmp12075>
-   0x0003af54:            1           1         116          15     100.00%     100.00%    <TC_Task_Tests:.LBB171_598:.Ltmp12074 + 0x8>
+   0x0003af54:            0           2         116          15      41.38%      75.86%    <TC_Task_Tests:.LBB171_598:.Ltmp12074 + 0x8>
    0x0003aff4:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_600:.Ltmp12100>
    0x0003b054:            0           1         128          16      78.12%      78.12%    <TC_Task_Tests:.LBB171_602:.Ltmp12109>
-   0x0003b0e4:            1           2         124          16      22.58%      96.77%    <TC_Task_Tests:.LBB171_606:.Ltmp12122>
+   0x0003b0e4:            0           3         124          16      22.58%      74.19%    <TC_Task_Tests:.LBB171_606:.Ltmp12122>
    0x0003b184:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_608:.Ltmp12140>
    0x0003b1e4:            0           1         112          14      85.71%      85.71%    <TC_Task_Tests:.LBB171_610:.Ltmp12149>
-   0x0003b264:            1           1         112          14     100.00%     100.00%    <TC_Task_Tests:.LBB171_614:.Ltmp12162 + 0x10>
+   0x0003b264:            0           2         112          14      42.86%      75.00%    <TC_Task_Tests:.LBB171_614:.Ltmp12162 + 0x10>
    0x0003b304:            0           2          48           6      41.67%      91.67%    <TC_Task_Tests:.LBB171_616:.Ltmp12181>
    0x0003b364:            0           1         120          15      86.67%      86.67%    <TC_Task_Tests:.LBB171_618:.Ltmp12190>
    0x0003b3e4:            0           2          76          10      26.32%      94.74%    <TC_Task_Tests:.LBB171_622:.Ltmp12205>
@@ -865,15 +865,15 @@ Instruction Cache Statistics:
    0x0003b4e4:            0           4          68           9      64.71%      64.71%    <Send_Patch_Data:.LBB172_2:.Ltmp12226>
    0x0003b534:            0           8         100          13      20.00%      80.00%    <Send_Patch_Data:.LBB172_4:.Ltmp12233>
    0x0003b5c4:            0           4          80          10      75.00%      75.00%    <Send_Patch_Data:.LBB172_6:.Ltmp12247>
-   0x0003b624:           64          64         112          14     100.00%     100.00%    <Send_Patch_Data:.Ltmp12256:.LBB172_9:.Ltmp12255>
-   0x0003b6c4:           60          68          44           6      45.45%     100.00%    <Send_Patch_Data:.LBB172_11:.Ltmp12276>
+   0x0003b624:            0         128         112          14      50.00%      67.86%    <Send_Patch_Data:.Ltmp12256:.LBB172_9:.Ltmp12255>
+   0x0003b6c4:            0         128          44           6      45.45%      90.91%    <Send_Patch_Data:.LBB172_11:.Ltmp12276>
    0x0003b714:            0          64         108          14      37.04%     100.00%    <Send_Patch_Data:.LBB172_13:.Ltmp12285>
    0x0003b784:            0          14         140          18      45.71%      54.29%    <.Lfunc_begin173:.LBB173_0:.Ltmp12299:Send_Patch_Code:.Ltmp12298>
    0x0003b834:            0           7          68           9      64.71%      64.71%    <Send_Patch_Code:.LBB173_2:.Ltmp12314>
    0x0003b884:            0          14         100          13      20.00%      80.00%    <Send_Patch_Code:.LBB173_4:.Ltmp12321>
    0x0003b914:            0           7          80          10      75.00%      75.00%    <Send_Patch_Code:.LBB173_6:.Ltmp12335>
-   0x0003b974:          112         112         112          14     100.00%     100.00%    <Send_Patch_Code:.Ltmp12344:.LBB173_9:.Ltmp12343>
-   0x0003ba14:          105         119          44           6      45.45%     100.00%    <Send_Patch_Code:.LBB173_11:.Ltmp12364>
+   0x0003b974:            0         224         112          14      50.00%      67.86%    <Send_Patch_Code:.Ltmp12344:.LBB173_9:.Ltmp12343>
+   0x0003ba14:            0         224          44           6      45.45%      90.91%    <Send_Patch_Code:.LBB173_11:.Ltmp12364>
    0x0003ba64:            0         112         108          14      37.04%     100.00%    <Send_Patch_Code:.LBB173_13:.Ltmp12373>
    0x0003bcc4:            0           3         164          21       9.76%      73.17%    <.Lfunc_begin180:.LBB180_0:.Ltmp12451:exit:.Ltmp12450>
    0x0003c994:           15          23          88          11      54.55%      54.55%    <.LBB190_0:.Lfunc_begin190:.Ltmp12819:memmove:.Ltmp12820>
@@ -1073,7 +1073,7 @@ Instruction Cache Statistics:
    0x000617c4:            0        5262         404          51     100.00%     100.00%    <.LBB386_0:FindMinQualityRecord_sp_>
    0x00061964:            0         394         544          68     100.00%     100.00%    <.LBB387_0:ClearEvents_sp_>
    0x00061b94:            0         394         796         100     100.00%     100.00%    <.LBB388_0:MemoryPatch_sp_:.Ltmp27848>
-   0x00061eb4:            0         788        1008         126       6.35%      93.65%    <.LBB389_0:ExecuteCommand_sp_:.Ltmp27892>
+   0x00061eb4:            1         787        1008         126       6.35%     100.00%    <.LBB389_0:ExecuteCommand_sp_:.Ltmp27892>
    0x000622b4:            0         394         364          46     100.00%     100.00%    <ExecuteCommand_sp_:.LBB389_1:.Ltmp27944>
    0x00062424:            0         394        1008         126     100.00%     100.00%    <.LBB390_0:UpdateTarget_sp_:.Ltmp27970>
    0x00062824:            0         394        1008         126     100.00%     100.00%    <UpdateTarget_sp_:.LBB390_1:.Ltmp27993>
@@ -1101,15 +1101,6 @@ Instruction Cache Statistics:
 
 
 Data Cache Statistics:
-   Bytes Transferred   :   33742576
-   Transfer Ratio      :      1.137
-   Miss Stall Cycles   :   37040108        7.38%
-
-                           total        hit      miss    miss-rate     reuse
-   Reads            :    6595985    4124927    2471058         37%
-   Bytes Read       :   19645735   12282125    7363610          -       0.99
-   Writes           :    2820386    1073622    1746764         61%
-   Bytes Written    :   10028968    3433984    6594984          -       0.44
 
 
 Stack Cache Statistics:
@@ -1128,110 +1119,6 @@ Stack Cache Statistics:
 
 
 Main Memory Statistics:
-                                total  % of cycles
-   Max Queue Size        :          1
-   Consecutive Transfers :          0
-   Requests              :    5811062
-   Bursts transferred    :   12658456
-   Bytes transferred     :  202535296
-   Stall Cycles          :   68067010      13.55%
-   Hidden Write Cycles   :          0       0.00%
-
-                                 Read                  Write
-   Requests              :    2990102                2820960
-   Bytes Requested       :  134464035      66.39%   22564559      11.14%
-   Bytes Transferred     :  157399936      77.71%   45135360      22.29%
-
-Request size    #requests
-           4 :         4549
-           8 :      5291444
-          12 :        11963
-          16 :           72
-          20 :        18677
-          24 :        24620
-          28 :        22374
-          32 :        10745
-          36 :          414
-          40 :         8424
-          44 :        16414
-          48 :         2756
-          52 :        38308
-          56 :           20
-          60 :         5370
-          64 :          135
-          68 :         8656
-          72 :         5464
-          76 :        11646
-          80 :         1939
-          84 :         5342
-          88 :           51
-          92 :        11563
-          96 :         6275
-         100 :         4478
-         104 :        27657
-         108 :         8028
-         112 :         5465
-         116 :         5942
-         120 :         5318
-         124 :        11166
-         128 :        12604
-         132 :        15873
-         136 :           32
-         140 :         5710
-         144 :        10567
-         148 :         2178
-         152 :           17
-         156 :           70
-         160 :         5722
-         164 :           42
-         168 :           31
-         172 :          132
-         176 :         5492
-         180 :         5269
-         184 :            1
-         188 :         5267
-         192 :         3117
-         196 :            3
-         200 :            6
-         204 :        21086
-         208 :            1
-         212 :            1
-         228 :            8
-         232 :            8
-         236 :         5268
-         264 :            1
-         288 :         5385
-         304 :        10537
-         320 :        15786
-         324 :            1
-         332 :           14
-         344 :         2625
-         348 :        10524
-         352 :         2625
-         364 :            1
-         368 :          394
-         392 :         5262
-         408 :         5656
-         428 :            1
-         432 :            2
-         444 :         5268
-         456 :         5263
-         476 :           17
-         548 :          395
-         560 :         5262
-         564 :        10524
-         572 :         5262
-         616 :         5262
-         620 :            2
-         764 :          394
-         800 :          788
-         872 :          447
-         888 :          390
-         972 :          390
-         988 :         5262
-        1004 :         5262
-        1008 :         5262
-        1012 :        23018
 
 
 Profiling information:
@@ -1239,270 +1126,270 @@ Profiling information:
  Function
   #calls       min         max           avg      cycles (abs)  cycles (rel)
   <_start>
-                                                           103       0.0000%
-     1   502160630   502160630   502160630.0         502160630     100.0000%
+                                                            38       0.0000%
+     1   434093620   434093620   434093620.0         434093620     100.0000%
   <__initreent>
-                                                           991       0.0002%
-     1        8213        8213        8213.0              8213       0.0016%
+                                                           141       0.0000%
+     1        2800        2800        2800.0              2800       0.0006%
   <__init>
-                                                            67       0.0000%
-     1          67          67          67.0                67       0.0000%
+                                                            24       0.0000%
+     1          24          24          24.0                24       0.0000%
   <__fini>
-                                                            67       0.0000%
-     1          67          67          67.0                67       0.0000%
+                                                            24       0.0000%
+     1          24          24          24.0                24       0.0000%
   <main>
-                                                            52       0.0000%
-     1   502148537   502148537   502148537.0         502148537      99.9976%
+                                                            15       0.0000%
+     1   434088768   434088768   434088768.0         434088768      99.9989%
   <Set_SU_Error>
-                                                          2944       0.0006%
-    76          21          58          38.7              2944       0.0006%
+                                                          1064       0.0002%
+    76          14          14          14.0              1064       0.0002%
   <Monitor_DPU_Voltage>
-                                                           424       0.0001%
-     1        2449        2449        2449.0              2449       0.0005%
+                                                           116       0.0000%
+     1         938         938         938.0               938       0.0002%
   <Boot>
-                                                          3324       0.0007%
-     1        4163        4163        4163.0              4163       0.0008%
+                                                          1206       0.0003%
+     1        1614        1614        1614.0              1614       0.0004%
   <HandleHealthMonitoring>
-                                                       3549676       0.7069%
-  31164        2647       13052        3188.6          99368564      19.7882%
+                                                       2430848       0.5600%
+  31164        2612        6481        2965.5          92418315      21.2900%
   <Monitor>
-                                                      88624458      17.6486%
-  31164        2555       12806        3074.7          95818888      19.0813%
+                                                      87008732      20.0438%
+  31164        2534        6403        2887.5          89987467      20.7300%
   <MeasureVoltage>
-                                                        227507       0.0453%
-  1225         958        4462        1395.1           1708940       0.3403%
+                                                         61425       0.0142%
+  1225         364        2350         589.0            721485       0.1662%
   <SelfTestChannel>
-                                                          2232       0.0004%
-     2        4350        5081        4715.5              9431       0.0019%
+                                                           584       0.0001%
+     2        1558        1658        1608.0              3216       0.0007%
   <SelfTest_SU>
-                                                           890       0.0002%
-     2        9734        9813        9773.5             19547       0.0039%
+                                                           334       0.0001%
+     2        3582        3584        3583.0              7166       0.0017%
   <MeasureTemperature>
-                                                        875133       0.1743%
-  2079        2026        6482        2632.5           5473065       1.0899%
+                                                        258952       0.0597%
+  2079         762        3323        1083.6           2252900       0.5190%
   <Read_AD_Channel>
-                                                       2550325       0.5079%
-  5386         449        4230        1126.8           6068914       1.2086%
+                                                       1032137       0.2378%
+  5386         274        2295         492.3           2651690       0.6109%
   <Monitor_SU_Voltage>
-                                                           398       0.0001%
-     2         199         199         199.0               398       0.0001%
+                                                           136       0.0000%
+     2          68          68          68.0               136       0.0000%
   <ExecuteChannelTest>
-                                                          6883       0.0014%
-    20         219         573         359.9              7199       0.0014%
+                                                          2492       0.0006%
+    20         114         163         131.6              2632       0.0006%
   <HandleHitTrigger>
-                                                      14232637       2.8343%
-  5380       11286       14347       12366.1          66529367      13.2486%
+                                                      12131900       2.7948%
+  5380       11279       11279       11279.0          60681020      13.9788%
   <HandleAcquisition>
-                                                       4467581       0.8897%
-  5262       56733       79266       62181.0         327196202      65.1577%
+                                                       2494188       0.5746%
+  5262       52524       52524       52524.0         276381288      63.6686%
   <SetSensorUnitOff>
-                                                         11554       0.0023%
-    56         112         223         206.3             11554       0.0023%
+                                                          2880       0.0007%
+    56          49          53          51.4              2880       0.0007%
   <TC_InterruptService>
-                                                        344840       0.0687%
-   401         358         923         860.0            344840       0.0687%
+                                                        143558       0.0331%
+   401         358         358         358.0            143558       0.0331%
   <HandleTelecommand>
-                                                        187828       0.0374%
-   394        6146        7762        6254.0           2464087       0.4907%
+                                                         62646       0.0144%
+   394        3545        3545        3545.0           1396730       0.3218%
   <TM_InterruptService>
-                                                       2064762       0.4112%
-  17795          93         258         116.0           2064762       0.4112%
+                                                       1530370       0.3525%
+  17795          86          86          86.0           1530370       0.3525%
   <ClearEvents>
-                                                           839       0.0002%
-     1         839         839         839.0               839       0.0002%
+                                                           408       0.0001%
+     1         408         408         408.0               408       0.0001%
   <CreateTask>
-                                                          1025       0.0002%
-     3          56        1309         479.0              1437       0.0003%
+                                                           201       0.0000%
+     3          36         207          95.0               285       0.0001%
   <Start_Conversion>
-                                                       2211064       0.4403%
-  16944          93         307         130.5           2211064       0.4403%
+                                                       1042556       0.2402%
+  16944          55          78          61.5           1042556       0.2402%
   <End_Of_ADC>
-                                                       1307525       0.2604%
-  14701          44         225          88.9           1307525       0.2604%
+                                                        576997       0.1329%
+  14701          29          60          39.2            576997       0.1329%
   <Clear_Errors>
-                                                         15006       0.0030%
-    61        7385        7629        7540.5            459971       0.0916%
+                                                          3843       0.0009%
+    61        3966        3966        3966.0            241926       0.0557%
   <Monitoring_Task_Tests>
-                                                       1622219       0.3230%
-     1   101192031   101192031   101192031.0         101192031      20.1513%
+                                                        459803       0.1059%
+     1    92956792    92956792    92956792.0          92956792      21.4140%
   <TM_Tests>
-                                                          3884       0.0008%
-     1       51672       51672       51672.0             51672       0.0103%
+                                                          2137       0.0005%
+     1       30066       30066       30066.0             30066       0.0069%
   <SU_Self_Test_Tests>
-                                                          6316       0.0013%
-     1      342561      342561      342561.0            342561       0.0682%
+                                                          1626       0.0004%
+     1      262715      262715      262715.0            262715       0.0605%
   <StartSystem>
-                                                       2293166       0.4567%
-     1   502144322   502144322   502144322.0         502144322      99.9968%
+                                                        954245       0.2198%
+     1   434087139   434087139   434087139.0         434087139      99.9985%
   <Exec_TC>
-                                                          7749       0.0015%
-    38        7295        7603        7337.7            278832       0.0555%
+                                                          2280       0.0005%
+    38        3963        3963        3963.0            150594       0.0347%
   <TC_Task_Tests>
-                                                         21471       0.0043%
-     1     2302981     2302981     2302981.0           2302981       0.4586%
+                                                          4973       0.0011%
+     1     1249020     1249020     1249020.0           1249020       0.2877%
   <Send_Patch_Data>
-                                                         12664       0.0025%
-     4      130980      130980      130980.0            523920       0.1043%
+                                                          2880       0.0007%
+     4       71094       71094       71094.0            284376       0.0655%
   <Send_Patch_Code>
-                                                         22162       0.0044%
-     7      130980      130980      130980.0            916860       0.1826%
+                                                          5040       0.0012%
+     7       71094       71094       71094.0            497658       0.1146%
   <exit>
-                                                           185       0.0000%
-     1       31133       31133       31133.0             31133       0.0062%
+                                                            37       0.0000%
+     1       16491       16491       16491.0             16491       0.0038%
   <memmove>
-                                                          6699       0.0013%
-    38          61         297         176.3              6699       0.0013%
+                                                          2307       0.0005%
+    38          43          82          60.7              2307       0.0005%
   <memset>
-                                                          3573       0.0007%
-     5          54        2899         714.6              3573       0.0007%
+                                                           733       0.0002%
+     5          40         529         146.6               733       0.0002%
   <printf>
-                                                           962       0.0002%
-     8        8430       27966       17105.5            136844       0.0273%
+                                                           216       0.0000%
+     8        3984       14291       10164.6             81317       0.0187%
   <__call_exitprocs>
-                                                           467       0.0001%
-     1        3913        3913        3913.0              3913       0.0008%
+                                                           157       0.0000%
+     1        2078        2078        2078.0              2078       0.0005%
   <__register_exitproc>
-                                                           331       0.0001%
-     1        3710        3710        3710.0              3710       0.0007%
+                                                            93       0.0000%
+     1        1990        1990        1990.0              1990       0.0005%
   <__sfvwrite_r>
-                                                         12813       0.0026%
-    23         911        1522        1175.8             27043       0.0054%
+                                                          6106       0.0014%
+    23         410         692         529.3             12173       0.0028%
   <__sinit>
-                                                          5900       0.0012%
-     1        9541        9541        9541.0              9541       0.0019%
+                                                          2470       0.0006%
+     1        4487        4487        4487.0              4487       0.0010%
   <_cleanup_r>
-                                                           400       0.0001%
-     1       26979       26979       26979.0             26979       0.0054%
+                                                           133       0.0000%
+     1       14357       14357       14357.0             14357       0.0033%
   <_free_r>
-                                                           293       0.0001%
-     1        3637        3637        3637.0              3637       0.0007%
+                                                            82       0.0000%
+     1        1979        1979        1979.0              1979       0.0005%
   <_malloc_r>
-                                                          1728       0.0003%
-     2        4067        4323        4195.0              8390       0.0017%
+                                                           427       0.0001%
+     2        2091        2130        2110.5              4221       0.0010%
   <_vfprintf_r>
-                                                         29901       0.0060%
-     8        8343       27847       16985.2            135882       0.0271%
+                                                         11165       0.0026%
+     8        3957       14264       10137.6             81101       0.0187%
   <__swrite>
-                                                          3435       0.0007%
-     8         371         450         429.4              3435       0.0007%
+                                                          2504       0.0006%
+     8         259         331         313.0              2504       0.0006%
   <__sclose>
-                                                            48       0.0000%
-     3          16          16          16.0                48       0.0000%
+                                                            15       0.0000%
+     3           5           5           5.0                15       0.0000%
   <__swsetup_r>
-                                                           282       0.0001%
-     1        4605        4605        4605.0              4605       0.0009%
+                                                            86       0.0000%
+     1        2244        2244        2244.0              2244       0.0005%
   <__sflush_r>
-                                                          2069       0.0004%
-    11         117         660         500.4              5504       0.0011%
+                                                           654       0.0002%
+    11          38         398         287.1              3158       0.0007%
   <_fflush_r>
-                                                          2376       0.0005%
-    11         373         962         796.2              8758       0.0017%
+                                                           781       0.0002%
+    11         128         488         377.1              4148       0.0010%
   <_fclose_r>
-                                                          1620       0.0003%
-     3        7645       11261        8859.7             26579       0.0053%
+                                                           460       0.0001%
+     3        4077        6070        4741.3             14224       0.0033%
   <__smakebuf_r>
-                                                           256       0.0001%
-     1        4323        4323        4323.0              4323       0.0009%
+                                                            67       0.0000%
+     1        2158        2158        2158.0              2158       0.0005%
   <__patmos_lock_acquire_recursive>
-                                                         68100       0.0136%
-    31          40        3379        2196.8             68100       0.0136%
+                                                         38149       0.0088%
+    31          19        1897        1230.6             38149       0.0088%
   <_exit>
-                                                            56       0.0000%
-     1          56          56          56.0                56       0.0000%
+                                                            19       0.0000%
+     1          19          19          19.0                19       0.0000%
   <__udivdi3>
-                                                           702       0.0001%
-    27         461         488         468.0             12636       0.0025%
+                                                           513       0.0001%
+    27         461         461         461.0             12447       0.0029%
   <__udivmoddi4>
-                                                          3852       0.0008%
-    54         442        1018         671.9             36280       0.0072%
+                                                          2781       0.0006%
+    54         442         847         644.5             34803       0.0080%
   <__udivsi3>
-                                                         21519       0.0043%
-    54         395         422         398.5             21519       0.0043%
+                                                         21330       0.0049%
+    54         395         395         395.0             21330       0.0049%
   <__umoddi3>
-                                                           778       0.0002%
-    27         881        1072         930.5             25124       0.0050%
+                                                           540       0.0001%
+    27         867         867         867.0             23409       0.0054%
   <__umodsi3>
-                                                         10909       0.0022%
-    27         396         427         404.0             10909       0.0022%
+                                                         10692       0.0025%
+    27         396         396         396.0             10692       0.0025%
   <Start_Conversion_sp_>
-                                                       4609539       0.9179%
-  32280          79         292         142.8           4609539       0.9179%
+                                                       2550120       0.5875%
+  32280          79          79          79.0           2550120       0.5875%
   <End_Of_ADC_sp_>
-                                                      47687191       9.4964%
-  807000          57         213          59.1          47687191       9.4964%
+                                                      45999000      10.5966%
+  807000          57          57          57.0          45999000      10.5966%
   <WaitMail_sp_>
-                                                        520961       0.1037%
-  5656          87         115          92.1            520961       0.1037%
+                                                        152712       0.0352%
+  5656          27          27          27.0            152712       0.0352%
   <ClassifyEvent_sp_>
-                                                       2222205       0.4425%
-  5262        8818        8916        8842.4          46528969       9.2658%
+                                                        573558       0.1321%
+  5262        5219        5219        5219.0          27462378       6.3264%
   <RecordEvent_sp_>
-                                                       1613099       0.3212%
-  5262       47054       69321       52399.1         275723987      54.9075%
+                                                        578820       0.1333%
+  5262       46804       46804       46804.0         246282648      56.7349%
   <CalculateQualityNumber_sp_>
-                                                      10014310       1.9942%
-  5262        8415        8429        8420.1          44306764       8.8232%
+                                                       7103700       1.6364%
+  5262        5110        5110        5110.0          26888820       6.1942%
   <FindMinQualityRecord_sp_>
-                                                     274110888      54.5863%
-  5262       46801       68921       52092.5         274110888      54.5863%
+                                                     245703828      56.6016%
+  5262       46694       46694       46694.0         245703828      56.6016%
   <ClearEvents_sp_>
-                                                        436677       0.0870%
-   394        1104        2469        1108.3            436677       0.0870%
+                                                        378634       0.0872%
+   394         961         961         961.0            378634       0.0872%
   <MemoryPatch_sp_>
-                                                        516966       0.1029%
-   394        1282        1646        1312.1            516966       0.1029%
+                                                        425126       0.0979%
+   394        1079        1079        1079.0            425126       0.0979%
   <ExecuteCommand_sp_>
-                                                        348278       0.0694%
-   394        3214        3333        3241.9           1277320       0.2544%
+                                                        105986       0.0244%
+   394        1319        1319        1319.0            519686       0.1197%
   <UpdateTarget_sp_>
-                                                        855389       0.1703%
-   394        2332        2451        2358.0            929042       0.1850%
+                                                        382968       0.0882%
+   394        1050        1050        1050.0            413700       0.0953%
   <SetSensorUnitOff_sp_>
-                                                         73653       0.0147%
-   394         185         283         186.9             73653       0.0147%
+                                                         30732       0.0071%
+   394          78          78          78.0             30732       0.0071%
   <__adddf3_sp_>
-                                                       5567196       1.1086%
-  5262        1231        1231        1231.0           6477522       1.2899%
+                                                       2257398       0.5200%
+  5262         567         567         567.0           2983554       0.6873%
   <__addsf3_sp_>
-                                                       7208940       1.4356%
-  26310         216         506         274.0           7208940       1.4356%
+                                                       5682960       1.3092%
+  26310         216         216         216.0           5682960       1.3092%
   <__gtsf2_sp_>
-                                                        989256       0.1970%
-  26310          22          61          37.6            989256       0.1970%
+                                                        578820       0.1333%
+  26310          22          22          22.0            578820       0.1333%
   <__extendsfdf2_sp_>
-                                                        894540       0.1781%
-  5262         229         229         229.0           1204998       0.2400%
+                                                        352554       0.0812%
+  5262          87          87          87.0            457794       0.1055%
   <__fixunsdfsi_sp_>
-                                                        257838       0.0513%
-  5262          49          49          49.0            257838       0.0513%
+                                                         94716       0.0218%
+  5262          18          18          18.0             94716       0.0218%
   <__floatsidf_sp_>
-                                                        747204       0.1488%
-  5262         201         201         201.0           1057662       0.2106%
+                                                        310458       0.0715%
+  5262          79          79          79.0            415698       0.0958%
   <__floatsisf_sp_>
-                                                       2425782       0.4831%
-  26310          59         142          92.2           2425782       0.4831%
+                                                       1552290       0.3576%
+  26310          59          59          59.0           1552290       0.3576%
   <__muldf3_sp_>
-                                                       4651608       0.9263%
-  5262        1037        1037        1037.0           5456694       1.0866%
+                                                       1889058       0.4352%
+  5262         477         477         477.0           2509974       0.5782%
   <__mulsf3_sp_>
-                                                       7566756       1.5068%
-  26310         184         443         287.6           7566756       1.5068%
+                                                       4841040       1.1152%
+  26310         184         184         184.0           4841040       1.1152%
   <__truncdfsf2_sp_>
-                                                       1236570       0.2462%
-  5262         313         313         313.0           1647006       0.3280%
+                                                        463056       0.1067%
+  5262         127         127         127.0            668274       0.1539%
   <__ashldi3_sp_>
-                                                       1878534       0.3741%
-  63144          20          59          29.8           1878534       0.3741%
+                                                       1262880       0.2909%
+  63144          20          20          20.0           1262880       0.2909%
   <__lshrdi3_sp_>
-                                                        868230       0.1729%
-  26310          19          54          33.0            868230       0.1729%
+                                                        499890       0.1152%
+  26310          19          19          19.0            499890       0.1152%
 
 
 Pasim options:
-   --flush-caches=0x298a4 --cpuid=0 --cores=1 --freq=80 --interrupt=1
+   --flush-caches=0x27304 --cpuid=0 --cores=1 --freq=80 --interrupt=1
    --mmbase=4026531840 --mmhigh=4294967295 --cpuinfo_offset=0 --excunit_offset=256 --timer_offset=512 --uart_offset=2048 --led_offset=2304
-   --gsize=33554432 --gtime=4 --tdelay=3 --trefresh=0 --bsize=16 --psize=0 --posted=0
+   --gsize=33554432 --gtime=0 --tdelay=0 --trefresh=0 --bsize=4 --psize=0 --posted=0
    --nocbase=3758096384 --noc_route_offset=16777216 --noc_st_offset=33554432 --noc_spm_offset=134217728 --nocsize=16777216
-   --lsize=2048 --dckind=dm --dcsize=2048 --dlsize=8 --sckind=block --scsize=2048
+   --lsize=2048 --dckind=ideal --dcsize=2048 --dlsize=0 --sckind=block --scsize=2048
    --icache=mcache --ickind=lru2 --ilsize=0 --mckind=fifo --mcsize=4096 --mbsize=8 --mcmethods=16
 
