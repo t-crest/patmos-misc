@@ -235,6 +235,7 @@ private
                    "-DENABLE_CTORTURE=false",
                    "-DENABLE_TESTING=true",
                    "-DENABLE_EMULATOR=false",
+                   "-DCMAKE_BUILD_TYPE=None",
                    "-DCMAKE_C_FLAGS='#{cflags}'",
                    "-DCMAKE_C_LINK_FLAGS='#{ldflags.chomp()}'",
                    "-DCONFIG_PML='#{File.expand_path(@config.pml_config_file)}'"
