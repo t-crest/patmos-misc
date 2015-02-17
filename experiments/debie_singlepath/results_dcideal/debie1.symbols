@@ -1,0 +1,5 @@
+00025f14	860	HandleAcquisition
+00025ad4	856	HandleHitTrigger
+000285f4	832	HandleTelecommand
+000268e4	1392	TC_InterruptService
+00028b94	340	TM_InterruptService

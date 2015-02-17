@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # TODO read this from build.cfg..
-BUILDDIR=../../../patmos-benchmarks-obj/
+#BUILDDIR=../../../patmos-benchmarks-obj/
+BUILDDIR=../../../bench/build/
 
 ARCHPML=config_default.pml
 
