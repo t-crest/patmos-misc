@@ -67,7 +67,8 @@ def papabench
 end
 
 def debie1
-  benchmarks = %w{debie1}
+  dir = ["Debie1-e","code"]
+  ais_path = File.expand_path(File.join($benchsrc,dir[0],'wtc11'))
   targets = %w{TC_InterruptService TM_InterruptService HandleHitTrigger HandleTelecommand HandleAcquisition HandleHealthMonitoring}
   benchmarks = [
     { 'analyses' => targets.map { |entry|
@@ -76,7 +77,17 @@ def debie1
         }
       },
       'name' => "debie1",
-      'path' => File.join("Debie1-e","code","debie1")
+      'path' => File.join(dir,"debie1"),
+      # a list of template-entry pairs ([[.ais.tmpl,entry], ... ])
+      'ais_templates' => {
+        'TC_InterruptService' => 'debie1_1.ais.tmpl',
+        'HandleTelecommand' => '*4?.ais.tmpl',
+        'HandleHealthMonitoring' => '*6?.ais.tmpl'
+        }.map { |entry,glob|
+          Dir.glob(File.join(ais_path, glob)).map { |ais|
+            [ais, entry]
+          }
+        }.flatten(1)
     }
   ]
 end
@@ -157,6 +168,7 @@ def standard_buildsettings
     {'name' => 'O1', 'cflags' => '-O1 -g', 'ldflags' => '' },
     {'name' => 'O1f', 'cflags' => '-O1 -g', 'ldflags' => '-Xopt -disable-inlining' },
     {'name' => 'O2', 'cflags' => '-O2 -g', 'ldflags' => '' },
+    {'name' => 'O3', 'cflags' => '-O3 -g', 'ldflags' => '' },
     {'name' => 'Os', 'cflags' => '-Os -g', 'ldflags' => '-Os'},
     {'name' => 'del', 'cflags' => '-O2 -g', 'ldflags' => '-Xllc -mpatmos-cfl=delayed' },
     {'name' => 'nd',  'cflags' => '-O2 -g', 'ldflags' => '-Xllc -mpatmos-cfl=non-delayed' },
