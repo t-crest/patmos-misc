@@ -37,7 +37,7 @@ function extract_wcet {
 
 
 CONFIGS="ideal dcideal"
-TARGETS="debie1.sim debie1.wcet.pml debie1.sp.sim debie1.times debie1.symbols debie1.sp.symbols"
+TARGETS="debie1.sim debie1.wcet.pml debie1.sp.sim debie1.times debie1.stats"
 
 for conf in ${CONFIGS}
 do

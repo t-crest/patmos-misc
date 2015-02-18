@@ -25,8 +25,7 @@ CC = patmos-clang
 CFLAGS = -fno-builtin -w -g -O2 -fno-unroll-loops
 
 # additional flags for sp codegen
-CFLAGS_SP = -mpatmos-singlepath=$(subst $(space),$(comma),$(SPROOTS)) \
-	    -Xopt -disable-early-taildup \
+CFLAGS_SP = -Xopt -disable-early-taildup \
 	    -Xopt -disable-tail-duplicate \
 	    -Xopt -enable-tail-merge \
 	    -Xllc -disable-early-taildup \
@@ -71,7 +70,9 @@ debie1.elf:
 # The debie singlepath binary
 debie1.sp.elf:
 	cd $(BUILDDIR) && $(MAKE) $(DEBIEOBJS)
-	$(CC) $(CFLAGS) $(CFLAGS_ARCH) $(CFLAGS_SP) -o $@ $(OBJS)
+	$(CC) $(CFLAGS) $(CFLAGS_ARCH) $(CFLAGS_SP) \
+	  -mpatmos-singlepath=$(subst $(space),$(comma),$(SPROOTS)) \
+	  -o $@ $(OBJS)
 
 %.dis: %.elf
 	patmos-llvm-objdump -d $< > $@
@@ -90,12 +91,6 @@ debie1.sp.elf:
 	  --report $@ --append-report --enable-wca; \
 	  done
 
-%.symbols: %.elf
-	patmos-llvm-objdump -t $< | \
-	  grep -E '$(subst $(space),|,$(SPROOTS))' | \
-	  awk 'BEGIN {OFS="\t"} { print $$1, strtonum("0x"$$5), $$6 }' | \
-	  tee $@
-
 %.times: %.elf
 	rm -f $@
 	$(PASIM) --debug=0 --debug-fmt=calls-indent --debug-file=$@.tmp $<
@@ -104,10 +99,23 @@ debie1.sp.elf:
 	  done
 	rm -f $@.tmp
 
+# create debug log / stats when converting only a particular function
+debie1.%.log:
+	$(CC) $(CFLAGS) $(CFLAGS_ARCH) $(CFLAGS_SP) \
+	  -mpatmos-singlepath=$* \
+	  -Xllc --debug-only=patmos-singlepath -Xllc -stats \
+	  -o debie1.tmp.elf $(OBJS) 2> $@
+	rm -f debie1.tmp.elf
 
-
-
+debie1.stats: debie1.sp.elf debie1.elf $(foreach root,$(SPROOTS),debie1.$(root).log)
+	echo "Task Conv SP" > $@
+	for root in $(SPROOTS); do \
+	  echo -n "$${root}" >> $@ ; \
+	  ./stats.sh debie1.$${root}.log debie1.elf    | awk '/Total:/ {printf " %d", $$2}' >> $@ ; \
+	  ./stats.sh debie1.$${root}.log debie1.sp.elf | awk '/Total:/ {printf " %d", $$2}' >> $@ ; \
+	  echo >> $@ ; \
+	  done;
 
 clean:
-	rm -f *.dis *.elf *.sim *.bc *.elf.pml *.wcet.pml *.times *.symbols
+	rm -f *.dis *.elf *.sim *.bc *.elf.pml *.wcet.pml *.times *.log *.stats
 	rm -fr ./tmp/
