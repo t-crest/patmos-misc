@@ -3,7 +3,7 @@
 .PHONY: main main.sp
 .PHONY: main.txt main.sp.txt
 
-all: compile pasim wcet
+all: compile wcet sim cat
 
 compile: main main.sp
 
