@@ -33,7 +33,7 @@
 /*                                                                       */
 /*  DESCRIPTION :                                                        */
 /*                                                                       */
-/*     FFT using Cooly-Turkey algorithm.                                 */
+/*     FFT umy_sing Cooly-Turkey algorithm.                                 */
 /*     There are two inputs, ar[] and ai[]. ar[] is real number parts    */
 /*     of input array and the ai[] is imaginary number parts of input.   */
 /*     The function fft1 process FFT or inverse FFT according to the    .*/
@@ -65,7 +65,7 @@ double          ai[8] = {0.,};
 int             fft1(int n, int flag);
 
 static double 
-fabs(double n)
+my_fabs(double n)
 {
 	double          f;
 
@@ -84,7 +84,7 @@ my_log(void)
 
 
 static double 
-sin(rad)
+my_sin(rad)
 	double          rad;
 {
 	double          app;
@@ -101,7 +101,7 @@ sin(rad)
 		((2.0 * inc) * (2.0 * inc + 1.0));
 	app = app + diff;
 	inc++;
-	while (fabs(diff) >= 0.00001) {
+	while (my_fabs(diff) >= 0.00001) {
 		diff = (diff * (-(rad * rad))) /
 			((2.0 * inc) * (2.0 * inc + 1.0));
 		app = app + diff;
@@ -113,11 +113,11 @@ sin(rad)
 
 
 static double 
-cos(double rad)
+my_cos(double rad)
 {
-	double          sin();
+	double          my_sin();
 
-	return (sin(PI / 2.0 - rad));
+	return (my_sin(PI / 2.0 - rad));
 }
 
 
@@ -130,7 +130,7 @@ main(void)
 
 	/* ar  */
 	for (i = 0; i < n; i++)
-		ar[i] = cos(2 * M_PI * i / n);
+		ar[i] = my_cos(2 * M_PI * i / n);
 
 	/* forward fft */
 	flag = 0;
@@ -139,7 +139,7 @@ main(void)
 	/* inverse fft */
 	flag = 1;
 	chkerr = fft1(n, flag);
-	return 0;
+	return chkerr;
 
 }
 
@@ -159,7 +159,7 @@ fft1(int n, int flag)
 	j = 1;
 	for (i = 0; i < iter; i++)
 		j *= 2;
-	if (fabs(n - j) > 1.0e-6)
+	if (my_fabs(n - j) > 1.0e-6)
 		return (1);
 
 	/* Main FFT Loops  */
@@ -171,8 +171,8 @@ fft1(int n, int flag)
 		w = PI / xp2;
 		for (k = 0; k < xp2; k++) {
 			arg = k * w;
-			wr = cos(arg);
-			wi = sign * sin(arg);
+			wr = my_cos(arg);
+			wi = sign * my_sin(arg);
 			i = k - xp;
 			for (j = xp; j <= n; j += xp) {
 				j1 = j + i;
