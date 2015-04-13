@@ -1,0 +1,18 @@
+#!/bin/bash
+
+cmd="pasim"
+pml=""
+
+while [[ "$1" != "" ]]; do
+  if [[ "$1" == "-i" ]]; then
+    pml=$2
+    cmd="$cmd "`platin tool-config -i $pml -t pasim`
+    shift 2
+    continue
+  fi
+  cmd="$cmd $1"
+  shift
+done
+
+$cmd
+exit $?
