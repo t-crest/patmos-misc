@@ -14,6 +14,10 @@ CFLAGSSP = $(CFLAGS) \
            -Xllc -enable-tail-merge
 
 TRACE_OPTS=--enable-trace-analysis --trace-entry gen_and_search # --check 3
+WCA_OPTS=--enable-wca --combine-wca -e gen_and_search
+
+CONFIG=config_dcideal.pml
+#CONFIG=config_full.pml
 
 all: dirs compile wcet sim cat
 
@@ -23,8 +27,8 @@ dirs:
 compile: main main.sp
 
 sim:
-	./pasim-pml -i config_full.pml main    -V 2>log.txt
-	./pasim-pml -i config_full.pml main.sp -V 2>log.sp.txt
+	./pasim-pml -i $(CONFIG) main    -V 2>log.txt
+	./pasim-pml -i $(CONFIG) main.sp -V 2>log.sp.txt
 
 wcet: main.txt main.sp.txt
 
@@ -39,22 +43,17 @@ main.sp:
 	patmos-clang -O2 main.c -mserialize-roots=gen_and_search -mserialize=main.sp.pml -o main.sp -mpatmos-singlepath=gen_and_search
 
 main.txt:
-	platin wcet -i config_full.pml --enable-wca $(TRACE_OPTS) -e gen_and_search -i main.pml -b main --report main.txt -o main.wcet.pml --outdir out
+	platin wcet -i $(CONFIG) $(TRACE_OPTS) $(WCA_OPTS) -i main.pml -b main --report main.txt -o main.wcet.pml --outdir out
 
 main.sp.txt:
-	platin wcet -i config_full.pml --enable-wca $(TRACE_OPTS) -e gen_and_search -i main.sp.pml -b main.sp --report main.sp.txt -o main.sp.wcet.pml --outdir out
+	platin wcet -i $(CONFIG) $(TRACE_OPTS) $(WCA_OPTS) -i main.sp.pml -b main.sp --report main.sp.txt -o main.sp.wcet.pml --outdir out
 
 wcet-min:
-	platin wcet -i config_full.pml --enable-wca -e gen_and_search -i main.pml -b main --report main.txt
-	platin wcet -i config_full.pml --enable-wca -e gen_and_search -i main.sp.pml -b main.sp --report main.sp.txt
+	platin wcet -i $(CONFIG) --enable-wca -e gen_and_search -i main.pml -b main --report main.txt
+	platin wcet -i $(CONFIG) --enable-wca -e gen_and_search -i main.sp.pml -b main.sp --report main.sp.txt
 
 graphs:
-	mkdir -p graphs/gen_and_search
-	mkdir -p graphs/gen_and_search.sp
-	mkdir -p graphs/sort
-	mkdir -p graphs/sort.sp
-	mkdir -p graphs/mybsearch
-	mkdir -p graphs/mybsearch.sp
+	mkdir -p graphs/gen_and_search{,.sp} graphs/sort{,.sp} graphs/mybsearch{,.sp}
 	platin visualize -i main.pml -f gen_and_search -O graphs/gen_and_search
 	platin visualize -i main.pml -f sort           -O graphs/sort
 	platin visualize -i main.pml -f mybsearch      -O graphs/mybsearch
