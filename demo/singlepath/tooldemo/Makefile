@@ -14,7 +14,7 @@ CFLAGSSP = $(CFLAGS) \
            -Xllc -enable-tail-merge
 
 TRACE_OPTS=--enable-trace-analysis --trace-entry gen_and_search # --check 3
-WCA_OPTS=--enable-wca --combine-wca -e gen_and_search
+WCA_OPTS=--enable-wca -e gen_and_search
 
 CONFIG=config_dcideal.pml
 #CONFIG=config_full.pml
@@ -53,7 +53,7 @@ wcet-min:
 	platin wcet -i $(CONFIG) --enable-wca -e gen_and_search -i main.sp.pml -b main.sp --report main.sp.txt
 
 graphs:
-	mkdir -p graphs/gen_and_search{,.sp} graphs/sort{,.sp} graphs/mybsearch{,.sp}
+	mkdir -p graphs/gen_and_search graphs/gen_and_search.sp graphs/sort graphs/sort.sp graphs/mybsearch graphs/mybsearch.sp
 	platin visualize -i main.pml -f gen_and_search -O graphs/gen_and_search
 	platin visualize -i main.pml -f sort           -O graphs/sort
 	platin visualize -i main.pml -f mybsearch      -O graphs/mybsearch
