@@ -8,7 +8,6 @@
 #
 # Try --hide-roots to separate the repositories, but there seems to be a bug/unintuitive behaviour with it.
 #
-# TODO Use repository dir setup from build.cfg
 # TODO Add other t-crest repositories
 # TODO Add caption file containing main events (reviews, major changes)
 #
