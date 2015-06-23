@@ -194,8 +194,8 @@ CTOOLS_ARGS=
 
 ## Options for the patmos-bench test environment
 # PML architecture files configure clang/llvm, pasim, and platin:
-# PML_CONFIG and PML_CONFIG_HW (for emulated executables)
-#BENCH_ARGS="-DCONFIG_PML=scripts/patmos-config-sim.pml"
+# PML_CONFIG and PML_CONFIG_LARGERAM (for benchmarks requiring >2Mb RAM)
+#BENCH_ARGS="-DCONFIG_PML=scripts/patmos-config.pml"
 # Add extra options for pasim when executing tests
 #BENCH_ARGS="${BENCH_ARGS} -DPASIM_EXTRA_OPTIONS='--maxc 1000'"
 # Disable gcc torture tests
