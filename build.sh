@@ -111,7 +111,7 @@ ECLIPSE_LLVM_TARGETS=Patmos
 # build LLVM using configure instead of cmake
 LLVM_USE_CONFIGURE=false
 # Set the build type for LLVM (currently only for cmake builds)
-LLVM_BUILD_TYPE=Debug
+LLVM_BUILD_TYPE=Release
 # build LLVM using shared libraries instead of static libs
 LLVM_BUILD_SHARED=true
 # skip checking out clang
@@ -184,8 +184,8 @@ RTEMS_BSP=pasim
 # Whether to use simulator (pasim) of FPGA (patex) for RTEMS tests
 RTEMS_SIM=pasim
 
-# Build simulator in Release mode
-#PASIM_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
+# Build simulator in Debug mode (default: RelWithDebInfo)
+#PASIM_ARGS="-DCMAKE_BUILD_TYPE=Debug"
 # Use a custom installation of Boost libraries
 #PASIM_ARGS="-DBOOST_ROOT=$HOME/local/ -DBoost_NO_BOOST_CMAKE=TRUE"
 
