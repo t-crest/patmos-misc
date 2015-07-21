@@ -44,9 +44,14 @@ class CacheSetLockable:
                 self.blocks.pop()
             return False
 
-    def lock_all(self):
-        """Lock all but one cache line."""
-        self.lock_offset = len(self.blocks)
+    def lockn(self, n):
+        """Lock n cache lines.
+
+        n must be smaller than the total number of cache lines.
+        The most recent (youngest) lines are locked.
+        """
+        assert n < len(self.blocks)
+        self.lock_offset = n
 
     def unlock_all(self):
         """Unlock all cache lines."""
@@ -76,14 +81,13 @@ class Cache:
         self.blocksize = blocksize
         self.sets = [CacheSetLockable(associativity) for i in range(sets)]
         self.size = blocksize * sets * associativity
+        self.associativity = associativity
         self.num_hits = 0
         self.num_misses = 0
         self.num_accesses = 0
 
-    def size(self, in_blocks=False):
-        retval = self.size
-        if in_blocks: retval /= self.blocksize
-        return retval
+    def size_blocks(self):
+        return self.size / self.blocksize
 
     def tagof(self, addr):
         """Get the tag of a specified address."""
@@ -103,8 +107,8 @@ class Cache:
             self.num_misses += 1
         return hit
 
-    def lock_all(self):
-        for s in self.sets: s.lock_all()
+    def lockn(self, n):
+        for s in self.sets: s.lockn(n)
 
     def unlock_all(self):
         for s in self.sets: s.unlock_all()
@@ -125,6 +129,7 @@ class Simulator:
     def __init__(self, cache, rpt, lt, memlatency, verbose=False):
         self.t = 0  # simulation time
         self.cache = cache
+        self.loop_registers = dict()
         self.RPT = rpt
         self.LT = lt
         self.memlatency = memlatency
@@ -139,7 +144,7 @@ class Simulator:
             "cnt_miss"           : 0,
         }
 
-    def prefetch(self, tag):
+    def _prefetch(self, tag):
         # check if there is a pending request.
         # if yes, we have to wait until it is finished
         if self.pending:
@@ -151,12 +156,15 @@ class Simulator:
             self.t = pend # wait
         addr = tag * self.cache.blocksize
         hit = self.cache.access(addr)
+        print "prefetch request", tag, self.t
         if not hit:
             self.pending = (tag, self.t)
+            print "add pending", self.pending
 
-    def fetch(self, tag):
+    def _fetch(self, tag):
         addr = tag * self.cache.blocksize
         hit = self.cache.access(addr)
+        print "fetch request", tag, self.t
         if self.pending:
             ptag, pstart = self.pending
             pend = pstart + self.memlatency
@@ -176,44 +184,66 @@ class Simulator:
             self.pending = None
         self.t += 1 # instruction
 
+
     def run(self, trace, enable_prefetch=False, enable_lock=False):
         cur_block = 0
-        loop_registers = dict()
-        for i, addr in trace():
+        self.loop_registers = dict()
+        for i, addr in enumerate(trace()):
             addr_tag = self.cache.tagof(addr)
+
+            ### fetch the instruction and update time ("wait" if necessary)
+            self._fetch(addr_tag)
+
             ### PREFETCH LOGIC
             if enable_prefetch:
                 if cur_block != addr_tag:
                     # we advanced, do something
                     cur_block = addr_tag
-                    # are we in a loop?
+                    # are we in a trigger line?
+                    # FIXME we should already know where to look at
                     if cur_block in RPT:
                         # get or create entry in loop registers
-                        dest, counter, size = loop_registers.setdefault(
+                        dest, counter, size = self.loop_registers.setdefault(
                             cur_block, tuple(RPT[cur_block]))
-                        # check if larger than cache size for prefetch
-                        if size >= self.cache.size(True):
-                             self.prefetch(dest) # prefetch dest
                         # check for last loop iteration
                         counter -= 1
-                        if counter == 0:
-                            del loop_registers[cur_block]
-                            self.prefetch(cur_block + 1) # prefetch next line
-                        else:
+                        if counter > 0:
                             # update registers
-                            loop_registers[cur_block] = (dest, counter, size)
+                            self.loop_registers[cur_block] = (dest, counter, size)
+                            # check if larger than cache size for prefetch
+                            if size >= self.cache.size_blocks():
+                                 self._prefetch(dest) # prefetch dest
+                        else:
+                            # this was the last iteration, so we remove the
+                            # registers for this loop and prefetch the line
+                            # after the loop
+                            del self.loop_registers[cur_block]
+                            self._prefetch(cur_block + 1) # prefetch next line
                     else:
-                        self.prefetch(cur_block + 1) # prefetch next line
+                        self._prefetch(cur_block + 1) # prefetch next line
             ### LOCK LOGIC
             if enable_lock:
-                if self.LT.islock(addr): self.cache.lock_all()
+                if self.LT.islock(addr):
+                    self.cache.lockn(self.cache.associativity - 2)
                 if self.LT.isunlock(addr): self.cache.unlock_all()
-            ### fetch the instruction and update time ("wait" if necessary)
-            self.fetch(addr_tag)
 
             # verbose trace output
             if self.verbose:
-                print i, self.t, hex(addr)
+                print i, hex(addr), str(self)#, str(self.stats)
+
+    def __str__(self):
+        """Return a textual representation of the hardware state."""
+        s = [
+                # simulation time
+                ("time", self.t),
+                # cache content
+                ("cache", self.cache),
+                # pending prefetch
+                ("pending", self.pending),
+                # loop registers
+                ("loops", self.loop_registers),
+        ]
+        return ", ".join("{}: {}".format(*pair) for pair in s)
 
 ###############################################################################
 # main program entry point:
@@ -231,13 +261,15 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--print-graphs", action="store_true",
                         help="Print dynamic control-flow graphs.")
     parser.add_argument("--blocksize", type=int, default=32,
-                        help="Size of a cache block in bytes.")
+                        help="Size of a cache block in bytes."\
+                        " (default: %(default)d)")
     parser.add_argument("--sets", type=int, default=1,
-                        help="Number of cache sets.")
+                        help="Number of cache sets. (default: %(default)d)")
     parser.add_argument("--assoc", type=int, default=8,
-                        help="Associativity.")
+                        help="Associativity. (default: %(default)d)")
     parser.add_argument("--mem-cycles", type=int, default=20,
-                        help="Number of cycles required to load a cache line.")
+                        help="Number of cycles required to load a cache line."\
+                        " (default: %(default)d)")
     parser.add_argument("--disable-prefetch", action="store_true",
                         help="Disable prefetching.")
     parser.add_argument("--disable-lock", action="store_true",
@@ -251,6 +283,7 @@ if __name__ == '__main__':
 
     # instantiate the cache
     C = Cache(args.blocksize, args.sets, args.assoc)
+    print "Cache size in blocks:", C.size_blocks()
 
     T = TraceAnalysis(Functions("funcs.txt"))
     T.analyze(trace)
