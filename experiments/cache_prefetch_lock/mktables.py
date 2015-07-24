@@ -19,17 +19,7 @@ class TableCreator:
         self.ta = trace_analysis
         self.tagof = tagof
         self.cache_size = cache_capacity_lines
-
-        self.rpt = []
-        self.func_offsets = {}
-        self._initial_fill()
-
-        # build the properties and patch the addresses
-        for i, rpt_entry in enumerate(self.rpt):
-            rpt_entry.idx = i
-            rpt_entry.trigger_line = tagof(rpt_entry.trigger_address)
-            rpt_entry._patch(self)
-
+        self.cache_block_size = 0xffffffff / tagof(0xffffffff)
 
     def unique_blocks(self, range_start, range_end):
         """Get the memory blocks covered by the given address range.
@@ -62,6 +52,38 @@ class TableCreator:
     def loop_size(self, loop):
         """Convenience function to determine the dynamic size of a loop."""
         return self.num_dyn_blocks(loop.head, loop.tail)
+
+    def skip_to_next_block(self, func, addr):
+        """Return an address of the memory block following addr
+
+        Given an instruction address, return an address in the next memory
+        block after the address
+        """
+        # An instruction starts at the start of the next block
+        addr_next_block = (self.tagof(addr) + 1) * self.cache_block_size
+        # Or at an offset of 4 byte.
+        # In practice (once 64bit instructions are removed), we
+        # could simply take the address at the beginning of the next block
+        if addr_next_block not in func.cfg:
+            addr_next_block += 4
+            assert addr_next_block in func.cfg
+        return addr_next_block
+
+
+###############################################################################
+
+
+class RPTCreator(TableCreator):
+    def __init__(self, trace_analysis, tagof=lambda x: x,
+                 cache_capacity_lines=1):
+        TableCreator.__init__(self,
+                              trace_analysis, tagof, cache_capacity_lines)
+        self.rpt = []
+        self.func_offsets = {}
+        # 1st pass: create the "table rows"
+        self._initial_fill()
+        # 2nd pass to add attributes based on location in table
+        self._backpatch()
 
     def entry_past_addr(self, addr):
         # lookup the function
@@ -101,21 +123,26 @@ class TableCreator:
             self.rpt.extend(rpt_group)
 
 
-###############################################################################
+    def _backpatch(self):
+        # build the properties and patch the addresses
+        for i, rpt_entry in enumerate(self.rpt):
+            rpt_entry.idx = i
+            rpt_entry.trigger_line = self.tagof(rpt_entry.trigger_address)
+            rpt_entry._patch(self)
 
+    def dump(self):
+        print RPT_Entry.columns
+        for e in self.rpt:
+            print e
 
 
 class RPT_Entry:
     columns = "idx trig type dest it nxt count retdest"
     def __init__(self, trigger_address):
         self.trigger_address = trigger_address
-        self.idx = None
 
     def _patch(self, creator):
-        """Implemented by subclasses for backpatching
-
-        Call this after the creator's rpt has initially been filled
-        """
+        """Implemented by subclasses for backpatching"""
         raise Exception("Not implemented!")
 
     def __str__(self):
@@ -124,7 +151,7 @@ class RPT_Entry:
         return "{} {} {} {} {} {} {} {} ".format(
             self.idx,
             self.trigger_line,
-            self.__class__.__name__[4:], # kind
+            self.__class__.__name__[4:], # prefetch type
             *attrs)
 
 
@@ -181,59 +208,53 @@ class RPT_Any(RPT_Entry):
 
 # following code is unused for now...
 
+class LockTableCreator(TableCreator):
+    def __init__(self, trace_analysis, tagof=lambda x: x,
+                 cache_capacity_lines=1):
+        TableCreator.__init__(self,
+                              trace_analysis, tagof, cache_capacity_lines)
 
 
-def create_lock_table(analysis, tagof=lambda x: x, cache_capacity_lines=1):
-    """Create the Lock Table for the analyzed trace.
+        self.lt = []
+        self.func_offsets = {}
+        # 1st pass: create the "table rows"
+        self._initial_fill()
 
-    tagof is a function to get the tag of a memory address.
-    """
-    call_sites = [tup[0] for tup in analysis.calls]
-    block_size = 0xffffffff / tagof(0xffffffff)
+    def _initial_fill(self):
 
-    def skip_to_next_block(func, addr):
-        # An instruction starts at the start of the next block
-        addr_next_block = (tagof(addr) + 1) * block_size
-        # Or at an offset of 4 byte.
-        # In practice (once 64bit instructions are removed), we
-        # could simply take the address at the beginning of the next block
-        if addr_next_block not in func.cfg:
-            addr_next_block += 4
-            assert addr_next_block in func.cfg
-        return addr_next_block
-
-    lock_table = LT()
-    for func in analysis.functions.values():
-        # iterate over "true" loops
-        for loop in cfg.loops():
-            # TODO distinct for the small_loop prefetching type
-            # only consider loops larger than the cache capacity
-            if loop.dyn_num_blocks(tagof) <= cache_capacity_lines:
-                continue
-            # TODO refine the next two conditions to consider dynamic
-            # block sizes instead and loops from called functions
-            # loops must not have a call inside
-            if len(loop.calls) > 0: continue
-            # innermost loops with at most one child are inserted
-            if len(loop.children) == 0:
-                lock_table.insert(loop.tail, loop.exitnode)
-                continue
-            # optimization for nesting-level 1 loops: lock the inner loop
-            # if it fits the cache
-            if len(loop.children) == 1:
-                chld = loop.children[0]
-                if chld.dyn_num_blocks(tagof) > cache_capacity_lines:
+        for func in self.ta.functions():
+            # iterate over "true" loops
+            for loop in func.loops():
+                if self.loop_size(loop) <= self.cache_size:
                     continue
-                # search for a fitting locking window
-                lock_addr = chld.tail
-                lock_block = tagof(lock_addr)
-                while lock_block - cache_capacity_lines + 1 \
-                      < tagof(loop.head):
-                    # skip forward to an address of the next cache block
-                    lock_addr = skip_to_next_block(lock_addr, cfg)
-                    lock_block = tagof(lock_addr)
-                lock_table.insert(lock_addr, loop.exitnode)
-    return lock_table
+                # innermost loops with at most one child are inserted
+                if len(loop.children) == 0:
+                    self.lt.append((loop.tail, loop.exitnode))
+                    continue
+                # TODO refine the next two conditions to consider dynamic
+                # block sizes instead and loops from called functions
+                # loops must not have a call inside
+                if len(loop.calls) > 0: continue
+                # optimization for nesting-level 1 loops: lock the inner loop
+                # if it fits the cache
+                if len(loop.children) == 1:
+                    chld = loop.children[0]
+                    if self.loop_size(chld) > self.cache_size:
+                        continue
+                    # search for a fitting locking window
+                    lock_addr = chld.tail
+                    lock_block = self.tagof(lock_addr)
+                    while lock_block - self.cache_size + 1 \
+                          < self.tagof(loop.head):
+                        # skip forward to an address of the next cache block
+                        lock_addr = self.skip_to_next_block(lock_addr, func)
+                        lock_block = self.tagof(lock_addr)
+                    self.lt.append((lock_addr, loop.exitnode))
+
+    def dump(self):
+        print "idx lock_addr  unlock_addr"
+        for idx, (lock_addr, unlock_addr) in enumerate(self.lt):
+            print "{:3d} {:#010x} {:#010x}".format(idx, lock_addr, unlock_addr)
 
 
 ###############################################################################
@@ -247,18 +268,25 @@ if __name__ == "__main__":
     # specify argument handling
     parser = argparse.ArgumentParser()
     # positional arguments
+    parser.add_argument("func_symbols",
+                        help="File containing the start address of each "
+                             "function; each line has the form "
+                             "\"address name\" and the lines are sorted by "
+                             "address.")
     parser.add_argument("trace",
-                        help="The instruction trace from simulation; "\
+                        help="The instruction trace from simulation; "
                              "one address (hex, w/o leading 0x) per line.")
     args = parser.parse_args()
 
 
     # create analyzer and performa analysis
-    TA = TraceAnalysis(FunctionMap("funcs.txt"), TraceGen(args.trace))
+    TA = TraceAnalysis(FunctionMap(args.func_symbols), TraceGen(args.trace))
 
-    TC = TableCreator(TA, lambda x: x / 32, 4)
+    tagof = lambda x: x / 32
+    RPTC = RPTCreator(TA, tagof, 4)
+    RPTC.dump()
 
-    print RPT_Entry.columns
-    for e in TC.rpt:
-        print e
+    LTC = LockTableCreator(TA, tagof, 4)
+    LTC.dump()
+
 

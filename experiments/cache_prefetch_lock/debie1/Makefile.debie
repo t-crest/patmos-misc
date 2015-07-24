@@ -1,0 +1,30 @@
+#
+# Makefile in the cache locking evaluation bench.
+#
+# Author: Daniel Prokesch
+#
+
+
+include Makefile
+
+# The build directory of the debie1 binary
+BUILDDIR := ../../../../bench/build/Debie1-e/code
+
+
+BCFILES := class.c.bc classtab.c.bc debie.c.bc health.c.bc hw_if.c.bc measure.c.bc tc_hand.c.bc telem.c.bc harness/harness.c.bc
+
+OBJS = $(addprefix $(BUILDDIR)/CMakeFiles/debie1.dir/,$(BCFILES)) $(BUILDDIR)/patmos/clang/libdebie1-target.a
+
+
+
+SPROOTS = TC_InterruptService TM_InterruptService HandleHitTrigger HandleTelecommand HandleAcquisition# HandleHealthMonitoring
+
+all: debie1.sp.subtraces
+
+# The main debie singlepath binary
+debie1.sp.elf:
+	cd $(BUILDDIR) && $(MAKE)
+	$(CC) $(CFLAGS) -o $@ -mpatmos-singlepath=$(subst $(space),$(comma),$(SPROOTS)) $(OBJS)
+
+
+

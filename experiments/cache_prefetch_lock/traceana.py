@@ -272,6 +272,11 @@ class TraceAnalysis:
         return sorted(call for call in self._calls.values()
                       if from_addr <= call.call_site <= to_addr)
 
+
+    def num_contexts(self, func):
+        return len([call.call_site for call in self.calls()
+                   if call.callee == func])
+
     def write_graphs(self, prefix=""):
         for f in self.functions():
             f.write_graph(prefix + f.name)
@@ -279,6 +284,7 @@ class TraceAnalysis:
 
     def dump(self):
         for f in self.functions():
+            print ">", self.num_contexts(f), "contexts"
             f.dump()
         print
         print "# call_site/return_adddress (count) [caller -> callee]"
@@ -309,6 +315,15 @@ class FunctionMap:
                 self.entries.append(int(addr, 16))
                 self.names.append(name.rstrip())
 
+    def _index(self, addr):
+        """"Return the index of entry <= addr"""
+        i = bisect(self.entries, addr)
+        if i > 0:
+            return i-1
+        else:
+            raise Exception("Invalid address")
+
+
     def __getitem__(self, addr):
         """Lookup the function containing a specified address.
 
@@ -320,6 +335,13 @@ class FunctionMap:
             return self.entries[i-1], self.names[i-1]
         else:
             raise Exception("Invalid address")
+
+    def func_next(self, addr):
+        i = bisect(self.entries, addr)
+        return self.entries[i] if i != len(self.entries) else 0x100000000
+
+    def name_exists(self, name):
+        return name in self.names
 
 
 ###############################################################################
@@ -343,6 +365,11 @@ if __name__ == "__main__":
     # specify argument handling
     parser = argparse.ArgumentParser()
     # positional arguments
+    parser.add_argument("func_symbols",
+                        help="File containing the start address of each "
+                             "function; each line has the form "
+                             "\"address name\" and the lines are sorted by "
+                             "address.")
     parser.add_argument("trace",
                         help="The instruction trace from simulation; "\
                              "one address (hex, w/o leading 0x) per line.")
@@ -351,7 +378,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # create analyzer and perform analysis
-    T = TraceAnalysis(FunctionMap("funcs.txt"), TraceGen(args.trace))
+    T = TraceAnalysis(FunctionMap(args.func_symbols), TraceGen(args.trace))
     T.dump()
 
     if args.print_graphs:
