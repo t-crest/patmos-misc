@@ -9,7 +9,7 @@
 #
 ###############################################################################
 
-
+import pickle
 
 ###############################################################################
 
@@ -135,6 +135,16 @@ class RPTCreator(TableCreator):
         for e in self.rpt:
             print e
 
+    def save(self, filename):
+        with open(filename, "w") as f:
+            pickle.dump(self.rpt, f)
+
+
+    @staticmethod
+    def load(filename):
+        with open(filename) as f:
+            return pickle.load(f)
+
 
 class RPT_Entry:
     columns = "idx trig type dest it nxt count retdest"
@@ -234,7 +244,7 @@ class LockTableCreator(TableCreator):
                 # TODO refine the next two conditions to consider dynamic
                 # block sizes instead and loops from called functions
                 # loops must not have a call inside
-                if len(loop.calls) > 0: continue
+                if len(self.ta.loop_calls(loop)) > 0: continue
                 # optimization for nesting-level 1 loops: lock the inner loop
                 # if it fits the cache
                 if len(loop.children) == 1:
@@ -267,6 +277,12 @@ if __name__ == "__main__":
 
     # specify argument handling
     parser = argparse.ArgumentParser()
+    # options
+    parser.add_argument("-s", "--size", type=int, default=16,
+                        help="Size of a cache line in bytes."\
+                        " (default: %(default)d)")
+    parser.add_argument("-l", "--lines", type=int, default=4,
+                        help="Number of cache lines. (default: %(default)d)")
     # positional arguments
     parser.add_argument("func_symbols",
                         help="File containing the start address of each "
@@ -279,14 +295,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
 
-    # create analyzer and performa analysis
+    # create analyzer and perform analysis
     TA = TraceAnalysis(FunctionMap(args.func_symbols), TraceGen(args.trace))
 
-    tagof = lambda x: x / 32
-    RPTC = RPTCreator(TA, tagof, 4)
-    RPTC.dump()
+    tagof = lambda x: x / args.size
 
-    LTC = LockTableCreator(TA, tagof, 4)
+    RPTC = RPTCreator(TA, tagof, args.lines)
+    RPTC.dump()
+    RPTC.save(args.trace + ".rpt")
+
+    LTC = LockTableCreator(TA, tagof, args.lines)
     LTC.dump()
 
 

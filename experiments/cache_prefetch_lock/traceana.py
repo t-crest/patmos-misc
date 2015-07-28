@@ -272,6 +272,9 @@ class TraceAnalysis:
         return sorted(call for call in self._calls.values()
                       if from_addr <= call.call_site <= to_addr)
 
+    def loop_calls(self, loop):
+        return self.call_sites_range(loop.head, loop.tail)
+
 
     def num_contexts(self, func):
         return len([call.call_site for call in self.calls()

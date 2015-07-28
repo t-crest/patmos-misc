@@ -30,7 +30,6 @@ comma := ,
 
 # Compile an ELF binary from a C file
 %.elf: %.c
-	cd $(BUILDDIR) && $(MAKE)
 	$(CC) $(CFLAGS) -o $@ -mpatmos-singlepath=$(SPROOTS) $<
 
 # Disassemble an elf binary

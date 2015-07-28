@@ -8,7 +8,8 @@
 #
 ###############################################################################
 
-from traceana import TraceAnalysis, TraceGen, Functions, RPT, LT
+from traceana import TraceGen
+from mktables import *
 
 
 import argparse
@@ -129,9 +130,11 @@ class Simulator:
     def __init__(self, cache, rpt, lt, memlatency, verbose=False):
         self.t = 0  # simulation time
         self.cache = cache
-        self.loop_registers = dict()
+        self.stack = []
         self.RPT = rpt
+        self.rptp = 0 # pointer into the rpt
         self.LT = lt
+        self.ltp = 0 # pointer into the lt
         self.memlatency = memlatency
         self.verbose = verbose
         # internal state
@@ -184,8 +187,37 @@ class Simulator:
             self.pending = None
         self.t += 1 # instruction
 
+    def _process_rpt(self, rpte):
+        if   type(rpt) is RPT_Loop:
+            # push loop counter onto stack
+            pass
+        elif type(rpt) is RPT_SmallLoop:
+            pass
+        elif type(rpt) is RPT_Call:
+            pass
+        elif type(rpt) is RPT_Return:
+            pass
+        elif type(rpt) is RPT_Any:
+            pass
+        # get or create entry in loop registers
+        dest, counter, size = self.loop_registers.setdefault(
+            cur_block, tuple(RPT[cur_block]))
+        # check for last loop iteration
+        counter -= 1
+        if counter > 0:
+            # update registers
+            self.loop_registers[cur_block] = (dest, counter, size)
+            # check if larger than cache size for prefetch
+            if size >= self.cache.size_blocks():
+                 self._prefetch(dest) # prefetch dest
+        else:
+            # this was the last iteration, so we remove the
+            # registers for this loop and prefetch the line
+            # after the loop
+            del self.loop_registers[cur_block]
+            self._prefetch(cur_block + 1) # prefetch next line
 
-    def run(self, trace, enable_prefetch=False, enable_lock=False):
+    def run(self, trace):
         cur_block = 0
         self.loop_registers = dict()
         for i, addr in enumerate(trace()):
@@ -195,37 +227,22 @@ class Simulator:
             self._fetch(addr_tag)
 
             ### PREFETCH LOGIC
-            if enable_prefetch:
-                if cur_block != addr_tag:
-                    # we advanced, do something
-                    cur_block = addr_tag
-                    # are we in a trigger line?
-                    # FIXME we should already know where to look at
-                    if cur_block in RPT:
-                        # get or create entry in loop registers
-                        dest, counter, size = self.loop_registers.setdefault(
-                            cur_block, tuple(RPT[cur_block]))
-                        # check for last loop iteration
-                        counter -= 1
-                        if counter > 0:
-                            # update registers
-                            self.loop_registers[cur_block] = (dest, counter, size)
-                            # check if larger than cache size for prefetch
-                            if size >= self.cache.size_blocks():
-                                 self._prefetch(dest) # prefetch dest
-                        else:
-                            # this was the last iteration, so we remove the
-                            # registers for this loop and prefetch the line
-                            # after the loop
-                            del self.loop_registers[cur_block]
-                            self._prefetch(cur_block + 1) # prefetch next line
-                    else:
-                        self._prefetch(cur_block + 1) # prefetch next line
+            if cur_block != addr_tag:
+                # we advanced, do something
+                cur_block = addr_tag
+                # the current RPT entry
+                rpte = self.RPT[self.rptp]
+                # are we in a trigger line?
+                if cur_block == rpte.trigger_line:
+                    # process depending on type
+                    self._process_rpt(rpte)
+                else:
+                    self._prefetch(cur_block + 1) # prefetch next line
             ### LOCK LOGIC
-            if enable_lock:
-                if self.LT.islock(addr):
-                    self.cache.lockn(self.cache.associativity - 2)
-                if self.LT.isunlock(addr): self.cache.unlock_all()
+            if addr in zip(*self.LT)[0]:
+                self.cache.lockn(self.cache.associativity - 2)
+            if addr in zip(*self.LT)[1]:
+                self.cache.unlock_all()
 
             # verbose trace output
             if self.verbose:
@@ -254,26 +271,23 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # positional arguments
     parser.add_argument("trace",
-                        help="The instruction trace from simulation; "\
+                        help="The instruction trace from simulation; "
                              "one address (hex, w/o leading 0x) per line.")
+    # options
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="Verbose simulation output.")
-    parser.add_argument("-p", "--print-graphs", action="store_true",
-                        help="Print dynamic control-flow graphs.")
-    parser.add_argument("--blocksize", type=int, default=32,
-                        help="Size of a cache block in bytes."\
+    parser.add_argument("--rpt", type=str,
+                        help="Reference Prediction Table.")
+    parser.add_argument("--size", type=int, default=16,
+                        help="Size of a cache line in bytes."\
                         " (default: %(default)d)")
     parser.add_argument("--sets", type=int, default=1,
                         help="Number of cache sets. (default: %(default)d)")
-    parser.add_argument("--assoc", type=int, default=8,
+    parser.add_argument("--assoc", type=int, default=4,
                         help="Associativity. (default: %(default)d)")
     parser.add_argument("--mem-cycles", type=int, default=20,
                         help="Number of cycles required to load a cache line."\
                         " (default: %(default)d)")
-    parser.add_argument("--disable-prefetch", action="store_true",
-                        help="Disable prefetching.")
-    parser.add_argument("--disable-lock", action="store_true",
-                        help="Disable locking.")
     args = parser.parse_args()
 
     # We need the instruction address trace more than once,
@@ -282,25 +296,19 @@ if __name__ == '__main__':
     trace = TraceGen(args.trace)
 
     # instantiate the cache
-    C = Cache(args.blocksize, args.sets, args.assoc)
+    C = Cache(args.size, args.sets, args.assoc)
     print "Cache size in blocks:", C.size_blocks()
 
-    T = TraceAnalysis(Functions("funcs.txt"))
-    T.analyze(trace)
+    rpt = RPTCreator.load(args.rpt) if args.rpt else [(0,)] # empty table
 
-    if args.print_graphs:
-        T.write_graphs("dyncfg_")
+    for e in rpt:
+        print e
 
-    RPT = T.create_rp_table(C.tagof)
-    LT = T.create_lock_table(C.tagof, args.sets * args.assoc)
-    if args.verbose:
-        T.dump(C.tagof)
-        print RPT
-        print LT
-
-
-    Sim = Simulator(C, RPT, LT, args.mem_cycles, args.verbose)
-    Sim.run(trace, not args.disable_prefetch, not args.disable_lock)
+    Sim = Simulator(C, rpt,
+                    [(0,0)], # empty lock table
+                    args.mem_cycles,
+                    args.verbose)
+    Sim.run(trace)
     if args.verbose:
         print Sim.stats
 
