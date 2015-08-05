@@ -626,6 +626,16 @@ function make_gold() {
     fi
 }
 
+function install_platin() {
+    # absolute source dir
+    local rootdir=$1
+    # absolute build dir
+    local builddir=$2
+    
+    echo "Installing platin toolkit .. "
+    run $rootdir/tools/platin/install.sh -i $INSTALL_DIR -b $builddir/tools/platin
+}
+
 function make_llvm() {
     # absolute source dir
     local rootdir=$1
@@ -679,8 +689,7 @@ function make_llvm() {
     fi
 
     # install platin
-    echo "Installing platin toolkit .. "
-    run $rootdir/tools/platin/install.sh -i $INSTALL_DIR -b $builddir/tools/platin
+    install_platin $rootdir $builddir
 
     # Update rpaths, since we are not using cmake install
     update_rpath llvm
@@ -917,6 +926,12 @@ function build_llvm() {
     fi
 }
 
+function build_platin() {
+  # Just install platin. This is mainly for development purposes. Platin 
+  # is also installed by build_llvm.
+  install_platin $ROOT_DIR/$(get_repo_dir llvm) $ROOT_DIR/$(get_build_dir llvm)
+}
+
 function build_rtems() {
     # source directory (relative to ROOT_DIR)
     local repodir=$(get_repo_dir rtems/rtems)
@@ -1020,6 +1035,9 @@ build_target() {
         clone_update ${GITHUB_BASEURL}/patmos-clang.git $(get_repo_dir llvm)/tools/clang
     fi
     build_llvm
+    ;;
+  'platin')
+    build_platin
     ;;
   'eclipse')
     build_llvm eclipse
