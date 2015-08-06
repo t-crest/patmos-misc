@@ -1,7 +1,10 @@
 TODOs
 =====
 
-This is a more or less unsorted list of various todos throughout the tool chain.
+This is a more or less unsorted list of various, mostly major todos throughout
+the tool chain. Most (if not all) of the todos are currently unassigned. If you
+want to work on one (or more) of the items, please contact the author of the 
+todo entry (see git blame) for further information and coordination.
 
 ISA, General Framework
 ----------------------
@@ -15,10 +18,10 @@ ISA, General Framework
     ALU operation with second load.
     - Same as Variant A, but less instruction overhead
 - Make 16 byte alignment of subfunctions a requirement
-    - Immediates of call/ret/brcf can be in 16 byte units, quadruples the supported top 
-      code address.
-    - call-with-return-to-subfunction can be naturally defined with aligned return
-    - assembler (paasm and patmos-llc) should ensure alignment
+  - Immediates of call/ret/brcf can be in 16 byte units, quadruples the supported top 
+    code address.
+  - call-with-return-to-subfunction can be naturally defined with aligned return
+  - assembler (paasm and patmos-llc) should ensure alignment
 
 
 Compiler
@@ -44,6 +47,39 @@ Compiler
       but add new dependencies to 'true' data-flow successors and predecessors of 
       predicated instructions. Either modify DFG on the fly or adapt DFG construction
       to support predicated instructions.
+    - This will primarily improve dual-issue code, but *may* also improve single-issue
+      code in rare cases. The overall improvement is probably quite low in any case,
+      since it basically only affects if-converted code.
+  - Implement a global scheduler
+    - Schedule instructions over BB boundaries in order to fill delay slots.
+      - Move unpredicated instructions into the delay slot of the branch and
+	predicate them with the predicate of the branch.
+	- Prefer moving instructions from the most likely target or the current
+	  WCET path / the most critical paths.
+  - Integrate Delay-slot killer with scheduling strategy. Determine type of 
+    branch instruction based on available fill instructions.
+  - Enable overlapping of delay-slots of predicated instructions
+      (p1) br .LBB1
+      (!p1) brnd .LBB2
+      (p1) <instr. from .LBB1
+    - This is already partially and optionally done by the function splitter
+    - WCET analysis (CFG reconstruction, ..) needs to support this kind of code
+  - Look into optimizations for very tight loops: do software pipelining for loop condition
+    if possible, to move whole loop body into branch delay slots.
+  - Make more efficient use of predicates in the code generator
+    - Loops with two iterations can use a predicate as loop counter
+      - Loops with more iterations can be reduced to such loops by loop unrolling
+    - Bool values that are used as guards or in bool operations only can be stored 
+      in predicate registers. Check if this can save conversion instructions.
+- Automatic use of data scratch-pad
+  - Let the compiler use the local scratchpad for register- and predicate spilling in
+    the backend
+  - Analysis to find data that can be stored in the scratchpad, or that profits
+    from fetching to the scratchpad before (multiple) use (over having D$ conflicts or
+    by using more efficient (?) burst transfers). Run analysis on bitcode.
+- Optimize code size versus performance
+  - Tune inliner and loop optimization heuristics to high latencies and caches of Patmos.
+    - Avoid inlining large callees multiple times within the same cache persistence scope.
 
 
 Platin Toolkit, Compiler Integration
@@ -51,6 +87,19 @@ Platin Toolkit, Compiler Integration
 
 - Run platin pml --validate on generated .pml files in patmos-benchmarks 
   (Malardalen benchmarks,..).
+- Data cache analysis
+  - Improve platin data cache persistence analysis
+    - Handle mixing of unknown, known and somewhat known address accesses
+      - Enable invalidation of multiple cache sets
+    - Determine number of unknown accesses within a persistence scope,
+      bound number of cache misses due to invalidation by unknown access by number 
+      of unknown accesses (i.e., a single unknown access (not inside a loop) within
+      a cache scope only causes a single (but unknown) cache line to miss, not each
+      cache line.
+  - Adapt platin to use static address information exported from patmos-llc about
+    loads to fields, structs and arrays.
+    - Import information and attach to load instructions
+    - Adapt cache analysis to use that information to determine cache sets
 
 
 Simulator
