@@ -135,7 +135,11 @@ Platin Toolkit, Compiler Integration
     - Handle mixing of unknown, known and range (+stride) address accesses
       - Enable invalidation of multiple cache sets in cache interface.
       - Unknown/array access cause an entry in all abstract cache sets
-      - Cleanup handling of always-miss accesses (stores)
+	- This only works if we either know that
+	  - the access happens only *once* within the scope, i.e. it is not within a loop inside the scope
+	  - or the access address is unknown but will always go to the *same* location
+	- Otherwise we always need to create a conflict, because a single instruction can actually
+	  pollute the whole cache if it is executed in a loop with random addresses.
     - Improve handling of unknowns:
       - Do not invalidate cache lines / create conflicts with unknowns
 	- Probably best approach: add them to sets, but do not count them for associativity check
