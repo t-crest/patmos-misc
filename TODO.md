@@ -36,8 +36,9 @@ Compiler
       is still necessary
 - Debugging Support
   - Test patmos-lldb and integrate it into the build scripts.
-    - Support for Stack unwinding?
+    - Support for Stack unwinding? Define stack layout for unwinding
     - Simulator support?
+    - Document in handbook
 - Scheduling
   - Check for any advances in the LLVM 3.6 scheduling framework, adapt if possible
   - Improve scheduling of instructions with mutually exclusive predicates.
@@ -71,6 +72,7 @@ Compiler
       - Loops with more iterations can be reduced to such loops by loop unrolling
     - Bool values that are used as guards or in bool operations only can be stored 
       in predicate registers. Check if this can save conversion instructions.
+  - Compare results of scheduler with manual asm implementations of patmos/ctzsi2,c and patmos/udivsi3.c
 - Automatic use of data scratch-pad
   - Let the compiler use the local scratchpad for register- and predicate spilling in
     the backend
@@ -132,13 +134,21 @@ Platin Toolkit, Compiler Integration
       - Read from value-facts / attach value-facts to instructions in a pre-pass
     - Handle mixing of unknown, known and range (+stride) address accesses
       - Enable invalidation of multiple cache sets in cache interface.
-      - Unknown access cause an entry in all abstract cache sets
-	- But is that the best way to handle this?? (see below)
-    - Determine number of unknown accesses within a persistence scope,
-      bound number of cache misses due to invalidation by unknown access by number 
-      of unknown accesses (i.e., a single unknown access (not inside a loop) within
-      a cache scope only causes a single (but unknown) cache line to miss, not each
-      cache line. Generate additional IPET constraints accordingly.
+      - Unknown/array access cause an entry in all abstract cache sets
+      - Cleanup handling of always-miss accesses (stores)
+    - Improve handling of unknowns:
+      - Do not invalidate cache lines / create conflicts with unknowns
+	- Probably best approach: add them to sets, but do not count them for associativity check
+      - Determine number of unknown accesses within the persistence scope (executions, not instructions!! 
+	i.e., needs loop bounds or at least SCC check) that can actually cause a conflict miss
+	- If set size is <= associativity even with unknowns, unknown access is not an issue .. at least
+	  for the current scope in question! Need to check scopes for other tags too though!
+      - Number of misses for unknown accesses is unbounded (do not include in IPET constraint
+	for the scope). Actual number of misses for known accesses in scopes that contain
+	at most N unknown accesses (dynamic count) that can cause conflict (number of unknown set entries 
+	above associativity) is bounded by <scope-entries> + N (for each unknown access, there is at most
+	one additional miss of a known access) within the set *and* over *all* sets!
+      - Check related work and prove correctness. Compare theoretical precision with path-based LRU analysis.
     - Improve statistics (minimum cold misses, max conflict misses, ..)
     - Test with path-sensitive conflict detection
   - Adapt platin to use static address information exported from patmos-llc about
