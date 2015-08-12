@@ -6,5 +6,5 @@ platin pml-config --target patmos-unknown-unknown-elf -o config.pml -m 2k -M fif
 
 patmos-clang `platin tool-config -i config.pml -t clang` -O2 -o sort -mserialize=sort.pml sort.c
 
-platin wcet -i config.pml --enable-trace-analysis --enable-wca -b sort -i sort.pml --outdir tmp --report
+platin wcet -i config.pml --enable-trace-analysis --enable-wca -b sort -e gen_and_sort -i sort.pml --outdir tmp --report
 
