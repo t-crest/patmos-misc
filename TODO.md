@@ -89,6 +89,14 @@ Platin Toolkit, Compiler Integration
 
 - Run platin pml --validate on generated .pml files in patmos-benchmarks 
   (Malardalen benchmarks,..).
+- Distribution
+  - Move platin into a git repository on its own, to make it easier for others to fork and adapt platin.
+  - (automatically?) extract and copy LLVM headers and implementations as reference code templates to platin repo
+    - PML.h, PMLExport.h, PMLImport.h; plus document code snipplets for integrating files into backend
+    - ALF backend
+    - bitcode flowfact transformation code patches??
+    - At least document where to find all the above relevant reference implementations
+  - Add documentation to repository
 - Reconstruct instructions in BBs from binary
   - A data flow analysis will need semantical information about the instructions in a BB. Enriching
     the PML with all all the required informations will make the files quite large and slow to process.
