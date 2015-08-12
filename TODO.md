@@ -89,6 +89,14 @@ Platin Toolkit, Compiler Integration
 
 - Run platin pml --validate on generated .pml files in patmos-benchmarks 
   (Malardalen benchmarks,..).
+- Result visualization and debugging support
+  - Add a tool to annotate source code files with WCET results
+    - Do colorization of source lines based on WCET path / criticality (generate as HTML, or eclipse plugin,..)
+    - Attach found value facts and flow facts to source code, add wcet frequencies and cycles
+    - Show cache hit/misses in source code
+  - Write trace analysis results to PML
+    - Add a tool to compare traces, show 'trace-diff' where one trace has higher frequencies than the other
+    - Useful for finding possible underestimations of the analysis
 - Distribution
   - Move platin into a git repository on its own, to make it easier for others to fork and adapt platin.
   - (automatically?) extract and copy LLVM headers and implementations as reference code templates to platin repo
@@ -232,6 +240,14 @@ Platin Toolkit, Compiler Integration
     - Find a way to map individual instructions so that data cache analysis results for loads to drive the bypass optimization 
       can be mapped. On the whole, it is probably easier to implement the relevant analyses in LLVM itself, or run
       the cache analyses on the exported PML level directly and avoid the need for back-annotation.
+- Support for source code flow transformations
+  - Transformation with relation graphs only works as long as no major structural or control flow decision changes are made.
+    For other, higher-level optimization passes, a different technique is required.
+  - Find and finish implementation for source code marker based flow facts
+    - Attach markers to variables, use markers for value facts too.
+      - pass the variable as parameter to the marker 'function call'. This prevents the compiler
+	from removing the variable or change its value before the marker.
+
 
 Simulator
 ---------
