@@ -80,10 +80,32 @@ class RPTCreator(TableCreator):
                               trace_analysis, tagof, cache_capacity_lines)
         self.rpt = []
         self.func_offsets = {}
+
+        # preparatory: compute offsets for loop depths
+        self.func_depth_offsets = self._compute_loop_depths()
+
         # 1st pass: create the "table rows"
         self._initial_fill()
         # 2nd pass to add attributes based on location in table
         self._backpatch()
+
+    def _compute_loop_depths(self):
+        cg = self.ta.call_graph()
+        # compute rpo and propagate offsets in that order
+        po = []
+        def dfs(n, visited):
+            visited.add(n)
+            for succ in cg[n]:
+                if succ not in visited: dfs(succ, visited)
+            po.append(n)
+        dfs(self.ta.functions()[0], set())
+        max_offsets = {f: 0 for f in self.ta.functions()}
+        for n in reversed(po):
+            for succ in cg[n]:
+                # maximum of current offset and new offset
+                max_offsets[succ] = max(max_offsets[succ],
+                                        max_offsets[n] + n.height)
+        return max_offsets
 
     def entry_past_addr(self, addr):
         # lookup the function
@@ -107,10 +129,10 @@ class RPTCreator(TableCreator):
             for loop in func.loops():
                 if self.loop_size(loop) >= self.cache_size:
                     # LARGE LOOP
-                    rpt_group.append(RPT_Loop(loop))
+                    rpt_group.append(RPT_Loop(loop, func))
                 else:
                     # SMALL LOOP
-                    rpt_group.append(RPT_SmallLoop(loop))
+                    rpt_group.append(RPT_SmallLoop(loop, func))
             for call in self.ta.call_sites_range(func.entry, func.exit):
                 rpt_group.append(RPT_Call(call))
             # function exit
@@ -147,7 +169,7 @@ class RPTCreator(TableCreator):
 
 
 class RPT_Entry:
-    columns = "idx trig type dest it nxt count retdest"
+    columns = "idx trig type dest it nxt count depth retdest"
     def __init__(self, trigger_address):
         self.trigger_address = trigger_address
 
@@ -157,8 +179,8 @@ class RPT_Entry:
 
     def __str__(self):
         attrs = [getattr(self, x, "-") for x in
-                 ["dest", "it", "nxt", "count", "retdest"]]
-        return "{} {} {} {} {} {} {} {} ".format(
+                 ["dest", "it", "nxt", "count", "depth", "retdest"]]
+        return "{} {} {} {} {} {} {} {} {} ".format(
             self.idx,
             self.trigger_line,
             self.__class__.__name__[4:], # prefetch type
@@ -166,18 +188,23 @@ class RPT_Entry:
 
 
 class RPT_Loop(RPT_Entry):
-    def __init__(self, loop):
+    def __init__(self, loop, func):
         self._loop = loop
+        self._func = func
         RPT_Entry.__init__(self, loop.tail)
     def _patch(self, creator):
         self.nxt = creator.entry_past_addr(self._loop.head).idx
         self.dest = creator.tagof(self._loop.head)
         self.it = self._loop.iterations()
+        # max depth in call graph
+        self.depth = creator.func_depth_offsets[self._func] + \
+                self._func.height - self._loop.depth
 
 
 class RPT_SmallLoop(RPT_Entry):
-    def __init__(self, loop):
+    def __init__(self, loop, func):
         self._loop = loop
+        self._func = func
         RPT_Entry.__init__(self, loop.tail)
     def _patch(self, creator):
         self.it = self._loop.iterations()
@@ -189,6 +216,9 @@ class RPT_SmallLoop(RPT_Entry):
         gap = creator.tagof(creator.rpt[self.idx + 1].trigger_address) - \
                 creator.tagof(self._loop.tail)
         self.count = min(remaining, gap)
+        # max depth in call graph
+        self.depth = creator.func_depth_offsets[self._func] + \
+                self._func.height - self._loop.depth
 
 
 class RPT_Call(RPT_Entry):
@@ -283,6 +313,10 @@ if __name__ == "__main__":
                         " (default: %(default)d)")
     parser.add_argument("-l", "--lines", type=int, default=4,
                         help="Number of cache lines. (default: %(default)d)")
+    parser.add_argument("--rpt", action="store_true",
+                        help="Generate RPT table.")
+    parser.add_argument("--lock", action="store_true",
+                        help="Generate lock table.")
     # positional arguments
     parser.add_argument("func_symbols",
                         help="File containing the start address of each "
@@ -300,11 +334,13 @@ if __name__ == "__main__":
 
     tagof = lambda x: x / args.size
 
-    RPTC = RPTCreator(TA, tagof, args.lines)
-    RPTC.dump()
-    RPTC.save(args.trace + ".rpt")
+    if args.rpt:
+        RPTC = RPTCreator(TA, tagof, args.lines)
+        RPTC.dump()
+        RPTC.save(args.trace + ".rpt")
 
-    LTC = LockTableCreator(TA, tagof, args.lines)
-    LTC.dump()
+    if args.lock:
+        LTC = LockTableCreator(TA, tagof, args.lines)
+        LTC.dump()
 
 

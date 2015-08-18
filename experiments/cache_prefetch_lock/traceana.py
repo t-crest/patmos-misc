@@ -77,6 +77,7 @@ class Function:
         self.seq   = Function.sequence_number
         Function.sequence_number += 1 # bump
         self.loop_tree = None
+        self.height = 0
 
     def advance(self, address):
         """Advance to the next address inside the function.
@@ -140,6 +141,7 @@ class Function:
                     break
                 par = par.parent
             new.depth = par.depth + 1
+            self.height = max(self.height, new.depth)
             last = new
         self.loop_tree = root
 
@@ -162,8 +164,8 @@ class Function:
             for child in loop.children:
                 dump_loop(child)
         # dump function header
-        print ("# {} (entry {:#010x}, exit {:#010x}):"
-              ).format(self.name, self.entry, self.exit)
+        print ("# {} (entry {:#010x}, exit {:#010x}, height {:d}):"
+              ).format(self.name, self.entry, self.exit, self.height)
         dump_loop(self.loop_tree)
 
     def __str__(self):
@@ -238,6 +240,14 @@ class TraceAnalysis:
     def calls(self):
         return self._calls.values()
 
+    def call_graph(self):
+        cg = {func : set() for func in self.functions()}
+        for call in self.calls():
+            caller = self.get_func_at(call.call_site)
+            cg[caller].add(call.callee)
+        return cg
+
+
     def _advance(self, addr):
         """Advance to a new address of the trace.
 
@@ -280,9 +290,33 @@ class TraceAnalysis:
         return len([call.call_site for call in self.calls()
                    if call.callee == func])
 
+    def write_callgraph(self, fname):
+        with open(fname + ".dot", "w") as f:
+            f.write('digraph CG {\n'
+                    '  graph[label="Call-graph from trace", '
+                             'ranksep=0.25, fontname="sans-serif"];\n'
+                    '  edge [fontname="sans-serif"];\n'
+                    '  node [shape=rectangle, '
+                             'fontname="sans-serif"];\n')
+            # print blocks in dfs-order
+            visited = set()
+            def dfs(cg, prev, func):
+                if func not in visited:
+                    f.write('  {};\n'.format(func.name))
+                if prev:
+                    f.write('  {} -> {};\n'.format(prev.name, func.name))
+                if func in visited: return
+                visited.add(func)
+                for callee in cg[func]: dfs(cg, func, callee)
+            dfs(self.call_graph(), None, self.functions()[0])
+            f.write('}\n')
+        assert(f.closed)
+        call(["/usr/bin/dot", "-Tpng", "-o", fname + ".png", fname + ".dot"])
+
     def write_graphs(self, prefix=""):
         for f in self.functions():
             f.write_graph(prefix + f.name)
+        self.write_callgraph(prefix + "callgraph")
 
 
     def dump(self):
