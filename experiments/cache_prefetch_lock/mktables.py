@@ -152,10 +152,10 @@ class RPTCreator(TableCreator):
             rpt_entry.trigger_line = self.tagof(rpt_entry.trigger_address)
             rpt_entry._patch(self)
 
-    def dump(self):
+    def dump(self, encoded=False):
         print RPT_Entry.columns
         for e in self.rpt:
-            print e
+            print e if not encoded else e.str_encoded()
 
     def save(self, filename):
         with open(filename, "w") as f:
@@ -186,9 +186,20 @@ class RPT_Entry:
             self.__class__.__name__[4:], # prefetch type
             *attrs)
 
+    def str_encoded(self):
+        attrs = [getattr(self, x, "0") for x in
+                 ["dest", "it", "nxt", "count", "depth", "retdest"]]
+        return "{} {} {} {} {} {} {} {} {} ".format(
+            self.idx,
+            self.trigger_line,
+            self.type_id,
+            *attrs)
+
+
 
 class RPT_Loop(RPT_Entry):
     def __init__(self, loop, func):
+        self.type_id = 2 # integer type encoding
         self._loop = loop
         self._func = func
         RPT_Entry.__init__(self, loop.tail)
@@ -203,6 +214,7 @@ class RPT_Loop(RPT_Entry):
 
 class RPT_SmallLoop(RPT_Entry):
     def __init__(self, loop, func):
+        self.type_id = 3 # integer type encoding
         self._loop = loop
         self._func = func
         RPT_Entry.__init__(self, loop.tail)
@@ -223,6 +235,7 @@ class RPT_SmallLoop(RPT_Entry):
 
 class RPT_Call(RPT_Entry):
     def __init__(self, call):
+        self.type_id = 0 # integer type encoding
         self._call = call
         RPT_Entry.__init__(self, call.call_site)
     def _patch(self, creator):
@@ -234,6 +247,7 @@ class RPT_Call(RPT_Entry):
 
 class RPT_Return(RPT_Entry):
     def __init__(self, of_func):
+        self.type_id = 1 # integer type encoding
         RPT_Entry.__init__(self, of_func.exit)
     def _patch(self, creator):
         pass # nothing to do here
@@ -241,6 +255,7 @@ class RPT_Return(RPT_Entry):
 
 class RPT_Any(RPT_Entry):
     def __init__(self, addr):
+        self.type_id = -1 # integer type encoding
         RPT_Entry.__init__(self, addr)
 
 
@@ -317,6 +332,9 @@ if __name__ == "__main__":
                         help="Generate RPT table.")
     parser.add_argument("--lock", action="store_true",
                         help="Generate lock table.")
+    parser.add_argument("-e", "--encoded", action="store_true",
+                        help="Output the tables suitable for parsing with "
+                             "Bekim's scala code.")
     # positional arguments
     parser.add_argument("func_symbols",
                         help="File containing the start address of each "
@@ -336,7 +354,7 @@ if __name__ == "__main__":
 
     if args.rpt:
         RPTC = RPTCreator(TA, tagof, args.lines)
-        RPTC.dump()
+        RPTC.dump(args.encoded)
         RPTC.save(args.trace + ".rpt")
 
     if args.lock:
