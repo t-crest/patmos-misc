@@ -8,4 +8,4 @@ patmos-clang `platin tool-config -i config.pml -t clang` -O2 -o sort -mserialize
 
 platin wcet -i config.pml --enable-trace-analysis --enable-wca -b sort -e gen_and_sort -i sort.pml -o wcet.pml --outdir tmp --report
 
-platin visualize -i sort.pml -o tmp --show-timings -f gen_and_sort
+platin visualize -i wcet.pml -o tmp --show-timings -f gen_and_sort
