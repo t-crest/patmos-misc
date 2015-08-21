@@ -39,6 +39,17 @@ Compiler
     - Support for Stack unwinding? Define stack layout for unwinding
     - Simulator support?
     - Document in handbook
+- Various Code Generation Issues
+  - The compiler generates code like this quite often (but not always):
+           p1 = cmp r1,r2
+      (p1) br .LBB1
+	   br .LBB2
+      .LBB1
+           ....
+    It would be more efficient to predicate the second jump with (!p1) and make the first branch
+    into a fall-through. Check where this comes from (code layout, branch code generation?,
+    function splitter?, ..) and fix/optimize this (avoid peephole optimization, should
+    be fixed at source).
 - Scheduling
   - Check for any advances in the LLVM 3.6 scheduling framework, adapt if possible
   - Improve scheduling of instructions with mutually exclusive predicates.
@@ -90,6 +101,15 @@ Platin Toolkit, Compiler Integration
 - Run platin pml --validate on generated .pml files in patmos-benchmarks 
   (Malardalen benchmarks,..).
 - Result visualization and debugging support
+  - The visualize tool does not properly support aiT loop context results.
+    - Add a function to core/programinfo.rb to merge timing results for the same program point but
+      with different contexts. Properly handle different context-strings and sub-contexts.
+    - The semantics of merging contexts might depend on the origin of the timing results. Either define
+      semantics of multiple results for different contexts properly (if not done already) and ensure
+      all timing sources adhere to that, or make the merge function callback the source plugin (ait,wca,..).
+    - Use the merge function to get a single timing entry per origin per (machinecode) edge, display results
+    - Alternatively (with an option) display all context results in the graph.
+  - Add flow-fact and value-facts from PML to graph output of visualize tool (as option).
   - Add a tool to annotate source code files with WCET results
     - Do colorization of source lines based on WCET path / criticality (generate as HTML, or eclipse plugin,..)
     - Attach found value facts and flow facts to source code, add wcet frequencies and cycles
@@ -144,6 +164,13 @@ Platin Toolkit, Compiler Integration
 	kept and passed to platin as well, which complicates the workflow (but this is required for 
 	iterative optimization anyway, and in most other cases a mapping to bitcode on instruction level
 	will not be needed).
+- WCA, cache analysis framework
+  - Instantiation of cache analyses should be driven by pml.arch plugin.
+    - Make the data-cache analysis use a function block to determine which instruction it needs to analyse / add costs to.
+    - Create an 'always-miss' cache analysis for local memory accesses, using the memory 'local'
+    - Let the StackCacheAnalysis variants handle stack loads+stores, use memory 'local' to determine latencies (?).
+    - Move the code to create M$/D$/I$/S$/.. analyses into @pml.arch, but use generic functions to setup analyses based
+      on command line options (?)
 - Data cache analysis
   - Improve platin data cache persistence analysis
     - Define an interface to get address-ranges of loads (as well as their width, by opcode)
