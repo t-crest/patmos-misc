@@ -309,7 +309,8 @@ class LockTableCreator(TableCreator):
     def dump(self):
         print "idx lock_addr  unlock_addr"
         for idx, (lock_addr, unlock_addr) in enumerate(self.lt):
-            print "{:3d} {:#010x} {:#010x}".format(idx, lock_addr, unlock_addr)
+            #print "{:3d} {:#010x} {:#010x}".format(idx, lock_addr, unlock_addr)
+            print "{:3d} {:d} {:d}".format(idx, lock_addr, unlock_addr)
 
 
 ###############################################################################
