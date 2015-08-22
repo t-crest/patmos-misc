@@ -267,9 +267,29 @@ Platin Toolkit, Compiler Integration
     - Find a way to map individual instructions so that data cache analysis results for loads to drive the bypass optimization 
       can be mapped. On the whole, it is probably easier to implement the relevant analyses in LLVM itself, or run
       the cache analyses on the exported PML level directly and avoid the need for back-annotation.
-- Support for source code flow transformations
+- Improved source code flow transformations
+  - Add support for (function-)global loop bounds: _Pragma(loopbound global min N max M)
+    - Very simple way to annotate some complex loops (triangle,..)
+    - But must handle inlining properly!!
+      - Either prevent inling, or let inliner transform annotation into marker-based annotation, or generate marker-based
+	flow-fact very early (bitcode pass, or already when parsing pragmas?)
+  - Support for parametric loop bounds and expressions: _Pragma(loopbound min 1 max N-1)
+    - clang framework to parse pragma expressions ??
+  - Support time bounds: _Pragma(loopbound min N max M cycles|msecs)
+    - Annotate time until loop condition becomes false
+    - In WCET analysis, add edge from loop entry to loop body with max-time as cost, add flow constraint <= 1 on loop header
+      - WCET path is: jump into loop just after condition becomes false, do a full loop iteration and then jump out of loop.
+      - But can we formulate it in a way that we get the max loop iterations as result of the WCET path analysis?
+	- Maybe do a separate analysis of the body to determine max number of iterations, if we want to know this
+    - How to store this in PML. Needs special kind of flow fact
+    - Can we use this with markers as well?
+      - We could specify that after executing marker A, some condition becomes true after at most N cycles/milli-secs.
+      - If condition is used as branch-condition, WCET path would be either the normal path from A to cond-test and then false-edge, or
+        a new edge with N cost from A to cond-test and then the true-edge.
+      - How could this be made to work across loops, like loop time bound?
   - Transformation with relation graphs only works as long as no major structural or control flow decision changes are made.
     For other, higher-level optimization passes, a different technique is required.
+    - relation graphs only for backend. Bitcode transformations must be marker-based.
   - Find and finish implementation for source code marker based flow facts
     - Attach markers to variables, use markers for value facts too.
       - pass the variable as parameter to the marker 'function call'. This prevents the compiler
