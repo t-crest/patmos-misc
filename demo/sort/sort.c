@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static const size_t MAX_SIZE = 100;
+#define MAX_SIZE 100
 
 void sort(int *arr, size_t N) {
 
@@ -21,7 +21,7 @@ void sort(int *arr, size_t N) {
 void gen_and_sort(int *arr, size_t N) __attribute__((noinline));
 void gen_and_sort(int *arr, size_t N) {
 
-  #pragma loopbound min 1 max 100
+  #pragma loopbound min 1 max MAX_SIZE
   for (size_t i = 0; i < N; i++) {
     arr[i] = rand() % N;
   }
