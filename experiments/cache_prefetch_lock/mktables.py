@@ -219,7 +219,6 @@ class RPT_SmallLoop(RPT_Entry):
         self._func = func
         RPT_Entry.__init__(self, loop.tail)
     def _patch(self, creator):
-        self.it = self._loop.iterations()
         # 'count' is the number of cache lines to prefetch after the loop.
         # it is the minimum of reaching the next trigger line (next table
         # index) and the number of cache lines to fill up the cache in addition
