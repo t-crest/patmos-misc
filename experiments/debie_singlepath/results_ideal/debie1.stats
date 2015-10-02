@@ -1,6 +1,6 @@
 Task Conv SP
-TC_InterruptService 1392 1528
+TC_InterruptService 1392 1524
 TM_InterruptService 340 352
 HandleHitTrigger 1576 1768
-HandleTelecommand 7048 8236
-HandleAcquisition 12224 12516
+HandleTelecommand 7048 8124
+HandleAcquisition 12224 12368
