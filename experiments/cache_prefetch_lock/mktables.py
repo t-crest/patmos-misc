@@ -206,7 +206,7 @@ class RPT_Loop(RPT_Entry):
     def _patch(self, creator):
         self.nxt = creator.entry_past_addr(self._loop.head).idx
         self.dest = creator.tagof(self._loop.head)
-        self.it = self._loop.iterations()
+        self.it = self._loop.iterations() - 1
         # max depth in call graph
         self.depth = creator.func_depth_offsets[self._func] + \
                 self._func.height - self._loop.depth
