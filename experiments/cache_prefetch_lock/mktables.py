@@ -120,7 +120,7 @@ class RPTCreator(TableCreator):
         Rows for functions have to occur grouped to preserve the 'next index'
         requirements.
         """
-        for i, func in enumerate(self.ta.functions()):
+        for func in self.ta.functions():
             # group of rows for func
             rpt_group = []
             # first index of the function in the rpt
@@ -135,10 +135,9 @@ class RPTCreator(TableCreator):
                     rpt_group.append(RPT_SmallLoop(loop, func))
             for call in self.ta.call_sites_range(func.entry, func.exit):
                 rpt_group.append(RPT_Call(call))
-            # function exit, except for top-level
+            # function exit
             # -> this implies every function has at least one entry!
-            if i != 0:
-                rpt_group.append(RPT_Return(func))
+            rpt_group.append(RPT_Return(func))
             # sort group by address
             rpt_group.sort(key=lambda rpt_entry: rpt_entry.trigger_address)
 
