@@ -4,6 +4,7 @@
 # this test is not supported from build.sh
 cd patmos
 make test
+cd ..
 # first do a bench build
 ./misc/build.sh bench
 ./misc/build.sh -t bench
