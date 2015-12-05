@@ -4,7 +4,7 @@
 ./misc/build.sh
 # this test is not supported from build.sh
 cd patmos
-make test >> result.txt
+make test >> ../result.txt
 cd ..
 # this is now the simulator test
 ./misc/build.sh -t patmos >> result.txt
