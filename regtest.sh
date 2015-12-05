@@ -4,11 +4,12 @@
 ./misc/build.sh
 # this test is not supported from build.sh
 cd patmos
-make test
+make test >> result.txt
 cd ..
 # this is now the simulator test
-./misc/build.sh -t patmos
-./misc/build.sh -t bench
+./misc/build.sh -t patmos >> result.txt
+./misc/build.sh bench
+./misc/build.sh -t bench >> result.txt
 ##./misc/build.sh -t gold # no tests
 ##./misc/build.sh -t llvm # fails always
 ##./misc/build.sh -t newlib # no tests
