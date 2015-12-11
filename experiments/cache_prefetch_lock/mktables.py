@@ -149,8 +149,12 @@ class RPTCreator(TableCreator):
         # build the properties and patch the addresses
         for i, rpt_entry in enumerate(self.rpt):
             rpt_entry.idx = i
-            rpt_entry.trigger_line = self.tagof(rpt_entry.trigger_address)
+            self.set_trigger_line(rpt_entry)
             rpt_entry._patch(self)
+
+    def set_trigger_line(self, e):
+        e.trigger_line = self.tagof(e.trigger_address + 4)
+
 
     def dump(self, encoded=False):
         print RPT_Entry.columns
