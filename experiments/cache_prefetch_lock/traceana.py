@@ -113,14 +113,22 @@ class Function:
         visited = set()
         finished = set()
         be = []
-        def dfs(v):
-          visited.add(v)
-          for w in self.cfg[v]:
-              if w in visited and w not in finished:
-                  be.append(((v, w), self.cfg[v][w]))
-              if w not in visited: dfs(w)
-          finished.add(v)
-        dfs(self.entry)
+        stack = [self.entry]
+        while len(stack) > 0:
+            v = stack.pop()
+            assert v not in finished, "visiting node twice!"
+            if v in visited:
+                # post-order step
+                finished.add(v)
+                continue
+            # visiting the node for the first time:
+            # mark the node as visited and put it back to the stack
+            visited.add(v)
+            stack.append(v)
+            for w in self.cfg[v]: # for each child
+                if w in visited and w not in finished:
+                    be.append(((v, w), self.cfg[v][w]))
+                if w not in visited: stack.append(w)
         return be
 
     def _create_loop_tree(self):
@@ -182,7 +190,11 @@ class Function:
                              'fontname="sans-serif"];\n').format(self.name))
             # print blocks in dfs-order
             visited = set()
-            def dfs(prev, addr):
+            # due to python's bad recursion handling, use an iteratively
+            # implemented depth-first search
+            stack = [(None, self.entry)]
+            while len(stack) > 0:
+                prev, addr = stack.pop()
                 if addr not in visited:
                     label = "{0:#08x}".format(addr) \
                             if type(addr) == type(0xffffffff) else addr
@@ -190,11 +202,10 @@ class Function:
                 if prev:
                     f.write('  {} -> {} [label="{}"];\n'.format(
                         prev, addr, self.cfg[prev][addr]))
-                if addr in visited: return
+                if addr in visited: continue
                 visited.add(addr)
                 if addr in self.cfg:
-                    for succ in self.cfg[addr]: dfs(addr, succ)
-            dfs(None, self.entry)
+                    stack.extend([(addr, succ) for succ in self.cfg[addr]])
             f.write('}\n')
         assert(f.closed)
         call(["/usr/bin/dot", "-Tpng", "-o", fname + ".png", fname + ".dot"])
