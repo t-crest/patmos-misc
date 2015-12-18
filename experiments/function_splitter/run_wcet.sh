@@ -21,11 +21,13 @@ NUM_HOSTS=1
 HOST_ID=0
 
 # Disable features not yet correctly supported by the analysis (?)
-CLANG_ARGS="-w -Xllc -mpatmos-cfl=delayed -mpatmos-disable-stack-cache"
+#CLANG_ARGS="-w -Xllc -mpatmos-cfl=delayed -mpatmos-disable-stack-cache"
+CLANG_ARGS="-w"
 
-PLATIN_OPTIONS="--tolerated-underestimation 100"
+PLATIN_CONFIG_OPTS="--target patmos-unknown-unknown-elf -g 64m --update-heap-syms 64k,32"
+PLATIN_OPTIONS="--wca-use-gurobi --accept-corrected-rgs"
 
-CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=$BENCH_SRC_DIR/cmake/patmos-clang-toolchain.cmake -DENABLE_CTORTURE=false -DENABLE_EMULATOR=false -DENABLE_TESTING=true -DPLATIN_ENABLE_WCET=true -DENABLE_STACK_CACHE_ANALYSIS_TESTING=false -DENABLE_C_TESTS=false -DENABLE_MEDIABENCH=false -DPLATIN_ENABLE_AIT=false"
+CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=$BENCH_SRC_DIR/cmake/patmos-clang-toolchain.cmake -DENABLE_CTORTURE=false -DENABLE_EMULATOR=false -DENABLE_TESTING=true -DPLATIN_ENABLE_WCET=true -DENABLE_STACK_CACHE_ANALYSIS_TESTING=false -DENABLE_C_TESTS=false -DENABLE_MEDIABENCH=false -DPLATIN_ENABLE_AIT=false -DTACLE_BENCH=true -DENABLE_HELI=false -DENABLE_NONFREE=false"
 
 MAX_FUNCTION_SIZE=1024
 
@@ -43,8 +45,7 @@ function config_bench() {
   local clang_args=$2
   local pasim_args=$3
 
-  mkdir -p $BENCH_BUILD_DIR
-  (cd $BENCH_BUILD_DIR && cmake $CMAKE_ARGS -DCMAKE_C_FLAGS="$CLANG_ARGS $clang_args" -DPASIM_EXTRA_OPTIONS="$pasim_args" -DCONFIG_PML="$config_pml" -DPLATIN_OPTIONS="$PLATIN_OPTIONS" $BENCH_SRC_DIR)
+  (cd $BENCH_BUILD_DIR && cmake $CMAKE_ARGS -DCMAKE_C_FLAGS="$CLANG_ARGS $clang_args" -DPASIM_EXTRA_OPTIONS="$pasim_args" -DCONFIG_PML="$config_pml" -DCONFIG_PML_LARGERAM="$config_pml" -DPLATIN_OPTIONS="$PLATIN_OPTIONS" $BENCH_SRC_DIR)
 }
 
 function build_bench() {
@@ -86,7 +87,7 @@ host_cnt=0
 # 
 function collect_stats() {
   local testname=$1
-  local configname=$2
+  local config_args=$2
   local clang_args=$3
 
   # Update the clang args that should be used for this benchmark
@@ -94,14 +95,11 @@ function collect_stats() {
     current_clang_args="$clang_args"
   fi
 
-  # Check for an architecture PML file
-  config_pml=`readlink -f "configs/config_${configname}.pml"`
-  if [ ! -f $config_pml ]; then
-    echo
-    echo "**** Skipping configuration $testname: no config PML file '${configname}' found! *****"
-    echo
-    return
-  fi
+  mkdir -p $BENCH_BUILD_DIR
+
+  # Create an architecture PML file
+  config_pml=`readlink -f "$BENCH_BUILD_DIR/config_${testname}.pml"`
+  platin pml-config $PLATIN_CONFIG_OPTS $config_args -o $config_pml
 
   # Round robin distribution of jobs over multiple hosts
   if [ ! -z "$clang_args" ]; then
@@ -207,17 +205,17 @@ function eval_caches() {
 
 
 # Ideal cache, no splitting; determine max. code size, reference for other runs
-collect_stats "ideal" "mc_ideal" "-Xllc -mpatmos-disable-function-splitter"
+collect_stats "ideal" "-m 8m" "-Xllc -mpatmos-disable-function-splitter"
 
 # I-cache without splitting, for comparison
-for j in "16" "8" "4" "2"; do
+for j in "16" "8" "4" "2" "1"; do
   echo
   # Emptyclang options: function splitter is disabled by platin tool-config for LRU caches
-  #collect_stats "nosplit_ic${j}k_dm"   "ic${j}k_dm" " "
-  #collect_stats "nosplit_ic${j}k_lru2" "-C icache -K lru2 -m $j"
-  #collect_stats "nosplit_ic${j}k_lru4" "-C icache -K lru4 -m $j"
-  collect_stats "nosplit_ic${j}k_lru8" "ic${j}k_lru8" " "
-  #collect_stats "nosplit_ic${j}k_lru"  "-C icache -K lru  -m $j"
+  collect_stats "nosplit_ic${j}k_dm"   "-C icache -M dm -m ${j}k"
+  collect_stats "nosplit_ic${j}k_lru2" "-C icache -M lru2 -m ${j}k"
+  collect_stats "nosplit_ic${j}k_lru4" "-C icache -M lru4 -m ${j}k"
+  collect_stats "nosplit_ic${j}k_lru8" "-C icache -M lru8 -m ${j}k"
+  collect_stats "nosplit_ic${j}k_lru" "-C icache -M lru -m ${j}k"
 done
 
 # Check influence of max-SF-size: ideal cache, fixed overhead for regions, split BBs
@@ -227,7 +225,7 @@ done
 
 # Check influence of function splitter
 for i in 32 64 128 256 512 1024 96 192 384 320 448; do
-  eval_caches $i $i
+#  eval_caches $i $i
 #  eval_caches $i 1024
 #  eval_caches $i 2048
 done
