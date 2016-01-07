@@ -27,14 +27,16 @@ CLANG_ARGS="-w"
 PLATIN_CONFIG_OPTS="--target patmos-unknown-unknown-elf -g 64m --update-heap-syms 64k,32"
 PLATIN_OPTIONS="--wca-use-gurobi --accept-corrected-rgs"
 
-CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=$BENCH_SRC_DIR/cmake/patmos-clang-toolchain.cmake -DENABLE_CTORTURE=false -DENABLE_EMULATOR=false -DENABLE_TESTING=true -DPLATIN_ENABLE_WCET=true -DENABLE_STACK_CACHE_ANALYSIS_TESTING=false -DENABLE_C_TESTS=false -DENABLE_MEDIABENCH=false -DPLATIN_ENABLE_AIT=false -DTACLE_BENCH=true -DENABLE_HELI=false -DENABLE_NONFREE=false"
+CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=$BENCH_SRC_DIR/cmake/patmos-clang-toolchain.cmake -DENABLE_CTORTURE=false -DENABLE_EMULATOR=false -DENABLE_TESTING=true -DPLATIN_ENABLE_WCET=true -DENABLE_STACK_CACHE_ANALYSIS_TESTING=false -DENABLE_C_TESTS=false -DENABLE_WTC14=false -DENABLE_TCAS=false -DENABLE_MEDIABENCH=false -DPLATIN_ENABLE_AIT=false -DTACLE_BENCH=true -DENABLE_HELI=false -DENABLE_NONFREE=false -DENABLE_DEBIE=false"
 
 TM_DEFAULT="-G 21"
 TM_PAGED=""
-TM_TDM=""
+TM_TDM4=""
+TM_TDM64=""
 
-MCACHE_IDEAL="-M fifo512 -m 8m"
+MCACHE_IDEAL="-M fifo -m 8m"
 
+MCACHE_NOBLOCK="--set-cache-attr method-cache,fill-mode,noblock"
 
 MAX_FUNCTION_SIZE=1024
 
@@ -102,10 +104,10 @@ function collect_stats() {
     current_clang_args="$clang_args"
   fi
 
-  mkdir -p $BENCH_BUILD_DIR
+  mkdir -p $BENCH_BUILD_DIR/configs
 
   # Create an architecture PML file
-  config_pml=`readlink -f "$BENCH_BUILD_DIR/config_${testname}.pml"`
+  config_pml=`readlink -f "$BENCH_BUILD_DIR/configs/config_${testname}.pml"`
   platin pml-config $PLATIN_CONFIG_OPTS $config_args -o $config_pml
 
   # Round robin distribution of jobs over multiple hosts
@@ -210,9 +212,22 @@ function eval_caches() {
   done
 }
 
+## LLC Options
+# -mpatmos-split-call-blocks = false
+# -mpatmos-split-calls = none, all, grow, analyze
+# -mpatmos-split-functions-with-call-in-loop = true
+#
+# -mpatmos-split-disposable = true
+# -mpatmos-dispose-blocks = none, all, scc, analyze
+#
+# -mpatmos-use-crit-edge-weight = false
+# 
+# -mpatmos-preferred-scc-size
+# -mpatmos-preferred-subfunction-size
+# -mpatmos-max-subfunction-size
 
 # Ideal cache, no splitting; determine max. code size, reference for other runs
-collect_stats "ideal" "-m 8m" "-Xllc -mpatmos-disable-function-splitter"
+collect_stats "nosplit_ideal" "$MCACHE_IDEAL" "-Xllc -mpatmos-disable-function-splitter"
 
 # I-cache without splitting, for comparison
 for j in "16" "8" "4" "2" "1"; do
@@ -223,17 +238,41 @@ for j in "16" "8" "4" "2" "1"; do
   collect_stats "nosplit_ic${j}k_lru4" "-C icache -M lru4 -m ${j}k"
   collect_stats "nosplit_ic${j}k_lru8" "-C icache -M lru8 -m ${j}k"
   collect_stats "nosplit_ic${j}k_lru" "-C icache -M lru -m ${j}k"
+  collect_stats "nosplit_ic${j}k_fifo2" "-C icache -M fifo2 -m ${j}k"
+  collect_stats "nosplit_ic${j}k_fifo4" "-C icache -M fifo4 -m ${j}k"
+  collect_stats "nosplit_ic${j}k_fifo8" "-C icache -M fifo8 -m ${j}k"
+  collect_stats "nosplit_ic${j}k_fifo" "-C icache -M fifo -m ${j}k"
 done
 
 # Check influence of max-SF-size: ideal cache, fixed overhead for regions, split BBs
-#for i in 2048 1024 512 256; do
-#  collect_stats "max_sf_${i}_ideal" "$MCACHE_IDEAL" "-mpatmos-max-subfunction-size=$i -mpatmos-split-call-blocks=false -mpatmos-preferred-subfunction-size=256"
-#done
+for sf in 2048 1024 512 256; do
+  collect_stats "max_sf${sf}_ideal" "$MCACHE_IDEAL" "-mpatmos-max-subfunction-size=$sf -mpatmos-preferred-subfunction-size=256"
+  for i in 16 8 4 2 1; do
+    for j in 8 16 32 64; do
+      collect_stats "max_sf${sf}_mc${i}k_fifo${j}" "-M fifo$j -m${i}k"
+    done
+  done
+done
+
+# Evaluate nonblocking burst mode
+# TODO use --wca-mcache-power-dfa
+for k in 268 128 512 768 1024; do
+  for rqs in 16 0 32 64; do
+    collect_stats "noblock_sf${k}_rqs${rqs}_ideal" "$MCACHE_IDEAL $MCACHE_NOBLOCK --set-cache-attr method-cache,request-size,$rqs" "-mpatmos-max-subfunction-size=1024 -mpatmos-preferred-subfunction-size=$k"
+    for i in 16 8 4 2 1; do
+      for j in 8 16 32 64; do
+        collect_stats "noblock_sf${k}_rqs{$rqs}_mc${i}k_fifo${j}" "-M fifo$j -m${i}k $MCACHE_NOBLOCK --set-cache-attr method-cache,request-size,$rqs"
+      done
+    done
+  done
+done
+
+
 
 # Check influence of function splitter
-for i in 32 64 128 256 512 1024 96 192 384 320 448; do
+#for i in 32 64 128 256 512 1024 96 192 384 320 448; do
 #  eval_caches $i $i
 #  eval_caches $i 1024
 #  eval_caches $i 2048
-done
+#done
 
