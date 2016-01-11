@@ -261,7 +261,7 @@ for k in 268 128 512 768 1024; do
     collect_stats "noblock_sf${k}_rqs${rqs}_ideal" "$MCACHE_IDEAL $MCACHE_NOBLOCK --set-cache-attr method-cache,request-size,$rqs" "-mpatmos-max-subfunction-size=1024 -mpatmos-preferred-subfunction-size=$k"
     for i in 16 8 4 2 1; do
       for j in 8 16 32 64; do
-        collect_stats "noblock_sf${k}_rqs{$rqs}_mc${i}k_fifo${j}" "-M fifo$j -m${i}k $MCACHE_NOBLOCK --set-cache-attr method-cache,request-size,$rqs"
+        collect_stats "noblock_sf${k}_rqs${rqs}_mc${i}k_fifo${j}" "-M fifo$j -m${i}k $MCACHE_NOBLOCK --set-cache-attr method-cache,request-size,$rqs"
       done
     done
   done
