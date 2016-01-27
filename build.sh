@@ -76,15 +76,15 @@ CHRPATH=$(dirname $self)/patmos-chrpath
 INSTALL_SH=$(dirname $self)/scripts/install.sh
 
 # List of available targets
-ALLTARGETS="gold llvm newlib compiler-rt pasim bench poseidon aegean"
+ALLTARGETS="gold llvm newlib compiler-rt patmos bench poseidon aegean"
 
 ########### Start of user configs, overwrite in build.cfg ##############
 
 # List of targets to build by default, developers may set this to $ALLTARGETS
 # or a subset of interesting tools
-BUILDSH_TARGETS="gold llvm newlib compiler-rt pasim poseidon aegean"
+BUILDSH_TARGETS="gold llvm newlib compiler-rt patmos poseidon aegean"
 #BUILDSH_TARGETS=$ALLTARGETS
-#BUILDSH_TARGETS="llvm pasim"
+#BUILDSH_TARGETS="llvm patmos"
 
 # Root directory for all repositories
 ROOT_DIR=$(pwd)
@@ -580,10 +580,10 @@ function usage() {
     -v		Show command that are executed
     -V		Make make verbosive
     -t		Run tests
-    -o          Build toolchain (gold, llvm, patmos) and do clean build of newlib, compiler-rt and bench with tests.
+    -o          Build toolchain (gold, llvm, patmos, newlib, compiler-rt) and do clean build of bench with tests.
 
   Available targets:
-    gold llvm newlib compiler-rt pasim|patmos bench rtems rtems-test rtems-examples eclipse aegean poseidon
+    gold llvm newlib compiler-rt patmos bench rtems rtems-test rtems-examples eclipse aegean poseidon
 
   The command-line options override the user-config read from '$CFGFILE'.
 EOT
@@ -1052,7 +1052,7 @@ build_target() {
   'compiler-rt')
     build_compiler_rt $(get_build_dir compiler-rt) $TARGET
     ;;
-  'patmos'|'pasim')
+  'patmos')
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
     build_tools
     if [ "$BUILD_EMULATOR" == "false" ]; then
@@ -1208,11 +1208,11 @@ mkdir -p "${INSTALL_DIR}"
 if [ "$DO_TOOLCHAIN_RUN" == "true" ]; then
     build_target gold
     build_target llvm
+    build_target compiler-rt
+    build_target newlib
     build_target patmos
     DO_CLEAN=true
     DO_RUN_TESTS=true
-    build_target compiler-rt
-    build_target newlib
     build_target bench
 else
     if [ "$DO_RUN_ALL" == "true" ]; then
