@@ -76,7 +76,7 @@ CHRPATH=$(dirname $self)/patmos-chrpath
 INSTALL_SH=$(dirname $self)/scripts/install.sh
 
 # List of available targets
-ALLTARGETS="gold llvm newlib compiler-rt patmos bench poseidon aegean"
+ALLTARGETS="gold llvm newlib compiler-rt patmos bench otawa poseidon aegean"
 
 ########### Start of user configs, overwrite in build.cfg ##############
 
@@ -569,7 +569,7 @@ function usage() {
 
     -a		Build all targets
     -c		Cleanup builds and rerun configure
-    -r          Rerun configure (resetting CMake cache where applicable)
+    -r		Rerun configure (resetting CMake cache where applicable)
     -j <n> 	Pass -j<n> to make
     -i <dir>	Set the install dir
     -h		Show this help
@@ -580,10 +580,10 @@ function usage() {
     -v		Show command that are executed
     -V		Make make verbosive
     -t		Run tests
-    -o          Build toolchain (gold, llvm, patmos, newlib, compiler-rt) and do clean build of bench with tests.
+    -o		Build toolchain (gold, llvm, patmos, newlib, compiler-rt) and do clean build of bench with tests.
 
   Available targets:
-    gold llvm newlib compiler-rt patmos bench rtems rtems-test rtems-examples eclipse aegean poseidon
+    gold llvm newlib compiler-rt patmos otawa bench rtems rtems-test rtems-examples eclipse aegean poseidon
 
   The command-line options override the user-config read from '$CFGFILE'.
 EOT
@@ -758,6 +758,37 @@ function build_newlib() {
         RANLIB_FOR_TARGET=${INSTALL_DIR}/bin/$NEWLIB_RANLIB LD_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang \
 	READELF_FOR_TARGET=${INSTALL_DIR}/bin/patmos-readelf \
         CC_FOR_TARGET=${INSTALL_DIR}/bin/patmos-clang  "CFLAGS_FOR_TARGET='-target ${target} -O2 ${NEWLIB_TARGET_CFLAGS}'" "$NEWLIB_ARGS"
+}
+
+function build_otawa() {
+    # build dir (relative to root)
+    local builddir=$1
+
+    # source repository dir (relative path, always do same otawa ckeckout, independent of build-dir)
+    local repo=$(get_repo_dir otawa)
+    clone_update  ${GITHUB_BASEURL}/otawa.git $repo
+
+    # options that need to be passed to otawa build script
+    local buildopt="-i ${INSTALL_DIR}"
+    if [ $DO_RECONFIGURE == true ] ; then
+      buildopt+=" -r";
+    fi
+    if [ "$DRYRUN" == "true" ] ; then
+      buildopt+=" -d";
+    fi
+    if [ "$VERBOSE" == "true" ] ; then
+      buildopt+=" -v";
+    fi
+
+
+    # set repository up and build
+    run pushd "${repo}" > /dev/null
+    run git submodule update --init
+
+    # do not use run here, since the otawa build script offers similar functions
+    run misc/build.sh ${buildopt}
+
+    run popd > /dev/null
 }
 
 function build_javatools() {
@@ -1051,6 +1082,9 @@ build_target() {
     ;;
   'compiler-rt')
     build_compiler_rt $(get_build_dir compiler-rt) $TARGET
+    ;;
+  'otawa')
+    build_otawa $(get_build_dir otawa)
     ;;
   'patmos')
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
