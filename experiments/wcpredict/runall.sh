@@ -2,24 +2,53 @@
 
 for pred in optimal worst not-taken taken bwd-taken; do
     sed -e "s#%PRED%#"$pred"#" \
+        -e "s#%IDXFUN%##" \
+        -e "s#%FAST%##" \
+        -e "s#%CONF%#../configurations/patmos-config-bp-16.pml#" \
         -e "s#%DIR%#work_"$pred"#" \
-        -e "s#%CONF%#../configurations/patmos-config-bp-16.pml#" \
         < configuration.rb.template > ../configuration.rb
-    ruby1.9.1 run.rb
+    ruby run.rb
 done
 
-for pred in 1bit 2bitc 2bith; do
-    sed -e "s#%PRED%#"$pred"#" \
-        -e "s#%DIR%#work_"$pred"_small#" \
-        -e "s#%CONF%#../configurations/patmos-config-bp-16.pml#" \
-        < configuration.rb.template > ../configuration.rb
-    ruby1.9.1 run.rb
+for size in 16 1024; do
+    for pred in 2bitc; do
+        for fast in false; do
+            for idxfun in local gshare; do
+                sed -e "s#%PRED%#"$pred"#" \
+                    -e "s#%IDXFUN%#"$idxfun"#" \
+                    -e "s#%FAST%#"$fast"#" \
+                    -e "s#%CONF%#../configurations/patmos-config-bp-"$size".pml#" \
+                    -e "s#%DIR%#work_"$pred"_"$idxfun"_"$fast"_"$size"#" \
+                    < configuration.rb.template > ../configuration.rb
+                ruby run.rb
+            done
+        done
+        for fast in true; do
+            for idxfun in local; do
+                sed -e "s#%PRED%#"$pred"#" \
+                    -e "s#%IDXFUN%#"$idxfun"#" \
+                    -e "s#%FAST%#"$fast"#" \
+                    -e "s#%CONF%#../configurations/patmos-config-bp-"$size".pml#" \
+                    -e "s#%DIR%#work_"$pred"_"$idxfun"_"$fast"_"$size"#" \
+                    < configuration.rb.template > ../configuration.rb
+                ruby run.rb
+            done
+        done
+    done
 done
 
-for pred in 1bit 2bitc 2bith; do
-    sed -e "s#%PRED%#"$pred"#" \
-        -e "s#%DIR%#work_"$pred"_large#" \
-        -e "s#%CONF%#../configurations/patmos-config-bp-1024.pml#" \
-        < configuration.rb.template > ../configuration.rb
-    ruby1.9.1 run.rb
+for size in 16 32 64 128 256 512 1024 2048; do
+    for pred in 2bitc; do
+        for fast in true false; do
+            for idxfun in gshare; do
+                sed -e "s#%PRED%#"$pred"#" \
+                    -e "s#%IDXFUN%#"$idxfun"#" \
+                    -e "s#%FAST%#"$fast"#" \
+                    -e "s#%CONF%#../configurations/patmos-config-bp-"$size".pml#" \
+                    -e "s#%DIR%#work_speed_"$fast"_"$size"#" \
+                    < configuration.rb.template > ../configuration.rb
+                ruby run.rb
+            done
+        done
+    done
 done

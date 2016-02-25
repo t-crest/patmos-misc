@@ -15,14 +15,14 @@ rescue LoadError => e
   $:.unshift File.join(File.dirname(__FILE__),"..")
   require 'lib/experiments'
 end
-require_configuration 'wcet'
+require_configuration 'wcpredict'
 
 
 # configuration
 config = default_configuration()
 config.build_log     = File.join(config.builddir, 'build.log')
 config.report        = File.join(config.workdir, 'report.yml')
-config.do_update        = true
+config.do_update        = false
 config.keep_trace_files = true
 
 # customized benchmark script
@@ -59,9 +59,13 @@ config.options.trace_analysis = false
 config.options.use_trace_facts = false
 # config.options.compute_criticalities = true
 config.options.disable_ait = true
-config.options.branch_prediction = $prediction
 config.options.wcet_build = true
 config.options.verbose = true
+
+config.options.branch_prediction = $prediction
+config.options.branch_prediction_idxfun = $prediction_idxfun
+config.options.branch_prediction_fast = $prediction_fast
+config.options.callstring_length = 1
 
 # run benchmarks
 build_and_run(config, BenchTool)

@@ -6,7 +6,7 @@ builds = %w{nd} # {O0 O1 O1f O2 del nd mix}
 configs = %w{notrace} #  {blockglobal blocklocal minimal notrace}
 $benchmarks = mrtc_benchmarks.select { |b|
   if b['recursive']
-    true
+    false
   elsif b['irreducible']
     true
   elsif b['expensive']
