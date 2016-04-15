@@ -107,6 +107,17 @@ function update_llvm() {
 	       ;;
 	esac
     done
+
+    libdir=$INSTALL_DIR/lib
+
+    for file in $libdir/*.so; do
+	case $file in
+	    *clang*|*LLVM*|*LTO*)
+	       update_binary $file
+           ;;
+	    *) ;;
+	esac
+    done
 }
 
 # one-shot config

@@ -1229,8 +1229,11 @@ if [ ! -z "$BENCH_GCC_C_TORTURE_PATH" ]; then
   BENCH_ARGS="-DGCC_C_TORTURE_EXECUTE_PATH='$BENCH_GCC_C_TORTURE_PATH' $BENCH_ARGS"
 fi
 
+if [ "$INSTALL_RPATH" == "true" ]; then
+    LLVM_CMAKE_ARGS+="$LLVM_CMAKE_ARGS -DCMAKE_INSTALL_RPATH='\$ORIGIN/../lib::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::'"
+fi
 if [ "$INSTALL_RPATH" == "build" ]; then
-    LLVM_LDFLAGS="$LLVM_LDFLAGS -Wl,-R${INSTALL_DIR}/lib"
+    LLVM_CMAKE_ARGS+="$LLVM_CMAKE_ARGS -DCMAKE_INSTALL_RPATH=${INSTALL_DIR}/lib"
 fi
 
 if [ "$BUILD_SOFTFLOAT" != "true" ]; then
