@@ -779,6 +779,10 @@ function build_otawa() {
     if [ "$VERBOSE" == "true" ] ; then
       buildopt+=" -v";
     fi
+    if [ "$DO_CLEAN" == "true" ] ; then
+      buildopt+=" -c";
+    fi
+
 
 
     # set repository up and build
