@@ -12,16 +12,15 @@ GRAPHDIR="./graphs"
 
 mkdir -p $BINDIR $OUTDIR $GRAPHDIR
 
-#patmos-clang -Wl,-disable-inlining -o "${BINDIR}/${DEMO}.elf" -mpatmos-serialize="${BINDIR}/${DEMO}.pml" "${SRC}"
-patmos-clang -O0 -Wl,-disable-inlining -o "${BINDIR}/${DEMO}.elf" -mpatmos-serialize="${BINDIR}/${DEMO}.pml" "${SRC}"
+patmos-clang -O0 -Xopt -disable-inlining -o "${BINDIR}/${DEMO}.elf" -mserialize="${BINDIR}/${DEMO}.pml" "${SRC}"
+patmos-llvm-objdump -d "${BINDIR}/${DEMO}.elf" > "${BINDIR}/${DEMO}.dis"
 
 # analyze
-platin bench-trace "${BINDIR}/${DEMO}.pml" --outdir ${OUTDIR} -o ${BINDIR}/${DEMO}.pml \
-    --objdump-command $(which patmos-llvm-objdump) \
+platin wcet -i "${BINDIR}/${DEMO}.pml" --outdir ${OUTDIR} -o ${BINDIR}/${DEMO}.pml \
     --binary "${BINDIR}/${DEMO}.elf" \
-    --header \
-    --analysis-entry ${ANALYZE}
+    --analysis-entry ${ANALYZE} \
+    --use-trace-facts
 
 
-platin visualize -f ${ANALYZE} -O "${GRAPHDIR}" "${BINDIR}/${DEMO}.pml"
+platin visualize -f ${ANALYZE} -O "${GRAPHDIR}" -i "${BINDIR}/${DEMO}.pml"
 

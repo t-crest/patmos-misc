@@ -1,0 +1,148 @@
+===========
+Base64 demo
+===========
+
+This was an early demo of the compiler and wcet analysis integration.
+It showed how the compiler outputs information about structure,
+and how simulation can be used to add flow information. Both are
+processed by platin and output as ais annotation.
+
+It was presented in the article
+
+P. Puschner, D. Prokesch, B. Huber, J. Knoop, S. Hepp and G. Gebhard, "The
+T-CREST approach of compiler and WCET-analysis integration," 16th IEEE
+International Symposium on Object/component/service-oriented Real-time
+distributed Computing (ISORC 2013), Paderborn, 2013, pp. 1-8.
+doi:10.1109/ISORC.2013.6913220
+[Actually, it was published and presented as part of the SEUS 2013 workshop.]
+
+
+http://www.t-crest.org/forum/topics/the-t-crest-approach-of-compiler-and-wcet-analysis-integration
+
+
+Of course, since then, much has happened.
+
+
+
+
+
+Function of interest:
+=====================
+
+static const char Base64[] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static const char Pad64 = '=';
+
+int b64_pton(char const *src, char *target, size_t targsize)
+{
+  int tarindex=0, state=0;
+  char *pos, ch;
+
+  while ((ch = *src++) != '\0') {
+    if (ch == Pad64) break;
+
+    pos = strchr(Base64, ch);
+    switch (state) {
+      case 0:
+        target[tarindex] = (pos - Base64) << 2;
+        state = 1;
+        break;
+      case 1:
+        target[tarindex]   |=  (pos - Base64) >> 4;
+        target[tarindex+1]  = ((pos - Base64) & 0x0f) << 4 ;
+        tarindex++;
+        state = 2;
+        break;
+      case 2:
+        target[tarindex]   |=  (pos - Base64) >> 2;
+        target[tarindex+1]  = ((pos - Base64) & 0x03) << 6;
+        tarindex++;
+        state = 3;
+        break;
+      case 3:
+        target[tarindex] |= (pos - Base64);
+        tarindex++;
+        state = 0;
+        break;
+      default:
+        unreachable();
+    }
+  }
+  return (tarindex);
+}
+
+
+
+Generates Jumptable:
+====================
+
+(-O0)
+.LBB2_2:
+  166c:  06 00 07 a9                       call    1961
+  1670:  02 89 d5 18                       lbc     $r4 = [$r29 + 24]
+  1674:  87 c6 00 00 00 01 95 28           li      $r3 = 103720
+  167c:  03 40 00 09                       sens    9
+  1680:  02 c5 d0 85                       swc     [$r29 + 5] = $r1
+  1684:  02 83 d1 04                       lwc     $r1 = [$r29 + 4]
+  1688:  00 40 00 00                       nop
+  168c:  02 03 70 b4                       cmpult  $p1 = $r23, $r1
+  1690:  cf c2 10 0d 00 01 92 28    (!$p1) shadd2  $r1 = $r1, 102952
+  1698:  4a 82 11 00                (!$p1) lwc     $r1 = [$r1]
+  169c:  00 40 00 00                       nop
+* 16a0:  4f 00 10 01                (!$p1) br      $r1
+  16a4:  00 40 00 00                       nop
+  16a8:  00 40 00 00                       nop
+  16ac:  06 7f ff e2                       br      -30
+  16b0:  00 40 00 00                       nop
+  16b4:  00 40 00 00                       nop
+
+(unreachable)
+.LBB2_3:
+  16b0:  87 c2 10 0d 00 01 92 28           shadd2    $r1 = $r1, 102952
+  16b8:  02 82 11 00                       lwc    $r1 = [$r1]
+  16bc:  00 40 00 00                       nop
+* 16c0:  07 00 10 01                       br    $r1
+  16c4:  00 40 00 00                       nop
+  16c8:  00 40 00 00                       nop
+
+
+
+(default)
+.LBB2_15:
+  14b4:  02 02 53 b4                       cmpult   $p1 = $r5, $r7
+  14b8:  cf ce 70 0d 00 01 6f 54    (!$p1) shadd2   $r7 = $r7, 94036
+  14c0:  4a 8e 71 00                (!$p1) lwc      $r7 = [$r7]
+  14c4:  00 40 00 00                       nop
+  14c8:  4f 00 70 01                (!$p1) br       $r7             <<<<<
+  14cc:  00 40 00 00                       nop
+  14d0:  00 40 00 00                       nop
+  14d4:  06 7f ff af                       br       -81
+  14d8:  00 40 00 00                       nop
+  14dc:  00 40 00 00                       nop
+
+
+Export to .ais:
+===============
+
+(-O0)
+instruction ".LBB2_2" + 52 bytes branches to
+    ".LBB2_3", ".LBB2_4", ".LBB2_5", ".LBB2_6"; # jumptable (source: llvm)
+...
+loop ".LBB2_1" max 95 ; # local loop header bound (source: trace)
+
+(unreachable)
+instruction ".LBB2_3" + 16 bytes branches to
+    ".LBB2_4", ".LBB2_5", ".LBB2_6", ".LBB2_7"; # jumptable (source: llvm)
+...
+loop ".LBB2_1" max 95 ; # local loop header bound (source: trace)
+
+(default)
+instruction ".LBB2_15" + 20 bytes branches to
+  ".LBB2_16", ".LBB2_17", ".LBB2_18", ".LBB2_19"; # jumptable (source: llvm)
+
+[loop bounds]
+loop ".LBB2_1" max 24 ; # local loop header bound (source: trace)
+loop ".LBB2_2" max 4 ; # local loop header bound (source: trace)
+loop ".LBB2_4" max 1 ; # local loop header bound (source: trace)
+loop ".LBB2_9" max 14 ; # local loop header bound (source: trace)
+loop ".LBB2_12" max 4 ; # local loop header bound (source: trace)
