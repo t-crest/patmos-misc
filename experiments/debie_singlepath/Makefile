@@ -21,8 +21,9 @@ OBJS = $(addprefix $(BUILDDIR)/,$(DEBIEOBJS))
 
 CC = patmos-clang
 
-# for debugging: -mpatmos-disable-function-splitter -mpatmos-disable-vliw -mpatmos-disable-post-ra
-CFLAGS = -fno-builtin -w -g -O2 -fno-unroll-loops
+# for debugging: -mpatmos-disable-function-splitter -mpatmos-disable-vliw -mpatmos-disable-post-ra -Xllc --debug-only=patmos-singlepath
+CFLAGS = -fno-builtin -w -g -O2 -fno-unroll-loops \
+-Xllc --debug-only=patmos-singlepath -mpatmos-disable-vliw -Xllc -mpatmos-cfl=non-delayed -mpatmos-disable-post-ra -mpatmos-disable-function-splitter -Xllc -mpatmos-basicblock-align=8
 
 # additional flags for sp codegen
 CFLAGS_SP = -Xopt -disable-early-taildup \
@@ -65,14 +66,14 @@ all:
 # The debie conventional binary
 debie1.elf:
 	cd $(BUILDDIR) && $(MAKE) $(DEBIEOBJS)
-	$(CC) $(CFLAGS) $(CFLAGS_ARCH) $(CFLAGS_CONV) -o $@ $(OBJS)
+	$(CC) $(CFLAGS) $(CFLAGS_ARCH) $(CFLAGS_CONV) -o $@ $(OBJS) 2>&1 | tee debie.log
 
 # The debie singlepath binary
 debie1.sp.elf:
 	cd $(BUILDDIR) && $(MAKE) $(DEBIEOBJS)
 	$(CC) $(CFLAGS) $(CFLAGS_ARCH) $(CFLAGS_SP) \
 	  -mpatmos-singlepath=$(subst $(space),$(comma),$(SPROOTS)) \
-	  -o $@ $(OBJS)
+	  -o $@ $(OBJS)  2>&1 | tee debie.sp.log | ./cpdot.sh debie
 
 %.dis: %.elf
 	patmos-llvm-objdump -d $< > $@
