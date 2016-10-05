@@ -790,7 +790,7 @@ function build_otawa() {
     run git submodule update --init
 
     # do not use run here, since the otawa build script offers similar functions
-    run misc/build.sh ${buildopt}
+    run misc/build.sh $MAKEJ ${buildopt}
 
     run popd > /dev/null
 }
