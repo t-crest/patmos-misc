@@ -46,7 +46,7 @@ comma := ,
 
 # Simulate a binary and verify constant execution time (manually)
 %.sim: %.elf
-	$(PASIM) -V $< |& grep -A2 -E '<($(subst $(comma),|,$(SPROOTS)))>' | \
+	$(PASIM) -V $< 2>&1 | grep -A2 -E '<($(subst $(comma),|,$(SPROOTS)))>' | \
 	  tee $@
 
 # Extract the start addresses of the functions from the symbol table
