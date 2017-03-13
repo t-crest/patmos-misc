@@ -11,6 +11,10 @@
 
 import pickle
 
+from collections import Counter
+
+import sys
+
 ###############################################################################
 
 class TableCreator:
@@ -114,6 +118,30 @@ class RPTCreator(TableCreator):
                     for rpt_entry in self.rpt[self.func_offsets[func]:]
                     if addr < rpt_entry.trigger_address)
 
+
+    def _check_loop_dyn_cache_conflicts(self, loop):
+        """Check if the any two memory blocks of a loop map to same line.
+
+        Given a loop, checks if the loop is executed, any two memory blocks
+        map to the same cache line, considering all visited memory blocks,
+        and, for each function called, the block after the function.
+        Mapping is done with block modulo self.cache_size.
+
+        Returns True if there is a conflict.
+        """
+        inner_functions = set()
+        blocks = self.dyn_blocks(loop.head, loop.tail, inner_functions)
+        # add one block past return instruction of every inner function to
+        # the set
+        print >>sys.stderr, "dynamic memory blocks of loop", blocks
+        blocks.update(self.tagof(f.exit) + 1 for f in inner_functions)
+        print >>sys.stderr, "inner functions", inner_functions
+        print >>sys.stderr, "with additional function blocks added", blocks
+        # map to cache lines
+        cnt = Counter([b % self.cache_size for b in blocks])
+        print >>sys.stderr, "mapping to cache lines", cnt
+        return any(c > 1 for c in cnt.values())
+
     def _initial_fill(self):
         """Initially fill the RPT.
 
@@ -127,12 +155,15 @@ class RPTCreator(TableCreator):
             self.func_offsets[func] = len(self.rpt)
             # collect entries of interest
             for loop in func.loops():
-                if self.loop_size(loop) >= self.cache_size:
-                    # LARGE LOOP
-                    rpt_group.append(RPT_Loop(loop, func))
-                else:
+                # Small lopp if there are no conflicts on cache lines
+                if self.loop_size(loop) <= self.cache_size and \
+                   not self._check_loop_dyn_cache_conflicts(loop):
                     # SMALL LOOP
                     rpt_group.append(RPT_SmallLoop(loop, func))
+
+                else:
+                    # LARGE LOOP
+                    rpt_group.append(RPT_Loop(loop, func))
             for call in self.ta.call_sites_range(func.entry, func.exit):
                 rpt_group.append(RPT_Call(call))
             # function exit
@@ -231,6 +262,15 @@ class RPT_SmallLoop(RPT_Entry):
         gap = creator.tagof(creator.rpt[self.idx + 1].trigger_address) - \
                 creator.tagof(self._loop.tail)
         self.count = min(remaining, gap)
+        self.dest = creator.tagof(self._loop.head)
+        #################################################################
+        # if the gap is zero, switch to loop end
+        if self.count == 0:
+            self.type_id = 2
+            self.nxt = creator.entry_past_addr(self._loop.head).idx
+            self.dest = creator.tagof(self._loop.head)
+            self.it = self._loop.iterations() - 1
+        ################################################################
         # max depth in call graph
         self.depth = creator.func_depth_offsets[self._func] + \
                 self._func.height - self._loop.depth
@@ -330,7 +370,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--size", type=int, default=16,
                         help="Size of a cache line in bytes."\
                         " (default: %(default)d)")
-    parser.add_argument("-l", "--lines", type=int, default=4,
+    parser.add_argument("-l", "--lines", type=int, default=2048,
                         help="Number of cache lines. (default: %(default)d)")
     parser.add_argument("--rpt", action="store_true",
                         help="Generate RPT table.")
