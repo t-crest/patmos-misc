@@ -246,12 +246,18 @@ class TraceAnalysis:
         return self._functions.setdefault(name, Function(name, entry))
 
     def functions(self):
+        """Returns a list of all executed functions.
+
+        The functions are sorted by the time they are executed for the first
+        time.
+        """
         return sorted(self._functions.values(), key=lambda x: x.seq)
 
     def calls(self):
         return self._calls.values()
 
     def call_graph(self):
+        """Compute and return a call graph."""
         cg = {func : set() for func in self.functions()}
         for call in self.calls():
             caller = self.get_func_at(call.call_site)
@@ -294,10 +300,12 @@ class TraceAnalysis:
                       if from_addr <= call.call_site <= to_addr)
 
     def loop_calls(self, loop):
+        """"Return the calls contained in a given loop."""
         return self.call_sites_range(loop.head, loop.tail)
 
 
     def num_contexts(self, func):
+        """Return the number of different contexts of a function."""
         return len([call.call_site for call in self.calls()
                    if call.callee == func])
 
@@ -353,8 +361,14 @@ class FunctionMap:
 
     Lookups of the form FM[addr] will return pairs
     (entry_address, function_name).
+
+    The argument 'fname' points to a file containing the start address of each
+    function.  Each line has the form \"address name\" and the lines are sorted
+    by address.
     """
     def __init__(self, fname):
+        # we use two separate lists with matching indices in order to
+        # use binary search for lookup (bisect).
         self.entries = []
         self.names = []
         with open(fname, "r") as f:
@@ -362,15 +376,6 @@ class FunctionMap:
                 addr, name = line.split(" ")
                 self.entries.append(int(addr, 16))
                 self.names.append(name.rstrip())
-
-    def _index(self, addr):
-        """"Return the index of entry <= addr"""
-        i = bisect(self.entries, addr)
-        if i > 0:
-            return i-1
-        else:
-            raise Exception("Invalid address")
-
 
     def __getitem__(self, addr):
         """Lookup the function containing a specified address.
@@ -380,6 +385,7 @@ class FunctionMap:
         """
         i = bisect(self.entries, addr)
         if i > 0:
+            # index of entry <= addr
             return self.entries[i-1], self.names[i-1]
         else:
             raise Exception("Invalid address")

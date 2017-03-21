@@ -21,6 +21,9 @@ SPROOTS ?= main
 
 SUBTRACES = $(addsuffix .trace,$(SPROOTS))
 
+TRACE_CMD = $(PASIM) --debug=0 --debug-fmt=trace $< 2>&1 >/dev/null | cut -d' ' -f1
+#TRACE_CMD = patmos-emulator -r $< | awk '{ printf("%08x\n", $1) }'
+
 
 null  :=
 space := $(null) #
@@ -41,8 +44,7 @@ comma := ,
 
 # Generate a compressed instruction address trace
 %.trace.gz: %.elf
-	$(PASIM) --debug=0 --debug-fmt=trace $< 2>&1 >/dev/null \
-	  | cut -d' ' -f1 | gzip > $@
+	$(TRACE_CMD) | gzip > $@
 
 # Simulate a binary and verify constant execution time (manually)
 %.sim: %.elf
