@@ -8,6 +8,7 @@
 
 
 TACLE?=$(HOME)/source/tacle-bench-play/bench/kernel
+T-CREST?=../../../..
 
 # kernel benchmarks
 # binarysearch	countnegative	iir		matrix1		quicksort
@@ -16,16 +17,29 @@ TACLE?=$(HOME)/source/tacle-bench-play/bench/kernel
 # bsort		filterbank	lms		pm		st
 # complex_updates	fir2dim		ludcmp		prime
 
-# bitcount gives exit value of 1, broken on Patmos?
+# bitcount, fft gives exit value of 1, broken on Patmos?
+# bsort, ludcmp are faster with SP, why?
+#   because I missed disable-inlining
+# minver mit SP code gibt exit != 0
+
+APP=minver
 APP=binarysearch
-APP=bsort
+APP=iir
+APP=ludcmp
+
+# TODO: add more examples
+ALLAPPS=ludcmp binarysearch bsort
 
 SPM=-mpatmos-singlepath=$(APP)_main
 
-CFLAGS= -O2
+# -mpatmos-disable-function-splitter as not needed in a normal I$# -mpatmos-method-cache-size=8192 maybe not
+
+CFLAGS= -O2 -mpatmos-max-subfunction-size=4096 -mpatmos-preferred-subfunction-size=1024
+# -Xopt -disable-inlining
+# -mpatmos-disable-function-splitter
 CFLAGSSP= $(CFLAGS) $(SPM)
 
-all: comp
+all: doall
 
 hello:
 	echo "Hello World"
@@ -43,6 +57,20 @@ comp:
 	pasim -v a.elf 2> abc.txt
 	cat abc.txt | grep Cycles:
 	patmos-emulator -p a.elf | grep exec_cycles
+
+
+doit:
+	patmos-clang $(CFLAGSSP) $(TACLE)/$(APP)/*.c -o a.elf
+	cp *.xml $(T-CREST)/patmos/hardware/config
+	cd $(T-CREST)/patmos; make clean emulator BOARD=mcache
+	echo "$(APP) mcache" > mc_$(APP).txt
+	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> mc_$(APP).txt
+	cd $(T-CREST)/patmos; make clean emulator BOARD=icache
+	echo "$(APP) icache" > ic_$(APP).txt
+	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> ic_$(APP).txt
+
+doall:
+	for P in $(ALLAPPS); do make doit APP=$${P}; done;
 
 clean:
 	-rm *.txt *.elf
