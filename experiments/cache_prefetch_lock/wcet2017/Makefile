@@ -7,8 +7,23 @@
 -include config.mk
 
 
-TACLE?=$(HOME)/source/tacle-bench-play/bench/kernel/binarysearch
-#TACLE?=$(HOME)/source/tacle-bench-play/bench/kernel/bitcount
+TACLE?=$(HOME)/source/tacle-bench-play/bench/kernel
+
+# kernel benchmarks
+# binarysearch	countnegative	iir		matrix1		quicksort
+# bitcount	fac		insertsort	md5		recursion
+# bitonic		fft		jfdctint	minver		sha
+# bsort		filterbank	lms		pm		st
+# complex_updates	fir2dim		ludcmp		prime
+
+# bitcount gives exit value of 1, broken on Patmos?
+APP=binarysearch
+APP=bsort
+
+SPM=-mpatmos-singlepath=$(APP)_main
+
+CFLAGS= -O2
+CFLAGSSP= $(CFLAGS) $(SPM)
 
 all: comp
 
@@ -16,10 +31,15 @@ hello:
 	echo "Hello World"
 	ls $(TACLE)
 
-# pasim and emulator are off by about 2000 clock cycles on binarysearch
+# pasim and emulator are off by about 300 clock cycles on binarysearch
 # Need to be looked at
+
 comp:
-	patmos-clang -O0 $(TACLE)/*.c -o a.elf
+	patmos-clang $(CFLAGS) $(TACLE)/$(APP)/*.c -o a.elf
+	pasim -v a.elf 2> abc.txt
+	cat abc.txt | grep Cycles:
+	patmos-emulator -p a.elf | grep exec_cycles
+	patmos-clang $(CFLAGSSP) $(TACLE)/$(APP)/*.c -o a.elf
 	pasim -v a.elf 2> abc.txt
 	cat abc.txt | grep Cycles:
 	patmos-emulator -p a.elf | grep exec_cycles
