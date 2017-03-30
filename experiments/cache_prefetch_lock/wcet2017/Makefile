@@ -10,6 +10,8 @@
 TACLE?=$(HOME)/source/tacle-bench-play/bench/kernel
 T-CREST?=../../../..
 
+TACLE_LOCAL=./tacle-src-local
+
 # kernel benchmarks
 # binarysearch	countnegative	iir		matrix1		quicksort
 # bitcount	fac		insertsort	md5		recursion
@@ -30,8 +32,7 @@ APP=ludcmp
 # TODO: add more examples
 ALLAPPS=ludcmp binarysearch bsort
 
-# SPM=-mpatmos-singlepath=$(APP)_main
-SPM=-mpatmos-singlepath=main
+SPM=-mpatmos-singlepath=$(APP)_main
 
 # -mpatmos-disable-function-splitter as not needed in a normal I$# -mpatmos-method-cache-size=8192 maybe not
 
@@ -42,28 +43,40 @@ CFLAGS= -O2 \
 # -mpatmos-disable-function-splitter
 CFLAGSSP= $(CFLAGS) $(SPM)
 
+
+.PHONY: all doall comp doit clean hello tacle-local
+
 all: doall
 
 hello:
 	echo "Hello World"
 	ls $(TACLE)
 
+tacle-local: $(TACLE_LOCAL)
+
+# create a local copy of the tacle source directory and
+# replace all entrypoint pragmas with noinline attributes
+$(TACLE_LOCAL): $(TACLE)
+	cp -r $< $@
+	find $@ -name "*.c" -exec sed -i -e \
+	  "s/^\(.*\)\(_Pragma\s*(\s*\"entrypoint\"\s*)\) /__attribute__((noinline)) \1/" '{}' \+
+
 # pasim and emulator are off by about 300 clock cycles on binarysearch
 # Need to be looked at
 
 comp:
-	patmos-clang $(CFLAGS) $(TACLE)/$(APP)/*.c -o a.elf
+	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
 	pasim -v a.elf 2> abc.txt
 	cat abc.txt | grep Cycles:
 	patmos-emulator -p a.elf | grep exec_cycles
-	patmos-clang $(CFLAGSSP) $(TACLE)/$(APP)/*.c -o a.elf
+	patmos-clang $(CFLAGSSP) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
 	pasim -v a.elf 2> abc.txt
 	cat abc.txt | grep Cycles:
 	patmos-emulator -p a.elf | grep exec_cycles
 
 
 doit:
-	patmos-clang $(CFLAGSSP) $(TACLE)/$(APP)/*.c -o a.elf
+	patmos-clang $(CFLAGSSP) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
 	cp *.xml $(T-CREST)/patmos/hardware/config
 	cd $(T-CREST)/patmos; make clean emulator BOARD=mcache
 	echo "$(APP) mcache" > mc_$(APP).txt
@@ -72,8 +85,8 @@ doit:
 	echo "$(APP) icache" > ic_$(APP).txt
 	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> ic_$(APP).txt
 
-doall:
-	for P in $(ALLAPPS); do make doit APP=$${P}; done;
+doall: $(TACLE_LOCAL)
+	for P in $(ALLAPPS); do $(MAKE) doit APP=$${P}; done;
 
 clean:
 	-rm *.txt *.elf
