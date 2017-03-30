@@ -6,8 +6,7 @@
 # for local configurations, e.g., to override my path to the TACLeBench source
 -include config.mk
 
-
-TACLE?=$(HOME)/data/repository/tacle-bench/bench
+TACLE?=/home/bekim/Desktop/t-crest/tacle-bench/tacle-bench/bench
 T-CREST?=../../../..
 
 TACLE_LOCAL=./tacle-src-local
@@ -99,6 +98,7 @@ comp_sp:
 	patmos-clang $(CFLAGSSP) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
 
 doit:
+	#cd $(T-CREST)/patmos; git checkout icache_with_prefetcher
 	cp *.xml $(T-CREST)/patmos/hardware/config
 	cd $(T-CREST)/patmos; make clean emulator BOARD=mcache
 	make comp_normal
@@ -114,6 +114,15 @@ doit:
 	make comp_sp
 	echo "$(APP) icache sp" > ic_sp_$(APP).txt
 	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> ic_sp_$(APP).txt
+	#cd $(T-CREST)/patmos; make clean emulator BOARD=pcache
+	#make comp_normal
+	#echo "$(APP) pcache normal" > pc_np_$(APP).txt
+	#$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> mc_np_$(APP).txt
+	#make comp_sp
+	#echo "$(APP) pcache sp" > pc_sp_$(APP).txt
+	#$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> pc_sp_$(APP).txt
+	#cd $(T-CREST)/patmos; git checkout master
+
 
 doall: $(TACLE_LOCAL)
 	for P in $(ALLAPPS); do $(MAKE) doit APP=$${P}; done;
