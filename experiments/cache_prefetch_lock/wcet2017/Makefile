@@ -7,7 +7,7 @@
 -include config.mk
 
 
-TACLE?=$(HOME)/source/tacle-bench-play/bench/kernel
+TACLE?=$(HOME)/data/repository/tacle-bench/bench
 T-CREST?=../../../..
 
 TACLE_LOCAL=./tacle-src-local
@@ -29,13 +29,18 @@ APP=binarysearch
 APP=iir
 APP=ludcmp
 
+# those are all benchmarks (except parallel) from TACLeBench
+# Which are useful? Which are broken due to byte order? Which cannot be transformed to SP code?
+ALLALL=adpcm_dec adpcm_enc ammunition anagram audiobeam binarysearch bitcount bitonic bsort cjpeg_transupp cjpeg_wrbmp complex_updates countnegative cover dijkstra duff epic fac fft filterbank fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec huff_enc iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver mpeg2 ndes petrinet pm powerwindow prime quicksort recursion rijndael_dec rijndael_enc sha st statemate susan test3
+
 # TODO: add more examples
-ALLAPPS=ludcmp binarysearch bsort
+ALLAPPS=adpcm_dec ludcmp binarysearch bsort
 
 #SPM=-mpatmos-singlepath=$(APP)_main
 SPM=-mpatmos-singlepath=main
 
-# -mpatmos-disable-function-splitter as not needed in a normal I$# -mpatmos-method-cache-size=8192 maybe not
+# -mpatmos-disable-function-splitter as not needed in a normal I$
+# -mpatmos-method-cache-size=8192 maybe not
 
 CFLAGS= -O2 \
         -mpatmos-max-subfunction-size=4096 -mpatmos-preferred-subfunction-size=1024 \
@@ -53,17 +58,26 @@ hello:
 	echo "Hello World"
 	ls $(TACLE)
 
-tacle-local: $(TACLE_LOCAL)
+tacle-local: $(TACLE_LOCAL)		
 
 # create a local copy of the tacle source directory and
 # mark all main() as noinline
 $(TACLE_LOCAL): $(TACLE)
-	cp -r $< $@
+	mkdir $@
+	cp -r $</app/* $@
+	cp -r $</kernel/* $@
+	cp -r $</sequential/* $@
+	cp -r $</test/* $@
 	find $@ -name "*.c" -exec sed -i -e \
 	  "/\(int\|void\)\s\+main/i__attribute__((noinline))" '{}' \+
-	@# replace all entrypoint pragmas with noinline attributes
-	@#find $@ -name "*.c" -exec sed -i -e \
-	 #   "s/^\(.*\)\(_Pragma\s*(\s*\"entrypoint\"\s*)\) /__attribute__((noinline)) \1/" '{}' \+
+
+# not all benchmarks have a main forward declaration. We should fix this.
+# Daniel: no worries, just prepend the attribute to the declaration
+# However, main is usually not inlined so it should be fine.
+
+# the following does not work for all examples
+#	find $@ -name "*.c" -exec sed -i -e \
+#	  "s/^\(.*\)\(_Pragma\s*(\s*\"entrypoint\"\s*)\) /__attribute__((noinline)) \1/" '{}' \+
 
 # pasim and emulator are off by about 300 clock cycles on binarysearch
 # Need to be looked at
@@ -78,20 +92,32 @@ comp:
 	cat abc.txt | grep Cycles:
 	patmos-emulator -p a.elf | grep exec_cycles
 
+comp_normal:
+	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
+
+comp_sp:
+	patmos-clang $(CFLAGSSP) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
 
 doit:
-	patmos-clang $(CFLAGSSP) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
 	cp *.xml $(T-CREST)/patmos/hardware/config
 	cd $(T-CREST)/patmos; make clean emulator BOARD=mcache
-	echo "$(APP) mcache" > mc_$(APP).txt
-	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> mc_$(APP).txt
+	make comp_normal
+	echo "$(APP) mcache normal" > mc_np_$(APP).txt
+	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> mc_np_$(APP).txt
+	make comp_sp
+	echo "$(APP) mcache sp" > mc_sp_$(APP).txt
+	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> mc_sp_$(APP).txt
 	cd $(T-CREST)/patmos; make clean emulator BOARD=icache
-	echo "$(APP) icache" > ic_$(APP).txt
-	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> ic_$(APP).txt
+	make comp_normal
+	echo "$(APP) icache normal" > ic_np_$(APP).txt
+	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> ic_np_$(APP).txt
+	make comp_sp
+	echo "$(APP) icache sp" > ic_sp_$(APP).txt
+	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> ic_sp_$(APP).txt
 
 doall: $(TACLE_LOCAL)
 	for P in $(ALLAPPS); do $(MAKE) doit APP=$${P}; done;
 
 clean:
 	-rm *.txt *.elf
-
+	-rm -r $(TACLE_LOCAL)
