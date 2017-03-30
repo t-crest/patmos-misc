@@ -32,7 +32,8 @@ APP=ludcmp
 # TODO: add more examples
 ALLAPPS=ludcmp binarysearch bsort
 
-SPM=-mpatmos-singlepath=$(APP)_main
+#SPM=-mpatmos-singlepath=$(APP)_main
+SPM=-mpatmos-singlepath=main
 
 # -mpatmos-disable-function-splitter as not needed in a normal I$# -mpatmos-method-cache-size=8192 maybe not
 
@@ -55,11 +56,14 @@ hello:
 tacle-local: $(TACLE_LOCAL)
 
 # create a local copy of the tacle source directory and
-# replace all entrypoint pragmas with noinline attributes
+# mark all main() as noinline
 $(TACLE_LOCAL): $(TACLE)
 	cp -r $< $@
 	find $@ -name "*.c" -exec sed -i -e \
-	  "s/^\(.*\)\(_Pragma\s*(\s*\"entrypoint\"\s*)\) /__attribute__((noinline)) \1/" '{}' \+
+	  "/\(int\|void\)\s\+main/i__attribute__((noinline))" '{}' \+
+	@# replace all entrypoint pragmas with noinline attributes
+	@#find $@ -name "*.c" -exec sed -i -e \
+	 #   "s/^\(.*\)\(_Pragma\s*(\s*\"entrypoint\"\s*)\) /__attribute__((noinline)) \1/" '{}' \+
 
 # pasim and emulator are off by about 300 clock cycles on binarysearch
 # Need to be looked at
