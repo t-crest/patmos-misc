@@ -30,11 +30,14 @@ APP=ludcmp
 # TODO: add more examples
 ALLAPPS=ludcmp binarysearch bsort
 
-SPM=-mpatmos-singlepath=$(APP)_main
+# SPM=-mpatmos-singlepath=$(APP)_main
+SPM=-mpatmos-singlepath=main
 
 # -mpatmos-disable-function-splitter as not needed in a normal I$# -mpatmos-method-cache-size=8192 maybe not
 
-CFLAGS= -O2 -mpatmos-max-subfunction-size=4096 -mpatmos-preferred-subfunction-size=1024
+CFLAGS= -O2 \
+        -mpatmos-max-subfunction-size=4096 -mpatmos-preferred-subfunction-size=1024 \
+        -Xllc -mpatmos-disable-vliw=false
 # -Xopt -disable-inlining
 # -mpatmos-disable-function-splitter
 CFLAGSSP= $(CFLAGS) $(SPM)
