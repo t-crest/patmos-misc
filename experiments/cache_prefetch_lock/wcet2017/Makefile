@@ -6,7 +6,7 @@
 # for local configurations, e.g., to override my path to the TACLeBench source
 -include config.mk
 
-TACLE?=/home/bekim/Desktop/t-crest/tacle-bench/tacle-bench/bench
+TACLE?=$(HOME)/data/repository/tacle-bench/bench
 T-CREST?=../../../..
 
 TACLE_LOCAL=./tacle-src-local
