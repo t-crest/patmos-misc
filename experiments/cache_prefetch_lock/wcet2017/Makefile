@@ -35,9 +35,10 @@ ALLALL=adpcm_dec adpcm_enc ammunition anagram audiobeam binarysearch bitcount bi
 # Issues: ammunition does not compile
 # anagram, bitcount endless loop
 # bitonic as SP endless loop
-ALLALL=adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_transupp cjpeg_wrbmp complex_updates countnegative cover dijkstra duff epic fac fft filterbank fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec huff_enc iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver mpeg2 ndes petrinet pm powerwindow prime quicksort recursion rijndael_dec rijndael_enc sha st statemate susan test3
+# simply too long dijkstra, epic, filterbank, huff_enc
+# done: ALLALL=adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_transupp cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells
+ALLALL=lift lms ludcmp matrix1 md5 minver mpeg2 ndes petrinet pm powerwindow prime quicksort recursion rijndael_dec rijndael_enc sha st statemate susan test3
 
-# TODO: add more examples
 ALLAPPS=adpcm_dec ludcmp binarysearch bsort
 ALLAPPS=$(ALLALL)
 
@@ -73,8 +74,11 @@ $(TACLE_LOCAL): $(TACLE)
 	cp -r $</kernel/* $@
 	cp -r $</sequential/* $@
 	cp -r $</test/* $@
-	find $@ -name "*.c" -exec sed -i -e \
-	  "/\(int\|void\)\s\+main/i__attribute__((noinline))" '{}' \+
+	./modmain.sh
+
+	# Martin: the following does not work in OS X
+	# find $@ -name "*.c" -exec sed -i -e \
+	#    "/\(int\|void\)\s\+main/i__attribute__((noinline))" '{}' \+
 
 # not all benchmarks have a main forward declaration. We should fix this.
 # Daniel: no worries, just prepend the attribute to the declaration
