@@ -6,14 +6,13 @@ import java.io._
 import scala.collection.mutable
 import scala.io.Source
 
-val types = List("normal", "sp")
+val types = List("np", "sp")
 val cache = List("mcache", "icache", "pref")
 
 val np = Map("mcache" -> mutable.Map[String, Int](), "icache" -> mutable.Map[String, Int](), "pref" -> mutable.Map[String, Int]())
 val sp = Map("mcache" -> mutable.Map[String, Int](), "icache" -> mutable.Map[String, Int](), "pref" -> mutable.Map[String, Int]())
 
-// TODO: switch to np in text generation
-val all = Map("normal" -> np, "sp" -> sp)
+val all = Map("np" -> np, "sp" -> sp)
 
 val bench = mutable.Set[String]()
 

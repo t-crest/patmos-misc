@@ -35,9 +35,10 @@ ALLALL=adpcm_dec adpcm_enc ammunition anagram audiobeam binarysearch bitcount bi
 # Issues: ammunition does not compile
 # anagram, bitcount endless loop
 # bitonic as SP endless loop
-# simply too long dijkstra, epic, filterbank, huff_enc
-# done: ALLALL=adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_transupp cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells
-ALLALL=lift lms ludcmp matrix1 md5 minver mpeg2 ndes petrinet pm powerwindow prime quicksort recursion rijndael_dec rijndael_enc sha st statemate susan test3
+# simply too long: cjpeg_transupp, dijkstra, epic, filterbank, huff_enc, mpeg2, pm, quicksort, recursion, rijndael_dec, rijndael_enc, test3
+# compile error: susan
+
+ALLALL=adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
 
 ALLAPPS=adpcm_dec ludcmp binarysearch bsort
 ALLAPPS=$(ALLALL)
@@ -108,34 +109,38 @@ comp_sp:
 	patmos-clang $(CFLAGSSP) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
 
 doit:
-	#cd $(T-CREST)/patmos; git checkout icache_with_prefetcher
 	cp *.xml $(T-CREST)/patmos/hardware/config
 	cd $(T-CREST)/patmos; make clean emulator BOARD=mcache
 	make comp_normal
-	echo "$(APP) mcache normal" > mc_np_$(APP).txt
-	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> mc_np_$(APP).txt
+	echo "$(APP) mcache np" > $(APP)_mc_np.txt
+	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_mc_np.txt
 	make comp_sp
-	echo "$(APP) mcache sp" > mc_sp_$(APP).txt
-	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> mc_sp_$(APP).txt
+	echo "$(APP) mcache sp" > $(APP)_mc_sp.txt
+	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_mc_sp.txt
 	cd $(T-CREST)/patmos; make clean emulator BOARD=icache
 	make comp_normal
-	echo "$(APP) icache normal" > ic_np_$(APP).txt
-	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> ic_np_$(APP).txt
+	echo "$(APP) icache np" > $(APP)_ic_np.txt
+	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_ic_np.txt
 	make comp_sp
-	echo "$(APP) icache sp" > ic_sp_$(APP).txt
-	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> ic_sp_$(APP).txt
+	echo "$(APP) icache sp" > $(APP)_ic_sp.txt
+	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_ic_sp.txt
+	#MS: is there a prefetching version without SP code?
+	#cd $(T-CREST)/patmos; git checkout icache_with_prefetcher
 	#cd $(T-CREST)/patmos; make clean emulator BOARD=pcache
 	#make comp_normal
-	#echo "$(APP) pcache normal" > pc_np_$(APP).txt
-	#$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> mc_np_$(APP).txt
+	#echo "$(APP) pcache np" > $(APP)_pc_np.txt
+	#$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_mc_np.txt
 	#make comp_sp
-	#echo "$(APP) pcache sp" > pc_sp_$(APP).txt
-	#$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> pc_sp_$(APP).txt
+	#echo "$(APP) pcache sp" > $(APP)_pc_sp.txt
+	#$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_pc_sp.txt
 	#cd $(T-CREST)/patmos; git checkout master
 
 
 doall: $(TACLE_LOCAL)
 	for P in $(ALLAPPS); do $(MAKE) doit APP=$${P}; done;
+
+eval:
+	scala eval.scala
 
 clean:
 	-rm *.txt *.elf
