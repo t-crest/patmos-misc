@@ -51,7 +51,8 @@ SPM=-mpatmos-singlepath=main
 
 CFLAGS= -O2 \
         -mpatmos-max-subfunction-size=4096 -mpatmos-preferred-subfunction-size=1024 \
-        -Xllc -mpatmos-disable-vliw=false
+        -Xllc -mpatmos-disable-vliw=false \
+	-Xllc -mpatmos-subfunction-align=64
 # -Xopt -disable-inlining
 # -mpatmos-disable-function-splitter
 CFLAGSSP= $(CFLAGS) $(SPM)

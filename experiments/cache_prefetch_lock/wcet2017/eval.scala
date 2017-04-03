@@ -45,3 +45,17 @@ def printStat(t: String) {
 
 types.map{ t => printStat(t) }
 
+def printData(t: String) {
+  println("sym y")
+  for (b <- bench) {
+    val v1 = all(t)("mcache")(b)
+    val v2 = all(t)("icache")(b)
+    val fac = v2.toDouble / v1
+    println(b + " " + fac)
+  }
+}
+
+// TODO substitute "_" with "\_"
+// TODO sort alphabetically
+// TODO spill out a file not just to stdout
+printData("np")
