@@ -1,10 +1,12 @@
-
-println("Hello from Scala")
+// Process emulation output for generation of bar charts
 
 import scala.sys.process._
 import java.io._
 import scala.collection.mutable
 import scala.io.Source
+
+// TODO make it dependent on args
+val log = false
 
 val types = List("np", "sp")
 val cache = List("mcache", "icache", "pref")
@@ -26,12 +28,12 @@ def addResult(f: String) {
   val v = l.next().split(" ")
   bench += v(0)
   val cycles = l.next().split(" ")(1).toInt
-  println(v.toList + ": " + cycles)
+  if (log) println(v.toList + ": " + cycles)
   all(v(2))(v(1)) += (v(0) -> cycles)
 }
 
-println()
-println(bench)
+if (log) println()
+if (log) println(bench)
 
 def printStat(t: String) {
   println("Results for " + t + ": mcache icache")
@@ -43,19 +45,20 @@ def printStat(t: String) {
   }
 }
 
-types.map{ t => printStat(t) }
 
 def printData(t: String) {
   println("sym y")
-  for (b <- bench) {
+  val sortedBench = bench.toSeq.sorted
+  for (b <- sortedBench) {
     val v1 = all(t)("mcache")(b)
     val v2 = all(t)("icache")(b)
     val fac = v2.toDouble / v1
-    println(b + " " + fac)
+    val n = b.flatMap { case '_' => "\\_" case c => s"$c" }
+    println(n + " " + fac)
   }
 }
 
-// TODO substitute "_" with "\_"
-// TODO sort alphabetically
-// TODO spill out a file not just to stdout
+// TODO use args and dependent on args just spill out stats or the right data
+if (log) types.map{ t => printStat(t) }
+
 printData("np")

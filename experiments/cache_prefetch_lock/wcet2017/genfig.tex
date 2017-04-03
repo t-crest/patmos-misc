@@ -5,8 +5,8 @@
 \pgfplotsset{compat=1.12}
 \usepackage{pgfplotstable}
 
-%\usepgfplotslibrary{external}
-%\tikzexternalize
+\usepgfplotslibrary{external}
+\tikzexternalize
 
 \begin{document}
 
@@ -35,8 +35,9 @@ p3 96
 \begin{tikzpicture}
 \begin{axis}[
   ybar,
-  title=Bar chart,
+%  title=Bar chart,
   width=16cm,
+  bar width=2mm,
   xticklabels from table={\mypoints}{sym},
   xtick=data,
   xticklabel style={rotate=90},

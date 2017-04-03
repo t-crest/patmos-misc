@@ -141,7 +141,15 @@ doall: $(TACLE_LOCAL)
 	for P in $(ALLAPPS); do $(MAKE) doit APP=$${P}; done;
 
 eval:
-	scala eval.scala
+	scala eval.scala > data.dat
+
+latex:
+	pdflatex -shell-escape genfig.tex
+	mv genfig-figure0.pdf example.pdf
+
+ms_copy:
+	cp *.pdf $(HOME)/paper/tcapapers/2017/spcaching
+
 
 clean:
 	-rm *.txt *.elf
