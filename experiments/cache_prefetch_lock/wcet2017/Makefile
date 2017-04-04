@@ -133,7 +133,7 @@ doit:
 	#make comp_sp
 	#echo "$(APP) pcache sp" > $(APP)_pc_sp.txt
 	#$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_pc_sp.txt
-	#cd $(T-CREST)/patmos; git checkout master
+	cd $(T-CREST)/patmos; git checkout master
 
 
 doall: $(TACLE_LOCAL)
