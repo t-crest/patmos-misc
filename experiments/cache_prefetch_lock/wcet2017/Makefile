@@ -51,8 +51,8 @@ SPM=-mpatmos-singlepath=main
 
 CFLAGS= -O2 \
         -mpatmos-max-subfunction-size=4096 -mpatmos-preferred-subfunction-size=1024 \
-        -Xllc -mpatmos-disable-vliw=false \
-	-Xllc -mpatmos-subfunction-align=64
+        -Xllc -mpatmos-disable-vliw=false
+# -Xllc -mpatmos-subfunction-align=32
 # -Xopt -disable-inlining
 # -mpatmos-disable-function-splitter
 CFLAGSSP= $(CFLAGS) $(SPM)
@@ -147,10 +147,14 @@ latex:
 	pdflatex -shell-escape genfig.tex
 	mv genfig-figure0.pdf example.pdf
 
-ms_copy:
-	cp *.pdf $(HOME)/paper/tcapapers/2017/spcaching
-
-
 clean:
-	-rm *.txt *.elf
+	-rm *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat
 	-rm -r $(TACLE_LOCAL)
+
+PAPER?=$(HOME)/paper/tcapapers/2017/spcaching
+
+ms_copy:
+	cp *.pdf $(PAPER)
+
+
+
