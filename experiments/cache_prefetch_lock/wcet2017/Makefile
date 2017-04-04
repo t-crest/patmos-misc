@@ -110,6 +110,7 @@ comp_sp:
 	patmos-clang $(CFLAGSSP) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
 
 doit:
+	cd $(T-CREST)/patmos; git checkout master
 	cp *.xml $(T-CREST)/patmos/hardware/config
 	cd $(T-CREST)/patmos; make clean emulator BOARD=mcache
 	make comp_normal
@@ -125,12 +126,10 @@ doit:
 	make comp_sp
 	echo "$(APP) icache sp" > $(APP)_ic_sp.txt
 	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_ic_sp.txt
-	#MS: is there a prefetching version without SP code?
-	#cd $(T-CREST)/patmos; git checkout icache_with_prefetcher
+	cd $(T-CREST)/patmos; git checkout icache_with_prefetcher
+	cp pcache.xml $(T-CREST)/patmos/hardware/config
+	# TODO generate RPT, copy to $(T-CREST)/patmos/hardware/src/icache/rpt.txt
 	#cd $(T-CREST)/patmos; make clean emulator BOARD=pcache
-	#make comp_normal
-	#echo "$(APP) pcache np" > $(APP)_pc_np.txt
-	#$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_mc_np.txt
 	#make comp_sp
 	#echo "$(APP) pcache sp" > $(APP)_pc_sp.txt
 	#$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_pc_sp.txt
