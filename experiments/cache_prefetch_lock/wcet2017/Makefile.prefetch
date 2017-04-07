@@ -1,0 +1,130 @@
+
+# targets for prefetching
+#
+# TODO factor out common targets
+# TODO make prefetch-specific variables global (not target dependent, as
+#      specifying intermediate targets will miss them)
+
+
+###############################################################################
+# Common configuration
+#
+
+SHELL = /bin/bash
+
+# to override default paths
+-include config.mk
+
+# default paths
+TACLE   ?= $(HOME)/data/repository/tacle-bench/bench
+T-CREST ?= ../../../..
+
+# tacle benchmark sources are copied to this local folder
+TACLE_LOCAL = ./tacle-src-local
+
+# command to generate an instruction trace (pasim is faster)
+TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace $< 2>&1 >/dev/null | cut -d' ' -f1
+#TRACE_CMD = patmos-emulator -r $< | awk '{ printf("%08x\n", $1) }'
+
+
+APP=binarysearch
+
+PATMOS_HWDIR = $(T-CREST)/patmos/hardware
+
+SPMAIN=main
+
+
+.PHONY: report-prefetch
+
+XML_SIZE ?= 8k
+XML_BURSTLENGTH ?= 4
+
+report-prefetch: $(APP)_report.txt
+
+# target-specific variables
+report-prefetch: LABEL = "pcache sp"
+report-prefetch: XML_TYPE = prefetch
+report-prefetch: XML_ASSOC = 1
+report-prefetch: CFLAGS = \
+  -O2 -g \
+  -mpatmos-disable-function-splitter \
+  -Xllc -mpatmos-disable-vliw=false \
+  -mpatmos-singlepath=$(SPMAIN)
+
+
+$(APP)_report.txt: $(APP).elf  patmos_emu_ic_prefetch
+	echo -n $(LABEL) >> $@
+	./patmos_emu_ic_prefetch -p $< | grep exec_cycles >> $@
+
+
+###############################################################################
+# Hardware/Emulator
+#
+
+patmos_emu_ic_prefetch: $(APP).rpt cache.xml
+	cd $(T-CREST)/patmos && git checkout icache_with_prefetcher
+	cp cache.xml $(PATMOS_HWDIR)/config
+	cp $< $(PATMOS_HWDIR)/src/icache/rpt.txt
+	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=pcache
+	cp $(PATMOS_HWDIR)/build/emulator $@
+
+cache.xml: template.xml
+	sed \
+	  -e "s/XML_BURSTLENGTH/$(XML_BURSTLENGTH)/" \
+	  -e "s/XML_TYPE/$(XML_TYPE)/" \
+	  -e "s/XML_SIZE/$(XML_SIZE)/" \
+	  -e "s/XML_ASSOC/$(XML_ASSOC)/" \
+	  $< > $@
+
+
+###############################################################################
+# Compilation
+#
+
+$(APP).elf: $(TACLE_LOCAL)
+	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o $@
+
+
+
+###############################################################################
+# Generation of the prefetch table
+#
+
+%.rpt: %.sym %.sptrace
+	#TODO  cache [+line] size
+	python ../mktables.py --rpt -e $^ > $@
+
+
+# Extract the start addresses of the functions from the symbol table
+# (required for trace analysis)
+%.sym: %.elf
+	patmos-llvm-objdump -t $< | grep -E "^[0-9a-f]{8} [gl]\s+F\s+.text" | \
+	  awk '{print $$1, $$6}' | sort > $@
+
+
+# Generate a compressed instruction address trace
+%.trace.gz: %.elf
+	$(TRACE_CMD) | gzip > $@
+
+
+# extract the subtraces from a compressed, complete trace
+%.sptrace: %.sym %.trace.gz
+	../extract_subtraces.py $*.sym <(gunzip -c $*.trace.gz) $(SPMAIN)
+	mv main.trace $@
+
+
+###############################################################################
+# Get a local copy of the tacle-bench
+#
+
+# FIXME clone directly from Github
+# create a local copy of the tacle source directory and
+# mark all main() as noinline
+$(TACLE_LOCAL): $(TACLE)
+	mkdir -p $@
+	cp -r $</app/* $@
+	cp -r $</kernel/* $@
+	cp -r $</sequential/* $@
+	cp -r $</test/* $@
+	find $@ -name "*.c" -exec sed -i'.orig' -e \
+	   "/\(int\|void\)\s\+main/i__attribute__((noinline))" '{}' \+
