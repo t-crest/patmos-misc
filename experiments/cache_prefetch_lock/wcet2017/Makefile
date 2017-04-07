@@ -23,10 +23,8 @@ TACLE_LOCAL=./tacle-src-local
 #   because I missed disable-inlining
 # minver mit SP code gibt exit != 0
 
-APP=minver
-APP=binarysearch
-APP=iir
-APP=ludcmp
+
+APP?=ludcmp
 
 # those are all benchmarks (except parallel) from TACLeBench
 # Which are useful? Which are broken due to byte order? Which cannot be transformed to SP code?
@@ -40,8 +38,10 @@ ALLALL=adpcm_dec adpcm_enc ammunition anagram audiobeam binarysearch bitcount bi
 
 ALLALL=adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
 
-ALLAPPS=adpcm_dec ludcmp binarysearch bsort
-ALLAPPS=$(ALLALL)
+# TODO: find a small set of benchmarks that execute relative quick
+# for playing with the scripts
+ALLAPPS?=adpcm_dec ludcmp binarysearch bsort
+ALLAPPS?=$(ALLALL)
 
 #SPM=-mpatmos-singlepath=$(APP)_main
 SPM=-mpatmos-singlepath=main
@@ -111,7 +111,7 @@ comp_sp:
 	patmos-clang $(CFLAGSSP) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
 
 doit:
-	cd $(T-CREST)/patmos; git checkout master
+	cd $(T-CREST)/patmos; git checkout master; git checkout b99441ede979f4c
 	cp *.xml $(T-CREST)/patmos/hardware/config
 	cd $(T-CREST)/patmos; make clean emulator BOARD=mcache
 	make comp_normal

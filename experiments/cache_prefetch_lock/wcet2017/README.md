@@ -33,11 +33,21 @@ and compile and run most of them. This will take several hours.
 Therefore, for first experiments restrict the number of benchmarks
 by setting `ALLAPPS` in the `Makefile` to a few programs.
 
+The result of the benchmarks are several .txt files containing the
+execution time in clock cycles. The naming convention of the text
+files is: <app>_<cache>_<code> where <app> is the benchmark name,
+<cache> is the cache type (`ic` normal instruction cache, `mc`
+method cache, and `pc` instruction cache with prefetching), and
+<code> the compilation type (`np` normal compilation, `sp`
+single path code generation).
+
 ### Makefile Targets
 
 `make` will build and run everything.
 
-`make eval` ....
+`make eval` will compute some results and produce tables in PDF form.
+
+`make clean` removes all generated files and folders.
 
 ## Repository Tags
 
