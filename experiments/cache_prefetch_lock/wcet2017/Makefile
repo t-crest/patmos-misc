@@ -6,7 +6,7 @@
 # for local configurations, e.g., to override my path to the TACLeBench source
 -include config.mk
 
-TACLE?=$(HOME)/data/repository/tacle-bench/bench
+// TACLE?=$(HOME)/data/repository/tacle-bench/bench
 T-CREST?=../../../..
 
 TACLE_LOCAL=./tacle-src-local
@@ -66,16 +66,17 @@ hello:
 	echo "Hello World"
 	ls $(TACLE)
 
-tacle-local: $(TACLE_LOCAL)		
+tacle-local: $(TACLE_LOCAL)	
 
 # create a local copy of the tacle source directory and
 # mark all main() as noinline
-$(TACLE_LOCAL): $(TACLE)
+$(TACLE_LOCAL):
+	git clone https://github.com/tacle/tacle-bench.git	
 	mkdir $@
-	cp -r $</app/* $@
-	cp -r $</kernel/* $@
-	cp -r $</sequential/* $@
-	cp -r $</test/* $@
+	cp -r tacle-bench/bench/app/* $@
+	cp -r tacle-bench/bench/kernel/* $@
+	cp -r tacle-bench/bench/sequential/* $@
+	cp -r tacle-bench/bench/test/* $@
 	./modmain.sh
 
 	# Martin: the following does not work in OS X
@@ -149,6 +150,7 @@ latex:
 clean:
 	-rm *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat
 	-rm -r $(TACLE_LOCAL)
+	-rm -rf tacle-bench
 
 PAPER?=$(HOME)/paper/tcapapers/2017/spcaching
 
