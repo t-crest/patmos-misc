@@ -3,13 +3,26 @@
 #
 # This must be in a subfolder to make the Python scripts happy
 
-# for local configurations, e.g., to override my path to the TACLeBench source
+
+###############################################################################
+# Common configuration
+#
+
+SHELL = /bin/bash
+
+# to override default paths
 -include config.mk
 
-// TACLE?=$(HOME)/data/repository/tacle-bench/bench
-T-CREST?=../../../..
+# default paths
+T-CREST      ?= ../../../..
+PATMOS_HWDIR  = $(T-CREST)/patmos/hardware
+TACLE         = ./tacle-bench
+TACLE_LOCAL   = ./tacle-src-local
 
-TACLE_LOCAL=./tacle-src-local
+# cache size / burst length setup
+XML_SIZE ?= 8k
+XML_BURSTLENGTH ?= 4
+
 
 # kernel benchmarks
 # binarysearch	countnegative	iir		matrix1		quicksort
@@ -43,8 +56,9 @@ ALLALL=adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_upda
 ALLAPPS?=adpcm_dec ludcmp binarysearch bsort
 ALLAPPS?=$(ALLALL)
 
-#SPM=-mpatmos-singlepath=$(APP)_main
-SPM=-mpatmos-singlepath=main
+SPMAIN=main
+#SPMAIN=$(APP)_main
+SPM=-mpatmos-singlepath=$(SPMAIN)
 
 # -mpatmos-disable-function-splitter as not needed in a normal I$
 # -mpatmos-method-cache-size=8192 maybe not
@@ -66,30 +80,118 @@ hello:
 	echo "Hello World"
 	ls $(TACLE)
 
-tacle-local: $(TACLE_LOCAL)	
+###############################################################################
+# Get a local copy of the tacle-bench
+#
+
+tacle-local: $(TACLE_LOCAL)
+
+$(TACLE):
+	-git clone https://github.com/tacle/tacle-bench.git $@
 
 # create a local copy of the tacle source directory and
 # mark all main() as noinline
-$(TACLE_LOCAL):
-	git clone https://github.com/tacle/tacle-bench.git	
-	mkdir $@
-	cp -r tacle-bench/bench/app/* $@
-	cp -r tacle-bench/bench/kernel/* $@
-	cp -r tacle-bench/bench/sequential/* $@
-	cp -r tacle-bench/bench/test/* $@
-	./modmain.sh
-
-	# Martin: the following does not work in OS X
-	# find $@ -name "*.c" -exec sed -i -e \
-	#    "/\(int\|void\)\s\+main/i__attribute__((noinline))" '{}' \+
-
-# not all benchmarks have a main forward declaration. We should fix this.
-# Daniel: no worries, just prepend the attribute to the declaration
-# However, main is usually not inlined so it should be fine.
+$(TACLE_LOCAL): $(TACLE)
+	mkdir -p $@
+	cp -r $</bench/app/* $@
+	cp -r $</bench/kernel/* $@
+	cp -r $</bench/sequential/* $@
+	cp -r $</bench/test/* $@
+	find $@ -name "*.c" -exec sed -i'.orig' -e \
+	   "/\(int\|void\)\s\+main/i__attribute__((noinline))" '{}' \+
 
 # the following does not work for all examples
 #	find $@ -name "*.c" -exec sed -i -e \
 #	  "s/^\(.*\)\(_Pragma\s*(\s*\"entrypoint\"\s*)\) /__attribute__((noinline)) \1/" '{}' \+
+
+
+###############################################################################
+# Hardware/Emulator
+#
+patmos_emu_ic_prefetch: XML_TYPE = prefetch
+patmos_emu_ic_prefetch: $(APP).rpt cache.xml
+	cd $(T-CREST)/patmos && git checkout icache_with_prefetcher
+	cp cache.xml $(PATMOS_HWDIR)/config/cache_$(XML_TYPE).xml
+	cp $< $(PATMOS_HWDIR)/src/icache/rpt.txt
+	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=cache_$(XML_TYPE)
+	cp $(PATMOS_HWDIR)/build/emulator $@
+
+
+
+cache.xml: template.xml
+	sed \
+	  -e "s/XML_BURSTLENGTH/$(XML_BURSTLENGTH)/" \
+	  -e "s/XML_TYPE/$(XML_TYPE)/" \
+	  -e "s/XML_SIZE/$(XML_SIZE)/" \
+	  -e "s/XML_ASSOC/$(XML_ASSOC)/" \
+	  $< > $@
+
+
+###############################################################################
+# Compilation
+#
+
+$(APP).elf: $(TACLE_LOCAL)
+	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o $@
+
+
+
+###############################################################################
+# Generation of the prefetch table
+#
+
+# command to generate an instruction trace (pasim is faster)
+TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
+	    $< 2>&1 >/dev/null | cut -d' ' -f1
+#TRACE_CMD = patmos-emulator -r $< | awk '{ printf("%08x\n", $1) }'
+
+%.rpt: %.sym %.sptrace
+	#TODO  cache [+line] size
+	python ../mktables.py --rpt -e $^ > $@
+
+
+# Extract the start addresses of the functions from the symbol table
+# (required for trace analysis)
+%.sym: %.elf
+	patmos-llvm-objdump -t $< | grep -E "^[0-9a-f]{8} [gl]\s+F\s+.text" | \
+	  awk '{print $$1, $$6}' | sort > $@
+
+
+# Generate a compressed instruction address trace
+%.trace.gz: %.elf
+	$(TRACE_CMD) | gzip > $@
+
+
+# extract the subtraces from a compressed, complete trace
+%.sptrace: %.sym %.trace.gz
+	../extract_subtraces.py $*.sym <(gunzip -c $*.trace.gz) $(SPMAIN)
+	mv main.trace $@
+
+
+###############################################################################
+
+.PHONY: report-prefetch
+
+
+report-prefetch: $(APP)_pc_sp.txt
+
+# target-specific variables
+$(APP)_pc_sp.txt: LABEL = pcache sp
+$(APP)_pc_sp.txt: XML_TYPE = prefetch
+$(APP)_pc_sp.txt: XML_ASSOC = 1
+$(APP)_pc_sp.txt: CFLAGS = \
+  -O2 -g \
+  -mpatmos-disable-function-splitter \
+  -Xllc -mpatmos-disable-vliw=false \
+  -mpatmos-singlepath=$(SPMAIN)
+
+
+$(APP)_pc_sp.txt: $(APP).elf  patmos_emu_ic_prefetch
+	echo $(LABEL) >> $@
+	./patmos_emu_ic_prefetch -p $< | grep exec_cycles >> $@
+
+
+###############################################################################
 
 # pasim and emulator are off by about 300 clock cycles on binarysearch
 # Need to be looked at
@@ -127,15 +229,12 @@ doit:
 	make comp_sp
 	echo "$(APP) icache sp" > $(APP)_ic_sp.txt
 	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_ic_sp.txt
-	cd $(T-CREST)/patmos; git checkout icache_with_prefetcher
-	cp pcache.xml $(T-CREST)/patmos/hardware/config
-	# TODO generate RPT, copy to $(T-CREST)/patmos/hardware/src/icache/rpt.txt
-	#cd $(T-CREST)/patmos; make clean emulator BOARD=pcache
-	#make comp_sp
-	#echo "$(APP) pcache sp" > $(APP)_pc_sp.txt
-	#$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_pc_sp.txt
+	$(MAKE) report-prefetch
 	cd $(T-CREST)/patmos; git checkout master
 
+
+
+###############################################################################
 
 doall: $(TACLE_LOCAL)
 	for P in $(ALLAPPS); do $(MAKE) doit APP=$${P}; done;
