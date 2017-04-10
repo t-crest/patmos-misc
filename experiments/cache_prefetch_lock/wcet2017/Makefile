@@ -97,9 +97,15 @@ $(TACLE_LOCAL): $(TACLE)
 	cp -r $</bench/kernel/* $@
 	cp -r $</bench/sequential/* $@
 	cp -r $</bench/test/* $@
+# fix for sed incompatibility between GNU and BSD (Mac OS X)
+# Maybe we should write a few lines of Scala and stop using sed
+ifeq ($(TERM_PROGRAM),$(filter $(TERM_PROGRAM), Apple_Terminal iTerm.app))
+	./modmain.sh
+else
 	find $@ -name "*.c" -exec sed -i'.orig' -e \
 	   "/\(int\|void\)\s\+main/i\
 	   __attribute__((noinline))" '{}' \+
+endif
 
 
 
@@ -185,7 +191,7 @@ $(APP)_pc_sp.txt: CFLAGS = \
 
 
 $(APP)_pc_sp.txt: $(APP).elf  patmos_emu_ic_prefetch
-	echo $(LABEL) >> $@
+	echo "$(APP) $(LABEL)" >> $@
 	./patmos_emu_ic_prefetch -p $< | grep exec_cycles >> $@
 
 
