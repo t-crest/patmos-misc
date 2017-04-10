@@ -98,7 +98,8 @@ $(TACLE_LOCAL): $(TACLE)
 	cp -r $</bench/sequential/* $@
 	cp -r $</bench/test/* $@
 	find $@ -name "*.c" -exec sed -i'.orig' -e \
-	   "/\(int\|void\)\s\+main/i__attribute__((noinline))" '{}' \+
+	   "/\(int\|void\)\s\+main/i\
+	   __attribute__((noinline))" '{}' \+
 
 # the following does not work for all examples
 #	find $@ -name "*.c" -exec sed -i -e \
@@ -247,9 +248,9 @@ latex:
 	mv genfig-figure0.pdf example.pdf
 
 clean:
-	-rm *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat
-	-rm -r $(TACLE_LOCAL)
-	-rm -rf tacle-bench
+	rm -f *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat
+	rm -rf $(TACLE_LOCAL)
+	rm -rf $(TACLE)
 
 PAPER?=$(HOME)/paper/tcapapers/2017/spcaching
 
