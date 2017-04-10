@@ -253,6 +253,7 @@ latex:
 clean:
 	rm -f *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat *.rpt *.sym
 	rm -f cache.xml
+	rm -f patmos_emu_ic_prefetch
 	rm -rf $(TACLE_LOCAL)
 	rm -rf $(TACLE)
 
