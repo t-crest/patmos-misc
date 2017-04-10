@@ -53,7 +53,7 @@ ALLALL=adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_upda
 
 # TODO: find a small set of benchmarks that execute relative quick
 # for playing with the scripts
-ALLAPPS?=adpcm_dec ludcmp binarysearch bsort
+ALLAPPS?=binarysearch bsort
 ALLAPPS?=$(ALLALL)
 
 SPMAIN=main
@@ -101,9 +101,6 @@ $(TACLE_LOCAL): $(TACLE)
 	   "/\(int\|void\)\s\+main/i\
 	   __attribute__((noinline))" '{}' \+
 
-# the following does not work for all examples
-#	find $@ -name "*.c" -exec sed -i -e \
-#	  "s/^\(.*\)\(_Pragma\s*(\s*\"entrypoint\"\s*)\) /__attribute__((noinline)) \1/" '{}' \+
 
 
 ###############################################################################
@@ -148,7 +145,7 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 
 %.rpt: %.sym %.sptrace
 	#TODO  cache [+line] size
-	python ../mktables.py --rpt -e $^ > $@
+	python2 ../mktables.py --rpt -e $^ > $@
 
 
 # Extract the start addresses of the functions from the symbol table
@@ -248,7 +245,8 @@ latex:
 	mv genfig-figure0.pdf example.pdf
 
 clean:
-	rm -f *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat
+	rm -f *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat *.rpt *.sym
+	rm -f cache.xml
 	rm -rf $(TACLE_LOCAL)
 	rm -rf $(TACLE)
 
