@@ -250,7 +250,8 @@ latex:
 	mv genfig-figure0.pdf example.pdf
 
 clean:
-	-rm *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat
+	-rm *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat *.rpt *.sym
+	-rm cache.xml
 	-rm -r $(TACLE_LOCAL)
 	-rm -rf tacle-bench
 
