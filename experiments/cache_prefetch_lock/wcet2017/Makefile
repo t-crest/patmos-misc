@@ -53,7 +53,7 @@ ALLALL=adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_upda
 
 # TODO: find a small set of benchmarks that execute relative quick
 # for playing with the scripts
-ALLAPPS?=adpcm_dec ludcmp binarysearch bsort
+ALLAPPS?=binarysearch bsort
 ALLAPPS?=$(ALLALL)
 
 SPMAIN=main
@@ -97,12 +97,15 @@ $(TACLE_LOCAL): $(TACLE)
 	cp -r $</bench/kernel/* $@
 	cp -r $</bench/sequential/* $@
 	cp -r $</bench/test/* $@
+# fix for sed incompatibility between GNU and BSD (Mac OS X)
+# Maybe we should write a few lines of Scala and stop using sed
+ifeq ($(TERM_PROGRAM),$(filter $(TERM_PROGRAM), Apple_Terminal iTerm.app))
+	./modmain.sh
+else
 	find $@ -name "*.c" -exec sed -i'.orig' -e \
-	   "/\(int\|void\)\s\+main/i__attribute__((noinline))" '{}' \+
+	  "/\(int\|void\)\s\+main/i__attribute__((noinline))" '{}' \+
+endif
 
-# the following does not work for all examples
-#	find $@ -name "*.c" -exec sed -i -e \
-#	  "s/^\(.*\)\(_Pragma\s*(\s*\"entrypoint\"\s*)\) /__attribute__((noinline)) \1/" '{}' \+
 
 
 ###############################################################################
@@ -147,7 +150,7 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 
 %.rpt: %.sym %.sptrace
 	#TODO  cache [+line] size
-	python ../mktables.py --rpt -e $^ > $@
+	python2 ../mktables.py --rpt -e $^ > $@
 
 
 # Extract the start addresses of the functions from the symbol table
