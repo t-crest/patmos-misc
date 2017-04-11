@@ -5,7 +5,7 @@
   <ExtMem size="2M" DevTypeRef="Sram16" />
 
   <bus burstLength="XML_BURSTLENGTH" writeCombine="false" />
-  <ICache type="XML_TYPE" size="XML_SIZE" assoc="XML_ASSOC" repl="fifo" />
+  <ICache type="XML_TYPE" size="XML_SIZE" assoc="XML_ASSOC" repl="XML_REPL" />
 
   <IOs>
 	<IO DevTypeRef="Uart" offset="8"/>

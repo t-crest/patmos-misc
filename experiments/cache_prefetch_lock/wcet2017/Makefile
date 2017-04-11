@@ -22,14 +22,8 @@ TACLE_LOCAL   = ./tacle-src-local
 # cache size / burst length setup
 XML_SIZE ?= 8192
 XML_BURSTLENGTH ?= 4
+XML_REPL ?= fifo
 
-
-# kernel benchmarks
-# binarysearch	countnegative	iir		matrix1		quicksort
-# bitcount	fac		insertsort	md5		recursion
-# bitonic		fft		jfdctint	minver		sha
-# bsort		filterbank	lms		pm		st
-# complex_updates	fir2dim		ludcmp		prime
 
 # bitcount, fft gives exit value of 1, broken on Patmos?
 # bsort, ludcmp are faster with SP, why?
@@ -49,7 +43,9 @@ ALLALL=adpcm_dec adpcm_enc ammunition anagram audiobeam binarysearch bitcount bi
 # simply too long: cjpeg_transupp, dijkstra, epic, filterbank, huff_enc, mpeg2, pm, quicksort, recursion, rijndael_dec, rijndael_enc, test3
 # compile error: susan
 
-ALLALL=adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
+# Single path with prefetch issue (on Mac): audiobeam
+
+ALLALL =adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
 
 # TODO: find a small set of benchmarks that execute relative quick
 # for playing with the scripts
@@ -68,15 +64,12 @@ CFLAGS = -O2 -g -Xllc -mpatmos-disable-vliw=false
 # -Xopt -disable-inlining
 
 
-.PHONY: all doall comp doit clean hello tacle-local
+.PHONY: all doall comp doit clean tacle-local
 
 all: doall
 
 FORCE:
 
-hello:
-	echo "Hello World"
-	ls $(TACLE)
 
 ###############################################################################
 # Get a local copy of the tacle-bench
@@ -113,7 +106,7 @@ patmos_emu_prefetch: $(APP).rpt pcache.xml
 
 
 patmos_emu_mc: XML_TYPE = method
-patmos_emu_mc: XML_ASSOC = 32
+patmos_emu_mc: XML_ASSOC = 16
 patmos_emu_mc: mcache.xml
 	cd $(T-CREST)/patmos && git checkout b99441ede979f4c
 	cp mcache.xml $(PATMOS_HWDIR)/config/
@@ -129,6 +122,16 @@ patmos_emu_ic: icache.xml
 	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=icache
 	cp $(PATMOS_HWDIR)/build/emulator $@
 
+# 2-way instruction cache not in master branch
+patmos_emu_lc: XML_TYPE = line
+patmos_emu_lc: XML_ASSOC = 2
+patmos_emu_lc: XML_REPL = lru
+patmos_emu_lc: lcache.xml
+	cd $(T-CREST)/patmos && git checkout icache_with_prefetcher
+	cp lcache.xml $(PATMOS_HWDIR)/config/
+	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=lcache
+	cp $(PATMOS_HWDIR)/build/emulator $@
+
 
 
 
@@ -138,6 +141,7 @@ patmos_emu_ic: icache.xml
 	  -e "s/XML_TYPE/$(XML_TYPE)/" \
 	  -e "s/XML_SIZE/$(XML_SIZE)/" \
 	  -e "s/XML_ASSOC/$(XML_ASSOC)/" \
+	  -e "s/XML_REPL/$(XML_REPL)/" \
 	  $< > $@
 
 
@@ -201,9 +205,10 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 .PHONY: report
 
 
-report: $(APP)_pc_sp.txt \
-  	$(APP)_ic_sp.txt $(APP)_ic_np.txt \
-  	$(APP)_mc_sp.txt $(APP)_mc_np.txt
+report: $(APP)_lc_sp.txt \
+	$(APP)_pc_sp.txt \
+	$(APP)_ic_sp.txt $(APP)_ic_np.txt \
+	$(APP)_mc_sp.txt $(APP)_mc_np.txt
 	cd $(T-CREST)/patmos; git checkout master
 
 # target-specific variables
@@ -224,6 +229,10 @@ $(APP)_ic_sp.txt: $(APP).nofs.sp.elf  patmos_emu_ic
 	echo "$(APP) $(LABEL)" >> $@
 	./patmos_emu_ic -p $< | grep exec_cycles >> $@
 
+$(APP)_lc_sp.txt: LABEL = lcache sp
+$(APP)_lc_sp.txt: $(APP).nofs.sp.elf  patmos_emu_lc
+	echo "$(APP) $(LABEL)" >> $@
+	./patmos_emu_lc -p $< | grep exec_cycles >> $@
 
 $(APP)_mc_np.txt: LABEL = mcache np
 $(APP)_mc_np.txt: $(APP).elf  patmos_emu_mc
