@@ -20,7 +20,7 @@ TACLE         = ./tacle-bench
 TACLE_LOCAL   = ./tacle-src-local
 
 # cache size / burst length setup
-XML_SIZE ?= 8k
+XML_SIZE ?= 8192
 XML_BURSTLENGTH ?= 4
 
 
@@ -53,7 +53,7 @@ ALLALL=adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_upda
 
 # TODO: find a small set of benchmarks that execute relative quick
 # for playing with the scripts
-ALLAPPS?=binarysearch bsort
+#ALLAPPS?=binarysearch bsort
 ALLAPPS?=$(ALLALL)
 
 SPMAIN=main
@@ -173,8 +173,10 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 #TRACE_CMD = patmos-emulator -r $< | awk '{ printf("%08x\n", $1) }'
 
 %.rpt: %.sym %.sptrace
-	#TODO  cache [+line] size
-	python2 ../mktables.py --rpt -e $^ > $@
+	python2 ../mktables.py --rpt -e \
+	  --size=$(shell dc -e "$(XML_BURSTLENGTH) 4 *p") \
+	  --line=$(shell dc -e "$(XML_SIZE) $(XML_BURSTLENGTH) /4/p") \
+	  $^ > $@
 
 
 # Extract the start addresses of the functions from the symbol table
@@ -203,6 +205,7 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 report: $(APP)_pc_sp.txt \
   	$(APP)_ic_sp.txt $(APP)_ic_np.txt \
   	$(APP)_mc_sp.txt $(APP)_mc_np.txt
+	cd $(T-CREST)/patmos; git checkout master
 
 # target-specific variables
 $(APP)_pc_sp.txt: LABEL = pcache sp
@@ -236,48 +239,6 @@ $(APP)_ic_np.txt: $(APP).nofs.elf  patmos_emu_ic
 
 ###############################################################################
 
-# pasim and emulator are off by about 300 clock cycles on binarysearch
-# Need to be looked at
-
-comp:
-	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
-	pasim -v a.elf 2> abc.txt
-	cat abc.txt | grep Cycles:
-	patmos-emulator -p a.elf | grep exec_cycles
-	patmos-clang $(CFLAGSSP) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
-	pasim -v a.elf 2> abc.txt
-	cat abc.txt | grep Cycles:
-	patmos-emulator -p a.elf | grep exec_cycles
-
-comp_normal:
-	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
-
-comp_sp:
-	patmos-clang $(CFLAGSSP) $(TACLE_LOCAL)/$(APP)/*.c -o a.elf
-
-doit:
-	cd $(T-CREST)/patmos; git checkout master; git checkout b99441ede979f4c
-	cp *.xml $(T-CREST)/patmos/hardware/config
-	cd $(T-CREST)/patmos; make clean emulator BOARD=mcache
-	make comp_normal
-	echo "$(APP) mcache np" > $(APP)_mc_np.txt
-	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_mc_np.txt
-	make comp_sp
-	echo "$(APP) mcache sp" > $(APP)_mc_sp.txt
-	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_mc_sp.txt
-	cd $(T-CREST)/patmos; make clean emulator BOARD=icache
-	make comp_normal
-	echo "$(APP) icache np" > $(APP)_ic_np.txt
-	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_ic_np.txt
-	make comp_sp
-	echo "$(APP) icache sp" > $(APP)_ic_sp.txt
-	$(T-CREST)/patmos/hardware/build/emulator -p a.elf | grep exec_cycles >> $(APP)_ic_sp.txt
-	$(MAKE) report-prefetch
-	cd $(T-CREST)/patmos; git checkout master
-
-
-
-###############################################################################
 
 doall: $(TACLE_LOCAL)
 	for P in $(ALLAPPS); do $(MAKE) report APP=$${P}; done;
