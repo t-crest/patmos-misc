@@ -53,7 +53,6 @@ ALLALL=adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_upda
 
 # TODO: find a small set of benchmarks that execute relative quick
 # for playing with the scripts
-ALLAPPS?=binarysearch bsort
 ALLAPPS?=$(ALLALL)
 
 SPMAIN=main
