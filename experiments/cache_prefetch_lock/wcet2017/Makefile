@@ -174,8 +174,8 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 
 %.rpt: %.sym %.sptrace
 	python2 ../mktables.py --rpt -e \
-	  --size=$(shell dc -e "$(XML_BURSTLENGTH) 4 *p") \
-	  --line=$(shell dc -e "$(XML_SIZE) $(XML_BURSTLENGTH) /4/p") \
+	  -s $(shell dc -e "$(XML_BURSTLENGTH) 4 *p") \
+	  -l $(shell dc -e "$(XML_SIZE) $(XML_BURSTLENGTH) /4/p") \
 	  $^ > $@
 
 
@@ -184,7 +184,6 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 %.sym: %.nofs.sp.elf
 	patmos-llvm-objdump -t $< | grep -E "^[0-9a-f]{8} [gl]\s+F\s+.text" | \
 	  awk '{print $$1, $$6}' | sort > $@
-
 
 # Generate a compressed instruction address trace
 %.trace.gz: %.nofs.sp.elf
