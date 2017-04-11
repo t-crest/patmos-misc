@@ -63,18 +63,16 @@ SPM=-mpatmos-singlepath=$(SPMAIN)
 # -mpatmos-disable-function-splitter as not needed in a normal I$
 # -mpatmos-method-cache-size=8192 maybe not
 
-CFLAGS= -O2 \
-        -mpatmos-max-subfunction-size=4096 -mpatmos-preferred-subfunction-size=1024 \
-        -Xllc -mpatmos-disable-vliw=false
+CFLAGS = -O2 -g -Xllc -mpatmos-disable-vliw=false
 # -Xllc -mpatmos-subfunction-align=32
 # -Xopt -disable-inlining
-# -mpatmos-disable-function-splitter
-CFLAGSSP= $(CFLAGS) $(SPM)
 
 
 .PHONY: all doall comp doit clean hello tacle-local
 
 all: doall
+
+FORCE:
 
 hello:
 	echo "Hello World"
@@ -97,32 +95,44 @@ $(TACLE_LOCAL): $(TACLE)
 	cp -r $</bench/kernel/* $@
 	cp -r $</bench/sequential/* $@
 	cp -r $</bench/test/* $@
-# fix for sed incompatibility between GNU and BSD (Mac OS X)
-# Maybe we should write a few lines of Scala and stop using sed
-ifeq ($(TERM_PROGRAM),$(filter $(TERM_PROGRAM), Apple_Terminal iTerm.app))
 	./modmain.sh
-else
-	find $@ -name "*.c" -exec sed -i'.orig' -e \
-	   "/\(int\|void\)\s\+main/i\
-	   __attribute__((noinline))" '{}' \+
-endif
 
 
 
 ###############################################################################
 # Hardware/Emulator
 #
-patmos_emu_ic_prefetch: XML_TYPE = prefetch
-patmos_emu_ic_prefetch: $(APP).rpt cache.xml
+patmos_emu_prefetch: XML_TYPE = prefetch
+patmos_emu_prefetch: XML_ASSOC = 1
+patmos_emu_prefetch: $(APP).rpt pcache.xml
 	cd $(T-CREST)/patmos && git checkout icache_with_prefetcher
-	cp cache.xml $(PATMOS_HWDIR)/config/cache_$(XML_TYPE).xml
+	cp pcache.xml $(PATMOS_HWDIR)/config/
 	cp $< $(PATMOS_HWDIR)/src/icache/rpt.txt
-	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=cache_$(XML_TYPE)
+	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=pcache
+	cp $(PATMOS_HWDIR)/build/emulator $@
+
+
+patmos_emu_mc: XML_TYPE = method
+patmos_emu_mc: XML_ASSOC = 32
+patmos_emu_mc: mcache.xml
+	cd $(T-CREST)/patmos && git checkout b99441ede979f4c
+	cp mcache.xml $(PATMOS_HWDIR)/config/
+	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=mcache
+	cp $(PATMOS_HWDIR)/build/emulator $@
+
+
+patmos_emu_ic: XML_TYPE = line
+patmos_emu_ic: XML_ASSOC = 1
+patmos_emu_ic: icache.xml
+	cd $(T-CREST)/patmos && git checkout b99441ede979f4c
+	cp icache.xml $(PATMOS_HWDIR)/config/
+	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=icache
 	cp $(PATMOS_HWDIR)/build/emulator $@
 
 
 
-cache.xml: template.xml
+
+%cache.xml: template.xml
 	sed \
 	  -e "s/XML_BURSTLENGTH/$(XML_BURSTLENGTH)/" \
 	  -e "s/XML_TYPE/$(XML_TYPE)/" \
@@ -135,10 +145,23 @@ cache.xml: template.xml
 # Compilation
 #
 
+$(APP).nofs.sp.elf: $(TACLE_LOCAL)
+	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o $@ \
+	  -mpatmos-disable-function-splitter \
+	  -mpatmos-singlepath=$(SPMAIN)
+
+$(APP).sp.elf: $(TACLE_LOCAL)
+	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o $@ \
+	  -mpatmos-max-subfunction-size=4096 -mpatmos-preferred-subfunction-size=1024 \
+	  -mpatmos-singlepath=$(SPMAIN)
+
+$(APP).nofs.elf: $(TACLE_LOCAL)
+	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o $@ \
+	  -mpatmos-disable-function-splitter
+
 $(APP).elf: $(TACLE_LOCAL)
-	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o $@
-
-
+	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o $@ \
+	  -mpatmos-max-subfunction-size=4096 -mpatmos-preferred-subfunction-size=1024
 
 ###############################################################################
 # Generation of the prefetch table
@@ -156,13 +179,13 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 
 # Extract the start addresses of the functions from the symbol table
 # (required for trace analysis)
-%.sym: %.elf
+%.sym: %.nofs.sp.elf
 	patmos-llvm-objdump -t $< | grep -E "^[0-9a-f]{8} [gl]\s+F\s+.text" | \
 	  awk '{print $$1, $$6}' | sort > $@
 
 
 # Generate a compressed instruction address trace
-%.trace.gz: %.elf
+%.trace.gz: %.nofs.sp.elf
 	$(TRACE_CMD) | gzip > $@
 
 
@@ -174,26 +197,42 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 
 ###############################################################################
 
-.PHONY: report-prefetch
+.PHONY: report
 
 
-report-prefetch: $(APP)_pc_sp.txt
+report: $(APP)_pc_sp.txt \
+  	$(APP)_ic_sp.txt $(APP)_ic_np.txt \
+  	$(APP)_mc_sp.txt $(APP)_mc_np.txt
 
 # target-specific variables
 $(APP)_pc_sp.txt: LABEL = pcache sp
-$(APP)_pc_sp.txt: XML_TYPE = prefetch
-$(APP)_pc_sp.txt: XML_ASSOC = 1
-$(APP)_pc_sp.txt: CFLAGS = \
-  -O2 -g \
-  -mpatmos-disable-function-splitter \
-  -Xllc -mpatmos-disable-vliw=false \
-  -mpatmos-singlepath=$(SPMAIN)
-
-
-$(APP)_pc_sp.txt: $(APP).elf  patmos_emu_ic_prefetch
+$(APP)_pc_sp.txt: $(APP).nofs.sp.elf  patmos_emu_prefetch
 	echo "$(APP) $(LABEL)" >> $@
-	./patmos_emu_ic_prefetch -p $< | grep exec_cycles >> $@
+	./patmos_emu_prefetch -p $< | grep exec_cycles >> $@
 
+
+$(APP)_mc_sp.txt: LABEL = mcache sp
+$(APP)_mc_sp.txt: $(APP).sp.elf  patmos_emu_mc
+	echo "$(APP) $(LABEL)" >> $@
+	./patmos_emu_mc -p $< | grep exec_cycles >> $@
+
+
+$(APP)_ic_sp.txt: LABEL = icache sp
+$(APP)_ic_sp.txt: $(APP).nofs.sp.elf  patmos_emu_ic
+	echo "$(APP) $(LABEL)" >> $@
+	./patmos_emu_ic -p $< | grep exec_cycles >> $@
+
+
+$(APP)_mc_np.txt: LABEL = mcache np
+$(APP)_mc_np.txt: $(APP).elf  patmos_emu_mc
+	echo "$(APP) $(LABEL)" >> $@
+	./patmos_emu_mc -p $< | grep exec_cycles >> $@
+
+
+$(APP)_ic_np.txt: LABEL = icache np
+$(APP)_ic_np.txt: $(APP).nofs.elf  patmos_emu_ic
+	echo "$(APP) $(LABEL)" >> $@
+	./patmos_emu_ic -p $< | grep exec_cycles >> $@
 
 ###############################################################################
 
@@ -241,7 +280,7 @@ doit:
 ###############################################################################
 
 doall: $(TACLE_LOCAL)
-	for P in $(ALLAPPS); do $(MAKE) doit APP=$${P}; done;
+	for P in $(ALLAPPS); do $(MAKE) report APP=$${P}; done;
 
 eval:
 	scala eval.scala > data.dat
@@ -252,8 +291,8 @@ latex:
 
 clean:
 	rm -f *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat *.rpt *.sym
-	rm -f cache.xml
-	rm -f patmos_emu_ic_prefetch
+	rm -f *cache.xml
+	rm -f patmos_emu_*
 	rm -rf $(TACLE_LOCAL)
 	rm -rf $(TACLE)
 
