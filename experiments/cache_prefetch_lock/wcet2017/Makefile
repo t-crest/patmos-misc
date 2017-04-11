@@ -43,9 +43,9 @@ ALLALL=adpcm_dec adpcm_enc ammunition anagram audiobeam binarysearch bitcount bi
 # simply too long: cjpeg_transupp, dijkstra, epic, filterbank, huff_enc, mpeg2, pm, quicksort, recursion, rijndael_dec, rijndael_enc, test3
 # compile error: susan
 
-# Single path with prefetch issue (on Mac): audiobeam
+# Single path (with prefetch issue) (on Mac): audiobeam
 
-ALLALL =adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
+ALLALL =adpcm_dec adpcm_enc binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
 
 # TODO: find a small set of benchmarks that execute relative quick
 # for playing with the scripts
