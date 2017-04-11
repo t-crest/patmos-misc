@@ -245,8 +245,6 @@ doall: $(TACLE_LOCAL)
 
 eval:
 	scala eval.scala > data.dat
-
-latex:
 	pdflatex -shell-escape genfig.tex
 	mv genfig-figure0.pdf example.pdf
 

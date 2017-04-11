@@ -60,13 +60,3 @@ compiler-rt: 187888708bd8532789b9a4e24935cf31c70c9024
 gold: cdde53177a57f6a7eccb0305089cbbf32c055509
 misc: TBD
 
-## Further Remarks
-
-Do we keep this?
-
-specify not inlining in benchmark main like:
-
-    void foo_main( void ) __attribute__ ((noinline));
-    void foo_main( void ) {
-    ...
-    }
