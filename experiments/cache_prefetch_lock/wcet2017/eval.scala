@@ -8,10 +8,10 @@ import scala.io.Source
 val log = args.length == 0
 
 val types = List("np", "sp")
-val cache = List("mcache", "icache", "pcache")
+val cache = List("mcache", "icache", "pcache", "lcache")
 
 val np = Map("mcache" -> mutable.Map[String, Int](), "icache" -> mutable.Map[String, Int](), "pref" -> mutable.Map[String, Int]())
-val sp = Map("mcache" -> mutable.Map[String, Int](), "icache" -> mutable.Map[String, Int](), "pcache" -> mutable.Map[String, Int]())
+val sp = Map("mcache" -> mutable.Map[String, Int](), "icache" -> mutable.Map[String, Int](), "pcache" -> mutable.Map[String, Int](), "lcache" -> mutable.Map[String, Int]())
 
 val all = Map("np" -> np, "sp" -> sp)
 

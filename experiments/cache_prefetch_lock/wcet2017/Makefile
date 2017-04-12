@@ -267,6 +267,9 @@ eval:
 	scala eval.scala sp mcache pcache > data.dat
 	pdflatex -shell-escape genfig.tex
 	mv genfig-figure0.pdf sp_mc_pc.pdf
+	scala eval.scala sp lcache icache > data.dat
+	pdflatex -shell-escape genfig.tex
+	mv genfig-figure0.pdf sp_lc_ic.pdf
 
 clean:
 	rm -f *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat *.rpt *.sym
