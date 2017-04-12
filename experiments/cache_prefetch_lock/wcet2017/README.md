@@ -56,9 +56,13 @@ You can explore the benchmarks on the head of the repositories.
 For reproducibility we provide the tags of the involved repositories:
 
 patmos: b99441ede979f4cc7c4ba736fd942927d696e9d6
+
 llvm: f529a1d62568f8165a9ca8b45260679f2c45ba18
+
 compiler-rt: 187888708bd8532789b9a4e24935cf31c70c9024
+
 gold: cdde53177a57f6a7eccb0305089cbbf32c055509
+
 misc: TBD
 
 ## Request for Help
