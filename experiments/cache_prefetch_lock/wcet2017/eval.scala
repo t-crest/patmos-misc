@@ -51,8 +51,8 @@ def printData(t: String, c1: String, c2: String) {
   println("sym y")
   val sortedBench = bench.toSeq.sorted
   for (b <- sortedBench) {
-    val v1 = all(t)("mcache")(b)
-    val v2 = all(t)("icache")(b)
+    val v1 = all(t)(c1)(b)
+    val v2 = all(t)(c2)(b)
     val fac = v2.toDouble / v1
     val n = b.flatMap { case '_' => "\\_" case c => s"$c" }
     println(n + " " + fac)

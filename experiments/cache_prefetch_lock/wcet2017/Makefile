@@ -259,9 +259,15 @@ doall: $(TACLE_LOCAL)
 	for P in $(ALLAPPS); do $(MAKE) report APP=$${P}; done;
 
 eval:
-	scala eval.scala > data.dat
+	scala eval.scala np mcache icache > data.dat
 	pdflatex -shell-escape genfig.tex
-	mv genfig-figure0.pdf example.pdf
+	mv genfig-figure0.pdf np_mc_ic.pdf
+	scala eval.scala sp mcache icache > data.dat
+	pdflatex -shell-escape genfig.tex
+	mv genfig-figure0.pdf sp_mc_ic.pdf
+	scala eval.scala sp mcache pcache > data.dat
+	pdflatex -shell-escape genfig.tex
+	mv genfig-figure0.pdf sp_mc_pc.pdf
 
 clean:
 	rm -f *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat *.rpt *.sym
