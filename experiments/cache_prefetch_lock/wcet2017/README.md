@@ -35,8 +35,8 @@ by setting `ALLAPPS` in the `Makefile` to just a few programs.
 
 The result of the benchmarks are several .txt files containing the
 execution time in clock cycles. The naming convention of the text
-files is: <app>_<cache>_<code> where <app> is the benchmark name,
-<cache> is the cache type (`ic` normal instruction cache, `mc`
+files is: *app*_*cache*_*code* where *app* is the benchmark name,
+*cache* is the cache type (`ic` normal instruction cache, `mc`
 method cache, `pc` instruction cache with prefetching, and 'lc'
 a 2-way set associative instruction cache with LRU replacement), and
 <code> the compilation type (`np` normal compilation, `sp`
