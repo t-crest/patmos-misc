@@ -44,8 +44,12 @@ ALLALL=adpcm_dec adpcm_enc ammunition anagram audiobeam binarysearch bitcount bi
 # compile error: susan
 
 # Single path (with prefetch issue) (on Mac): audiobeam
+# Issue probably with 2-way cache?: fir2dim
+# Takes too long: fft
+# Even simulation with pasim takes too long: fmref
 
-ALLALL =adpcm_dec adpcm_enc binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
+ALLALL=adpcm_dec adpcm_enc binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
+
 
 # TODO: find a small set of benchmarks that execute relative quick
 # for playing with the scripts
@@ -205,8 +209,8 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 .PHONY: report
 
 
-report: $(APP)_lc_sp.txt \
-	$(APP)_pc_sp.txt \
+report: $(APP)_pc_sp.txt \
+	$(APP)_lc_sp.txt \
 	$(APP)_ic_sp.txt $(APP)_ic_np.txt \
 	$(APP)_mc_sp.txt $(APP)_mc_np.txt
 	cd $(T-CREST)/patmos; git checkout master
