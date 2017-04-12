@@ -211,7 +211,6 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 
 report: $(APP)_pc_sp.txt \
 	$(APP)_lc_sp.txt \
-#	$(APP)_lc_np.txt \
 	$(APP)_ic_sp.txt $(APP)_ic_np.txt \
 	$(APP)_mc_sp.txt $(APP)_mc_np.txt
 	cd $(T-CREST)/patmos; git checkout master
