@@ -39,7 +39,7 @@ files is: *app*_*cache*_*code* where *app* is the benchmark name,
 *cache* is the cache type (`ic` normal instruction cache, `mc`
 method cache, `pc` instruction cache with prefetching, and 'lc'
 a 2-way set associative instruction cache with LRU replacement), and
-<code> the compilation type (`np` normal compilation, `sp`
+*code* the compilation type (`np` normal compilation, `sp`
 single path code generation).
 
 ### Makefile Targets
