@@ -211,6 +211,7 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 
 report: $(APP)_pc_sp.txt \
 	$(APP)_lc_sp.txt \
+#	$(APP)_lc_np.txt \
 	$(APP)_ic_sp.txt $(APP)_ic_np.txt \
 	$(APP)_mc_sp.txt $(APP)_mc_np.txt
 	cd $(T-CREST)/patmos; git checkout master
@@ -221,12 +222,10 @@ $(APP)_pc_sp.txt: $(APP).nofs.sp.elf  patmos_emu_prefetch
 	echo "$(APP) $(LABEL)" >> $@
 	./patmos_emu_prefetch -p $< | grep exec_cycles >> $@
 
-
 $(APP)_mc_sp.txt: LABEL = mcache sp
 $(APP)_mc_sp.txt: $(APP).sp.elf  patmos_emu_mc
 	echo "$(APP) $(LABEL)" >> $@
 	./patmos_emu_mc -p $< | grep exec_cycles >> $@
-
 
 $(APP)_ic_sp.txt: LABEL = icache sp
 $(APP)_ic_sp.txt: $(APP).nofs.sp.elf  patmos_emu_ic
@@ -243,11 +242,15 @@ $(APP)_mc_np.txt: $(APP).elf  patmos_emu_mc
 	echo "$(APP) $(LABEL)" >> $@
 	./patmos_emu_mc -p $< | grep exec_cycles >> $@
 
-
 $(APP)_ic_np.txt: LABEL = icache np
 $(APP)_ic_np.txt: $(APP).nofs.elf  patmos_emu_ic
 	echo "$(APP) $(LABEL)" >> $@
 	./patmos_emu_ic -p $< | grep exec_cycles >> $@
+
+$(APP)_lc_np.txt: LABEL = lcache np
+$(APP)_lc_np.txt: $(APP).nofs.elf  patmos_emu_lc
+	echo "$(APP) $(LABEL)" >> $@
+	./patmos_emu_lc -p $< | grep exec_cycles >> $@
 
 ###############################################################################
 

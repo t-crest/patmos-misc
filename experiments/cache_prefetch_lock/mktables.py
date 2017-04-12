@@ -133,13 +133,13 @@ class RPTCreator(TableCreator):
         blocks = self.dyn_blocks(loop.head, loop.tail, inner_functions)
         # add one block past return instruction of every inner function to
         # the set
-        print >>sys.stderr, "dynamic memory blocks of loop", blocks
+        #print >>sys.stderr, "dynamic memory blocks of loop", blocks
         blocks.update(self.tagof(f.exit) + 1 for f in inner_functions)
-        print >>sys.stderr, "inner functions", inner_functions
-        print >>sys.stderr, "with additional function blocks added", blocks
+        #print >>sys.stderr, "inner functions", inner_functions
+        #print >>sys.stderr, "with additional function blocks added", blocks
         # map to cache lines
         cnt = Counter([b % self.cache_size for b in blocks])
-        print >>sys.stderr, "mapping to cache lines", cnt
+        #print >>sys.stderr, "mapping to cache lines", cnt
         return any(c > 1 for c in cnt.values())
 
     def _initial_fill(self):
@@ -370,7 +370,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--size", type=int, default=16,
                         help="Size of a cache line in bytes."\
                         " (default: %(default)d)")
-    parser.add_argument("-l", "--lines", type=int, default=2048,
+    parser.add_argument("-l", "--lines", type=int, default=512,
                         help="Number of cache lines. (default: %(default)d)")
     parser.add_argument("--rpt", action="store_true",
                         help="Generate RPT table.")
@@ -399,7 +399,7 @@ if __name__ == "__main__":
     if args.rpt:
         RPTC = RPTCreator(TA, tagof, args.lines)
         RPTC.dump(args.encoded)
-        RPTC.save(args.trace + ".rpt")
+        #RPTC.save(args.trace + ".rpt")
 
     if args.lock:
         LTC = LockTableCreator(TA, tagof, args.lines)
