@@ -127,7 +127,7 @@ patmos_emu_lc: XML_TYPE = line
 patmos_emu_lc: XML_ASSOC = 2
 patmos_emu_lc: XML_REPL = lru
 patmos_emu_lc: lcache.xml
-	cd $(T-CREST)/patmos && git checkout b99441ede979f4c
+	cd $(T-CREST)/patmos && git checkout icache_with_prefetcher
 	cp lcache.xml $(PATMOS_HWDIR)/config/
 	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=lcache
 	cp $(PATMOS_HWDIR)/build/emulator $@
