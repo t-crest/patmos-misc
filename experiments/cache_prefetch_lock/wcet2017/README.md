@@ -31,13 +31,14 @@ A simple `make` will download the
 [TACLe Benchmarks](https://github.com/tacle/tacle-bench)
 and compile and run most of them. This will take several hours.
 Therefore, for first experiments restrict the number of benchmarks
-by setting `ALLAPPS` in the `Makefile` to a few programs.
+by setting `ALLAPPS` in the `Makefile` to just a few programs.
 
 The result of the benchmarks are several .txt files containing the
 execution time in clock cycles. The naming convention of the text
 files is: <app>_<cache>_<code> where <app> is the benchmark name,
 <cache> is the cache type (`ic` normal instruction cache, `mc`
-method cache, and `pc` instruction cache with prefetching), and
+method cache, `pc` instruction cache with prefetching, and 'lc'
+a 2-way set associative instruction cache with LRU replacement), and
 <code> the compilation type (`np` normal compilation, `sp`
 single path code generation).
 
@@ -59,4 +60,10 @@ llvm: f529a1d62568f8165a9ca8b45260679f2c45ba18
 compiler-rt: 187888708bd8532789b9a4e24935cf31c70c9024
 gold: cdde53177a57f6a7eccb0305089cbbf32c055509
 misc: TBD
+
+## Request for Help
+
+If you encounter any build or reproduction issues you have three options
+to notify us (seek for help): (1) open an issue on GitHub, (2) ask on the
+Patmos mailing list, or (3) send an email to martin@jopdesign.com.
 
