@@ -37,7 +37,7 @@ The result of the benchmarks are several .txt files containing the
 execution time in clock cycles. The naming convention of the text
 files is: *app*_*cache*_*code* where *app* is the benchmark name,
 *cache* is the cache type (`ic` normal instruction cache, `mc`
-method cache, `pc` instruction cache with prefetching, and 'lc'
+method cache, `pc` instruction cache with prefetching, and `lc`
 a 2-way set associative instruction cache with LRU replacement), and
 *code* the compilation type (`np` normal compilation, `sp`
 single path code generation).
@@ -63,7 +63,7 @@ compiler-rt: 187888708bd8532789b9a4e24935cf31c70c9024
 
 gold: cdde53177a57f6a7eccb0305089cbbf32c055509
 
-misc: TBD
+misc: 59d60d310f87d8fe8a021e716040d882b6712cd7
 
 ## Request for Help
 
