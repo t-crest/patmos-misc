@@ -48,10 +48,11 @@ ALLALL=adpcm_dec adpcm_enc ammunition anagram audiobeam binarysearch bitcount bi
 # Takes too long: fft
 # Even simulation with pasim takes too long: fmref
 
-ALLALL=adpcm_dec adpcm_enc binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
-
-# following used for eval
+# following used for eval (under Ubuntu)
 ALLALL =adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
+
+# following used on the Mac
+ALLALL=adpcm_dec adpcm_enc binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
 
 # TODO: find a small set of benchmarks that execute relative quick
 # for playing with the scripts
@@ -280,9 +281,14 @@ clean:
 	rm -f patmos_emu_*
 	rm -rf $(TACLE_LOCAL)
 	# don't need to delete the tacle-bench repo
-	#rm -rf $(TACLE)
+	# But MS wants to clean all stuff
+	rm -rf $(TACLE)
 
 PAPER?=$(HOME)/paper/tcapapers/2017/spcaching
+
+rm_outliner:
+	rm ludcmp*.txt
+	rm minver*.txt
 
 ms_copy:
 	cp *.pdf $(PAPER)
