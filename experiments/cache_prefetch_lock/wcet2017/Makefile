@@ -50,6 +50,8 @@ ALLALL=adpcm_dec adpcm_enc ammunition anagram audiobeam binarysearch bitcount bi
 
 ALLALL=adpcm_dec adpcm_enc binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
 
+# following used for eval
+ALLALL =adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
 
 # TODO: find a small set of benchmarks that execute relative quick
 # for playing with the scripts
@@ -83,6 +85,7 @@ tacle-local: $(TACLE_LOCAL)
 
 $(TACLE):
 	-git clone https://github.com/tacle/tacle-bench.git $@
+	cd $@ && git checkout fcabf4630cb239f34f37a03ce7d93c563b65c897
 
 # create a local copy of the tacle source directory and
 # mark all main() as noinline
@@ -99,9 +102,9 @@ $(TACLE_LOCAL): $(TACLE)
 ###############################################################################
 # Hardware/Emulator
 #
-patmos_emu_prefetch: XML_TYPE = prefetch
-patmos_emu_prefetch: XML_ASSOC = 1
-patmos_emu_prefetch: $(APP).rpt pcache.xml
+patmos_emu_prefetch.$(APP): XML_TYPE = prefetch
+patmos_emu_prefetch.$(APP): XML_ASSOC = 1
+patmos_emu_prefetch.$(APP): $(APP).rpt pcache.xml
 	cd $(T-CREST)/patmos && git checkout icache_with_prefetcher
 	cp pcache.xml $(PATMOS_HWDIR)/config/
 	cp $< $(PATMOS_HWDIR)/src/icache/rpt.txt
@@ -210,16 +213,16 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 
 
 report: $(APP)_pc_sp.txt \
-	$(APP)_lc_sp.txt \
 	$(APP)_ic_sp.txt $(APP)_ic_np.txt \
+	$(APP)_lc_sp.txt \
 	$(APP)_mc_sp.txt $(APP)_mc_np.txt
 	cd $(T-CREST)/patmos; git checkout master
 
 # target-specific variables
 $(APP)_pc_sp.txt: LABEL = pcache sp
-$(APP)_pc_sp.txt: $(APP).nofs.sp.elf  patmos_emu_prefetch
+$(APP)_pc_sp.txt: $(APP).nofs.sp.elf  patmos_emu_prefetch.$(APP)
 	echo "$(APP) $(LABEL)" >> $@
-	./patmos_emu_prefetch -p $< | grep exec_cycles >> $@
+	./patmos_emu_prefetch.$(APP) -p $< | grep exec_cycles >> $@
 
 $(APP)_mc_sp.txt: LABEL = mcache sp
 $(APP)_mc_sp.txt: $(APP).sp.elf  patmos_emu_mc
@@ -276,7 +279,8 @@ clean:
 	rm -f *cache.xml
 	rm -f patmos_emu_*
 	rm -rf $(TACLE_LOCAL)
-	rm -rf $(TACLE)
+	# don't need to delete the tacle-bench repo
+	#rm -rf $(TACLE)
 
 PAPER?=$(HOME)/paper/tcapapers/2017/spcaching
 
