@@ -44,7 +44,13 @@ ALLALL=adpcm_dec adpcm_enc ammunition anagram audiobeam binarysearch bitcount bi
 # compile error: susan
 
 # Single path (with prefetch issue) (on Mac): audiobeam
+# Issue probably with 2-way cache?: fir2dim
+# Takes too long: fft
+# Even simulation with pasim takes too long: fmref
 
+ALLALL=adpcm_dec adpcm_enc binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
+
+# following used for eval
 ALLALL =adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
 
 # TODO: find a small set of benchmarks that execute relative quick
@@ -255,9 +261,18 @@ doall: $(TACLE_LOCAL)
 	for P in $(ALLAPPS); do $(MAKE) report APP=$${P}; done;
 
 eval:
-	scala eval.scala > data.dat
+	scala eval.scala np mcache icache > data.dat
 	pdflatex -shell-escape genfig.tex
-	mv genfig-figure0.pdf example.pdf
+	mv genfig-figure0.pdf np_mc_ic.pdf
+	scala eval.scala sp mcache icache > data.dat
+	pdflatex -shell-escape genfig.tex
+	mv genfig-figure0.pdf sp_mc_ic.pdf
+	scala eval.scala sp mcache pcache > data.dat
+	pdflatex -shell-escape genfig.tex
+	mv genfig-figure0.pdf sp_mc_pc.pdf
+	scala eval.scala sp lcache icache > data.dat
+	pdflatex -shell-escape genfig.tex
+	mv genfig-figure0.pdf sp_lc_ic.pdf
 
 clean:
 	rm -f *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat *.rpt *.sym

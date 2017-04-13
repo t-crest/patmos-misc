@@ -5,14 +5,13 @@ import java.io._
 import scala.collection.mutable
 import scala.io.Source
 
-// TODO make it dependent on args
-val log = false
+val log = args.length == 0
 
 val types = List("np", "sp")
-val cache = List("mcache", "icache", "pcache")
+val cache = List("mcache", "icache", "pcache", "lcache")
 
 val np = Map("mcache" -> mutable.Map[String, Int](), "icache" -> mutable.Map[String, Int](), "pref" -> mutable.Map[String, Int]())
-val sp = Map("mcache" -> mutable.Map[String, Int](), "icache" -> mutable.Map[String, Int](), "pcache" -> mutable.Map[String, Int]())
+val sp = Map("mcache" -> mutable.Map[String, Int](), "icache" -> mutable.Map[String, Int](), "pcache" -> mutable.Map[String, Int](), "lcache" -> mutable.Map[String, Int]())
 
 val all = Map("np" -> np, "sp" -> sp)
 
@@ -37,7 +36,8 @@ if (log) println(bench)
 
 def printStat(t: String) {
   println("Results for " + t + ": mcache icache")
-  for (b <- bench) {
+  val sortedBench = bench.toSeq.sorted
+  for (b <- sortedBench) {
     val v1 = all(t)("mcache")(b)
     val v2 = all(t)("icache")(b)
     val fac = v2.toDouble / v1
@@ -46,19 +46,19 @@ def printStat(t: String) {
 }
 
 
-def printData(t: String) {
+// execution time in cycles therefore v2/v1 normalizes to v2
+def printData(t: String, c1: String, c2: String) {
   println("sym y")
   val sortedBench = bench.toSeq.sorted
   for (b <- sortedBench) {
-    val v1 = all(t)("mcache")(b)
-    val v2 = all(t)("icache")(b)
+    val v1 = all(t)(c1)(b)
+    val v2 = all(t)(c2)(b)
     val fac = v2.toDouble / v1
     val n = b.flatMap { case '_' => "\\_" case c => s"$c" }
     println(n + " " + fac)
   }
 }
 
-// TODO use args and dependent on args just spill out stats or the right data
 if (log) types.map{ t => printStat(t) }
 
-printData("np")
+if (!log) printData(args(0), args(1), args(2))
