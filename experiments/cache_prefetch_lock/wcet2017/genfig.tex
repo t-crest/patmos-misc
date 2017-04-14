@@ -37,12 +37,13 @@ p3 96
   ybar,
 %  title=Bar chart,
   width=14cm,
-  height=6cm,
+  height=5cm,
   bar width=2mm,
   ylabel={Relative performance},
   xticklabels from table={\mypoints}{sym},
   xtick=data,
   xticklabel style={font=\footnotesize, rotate=50, anchor=east},
+  ymin=0,
 ]
 \addplot table [x expr=\coordindex] {\mypoints};
 \end{axis}

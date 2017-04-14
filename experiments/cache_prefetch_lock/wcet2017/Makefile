@@ -284,6 +284,8 @@ clean:
 	# But MS wants to clean all stuff
 	rm -rf $(TACLE)
 
+# MS privat targets to simplify life
+
 PAPER?=$(HOME)/paper/tcapapers/2017/spcaching
 
 rm_outliner:
@@ -293,5 +295,12 @@ rm_outliner:
 ms_copy:
 	cp *.pdf $(PAPER)
 
-
+ms_nofs:
+	cp actual_nofs/*.txt .
+	make rm_outliner
+	rm gsm_encode_mc_sp.txt
+	make eval
+	mv sp_mc_ic.pdf sp_mc_ic_nofs.pdf
+	mv sp_mc_pc.pdf sp_mc_pc_nofs.pdf
+	cp *nofs.pdf $(PAPER)
 
