@@ -6,6 +6,6 @@ cd $HOME/t-crest-test
 git clone https://github.com/t-crest/patmos-misc.git misc
 # rest is done in regtest
 echo Testing T-CREST > result.txt
-./misc/regtest.sh
+# ./misc/regtest.sh
 RECIPIENTS=`cat $HOME/t-crest-test/misc/recipients.txt`
-mail -s "[T-CREST] Build report `date`" ${RECIPIENTS} < $HOME/t-crest-test/result.txt
+mail -s "[T-CREST] Build report `date` on ${HOSTNAME}" ${RECIPIENTS} < $HOME/t-crest-test/result.txt
