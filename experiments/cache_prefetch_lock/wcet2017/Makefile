@@ -284,7 +284,7 @@ clean:
 	# But MS wants to clean all stuff
 	rm -rf $(TACLE)
 
-# MS privat targets to simplify life
+# MS private targets to simplify life
 
 PAPER?=$(HOME)/paper/tcapapers/2017/spcaching
 
