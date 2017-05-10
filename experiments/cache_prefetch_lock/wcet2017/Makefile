@@ -56,7 +56,7 @@ ALLALL=adpcm_dec adpcm_enc binarysearch bsort cjpeg_wrbmp complex_updates countn
 
 # TODO: find a small set of benchmarks that execute relative quick
 # for playing with the scripts
-#ALLAPPS?=binarysearch bsort
+#ALLAPPS?=adpcm_dec binarysearch complex_updates cover h264_dec
 ALLAPPS?=$(ALLALL)
 
 SPMAIN=main
@@ -156,6 +156,10 @@ patmos_emu_lc: lcache.xml
 ###############################################################################
 # Compilation
 #
+# MS: why do there exist 3 function splitter parameters for actually just
+# two useful values: max and preferred? Which one are used and how?
+
+MSIZE=$(XML_SIZE)
 
 $(APP).nofs.sp.elf: $(TACLE_LOCAL)
 	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o $@ \
@@ -164,7 +168,9 @@ $(APP).nofs.sp.elf: $(TACLE_LOCAL)
 
 $(APP).sp.elf: $(TACLE_LOCAL)
 	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o $@ \
-	  -mpatmos-max-subfunction-size=4096 -mpatmos-preferred-subfunction-size=1024 \
+	  -mpatmos-max-subfunction-size=$(MSIZE) \
+	  -mpatmos-preferred-subfunction-size=$(MSIZE) \
+	  -mpatmos-method-cache-size=$(MSIZE) \
 	  -mpatmos-singlepath=$(SPMAIN)
 
 $(APP).nofs.elf: $(TACLE_LOCAL)
@@ -173,7 +179,9 @@ $(APP).nofs.elf: $(TACLE_LOCAL)
 
 $(APP).elf: $(TACLE_LOCAL)
 	patmos-clang $(CFLAGS) $(TACLE_LOCAL)/$(APP)/*.c -o $@ \
-	  -mpatmos-max-subfunction-size=4096 -mpatmos-preferred-subfunction-size=1024
+	  -mpatmos-max-subfunction-size=$(MSIZE) \
+	  -mpatmos-preferred-subfunction-size=$(MSIZE) \
+	  -mpatmos-method-cache-size=$(MSIZE)
 
 ###############################################################################
 # Generation of the prefetch table
@@ -213,10 +221,13 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 .PHONY: report
 
 
-report: $(APP)_pc_sp.txt \
-	$(APP)_ic_sp.txt $(APP)_ic_np.txt \
-	$(APP)_lc_sp.txt \
-	$(APP)_mc_sp.txt $(APP)_mc_np.txt
+report: $(APP)_mc_sp.txt \
+	$(APP)_ic_sp.txt \
+	$(APP)_mc_np.txt \
+	$(APP)_pc_sp.txt \
+	$(APP)_ic_np.txt \
+	$(APP)_lc_sp.txt
+	
 	cd $(T-CREST)/patmos; git checkout master
 
 # target-specific variables
