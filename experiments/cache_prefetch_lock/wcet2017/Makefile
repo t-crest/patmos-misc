@@ -26,9 +26,7 @@ XML_REPL ?= fifo
 
 
 # bitcount, fft gives exit value of 1, broken on Patmos?
-# bsort, ludcmp are faster with SP, why?
-#   because I missed disable-inlining
-# minver mit SP code gibt exit != 0
+# minver with SP code gives exit != 0
 
 
 APP?=ludcmp
@@ -53,7 +51,7 @@ ALLALL =adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_upd
 
 # Trouble with: gsm_encode
 # following used on the Mac
-ALLALL=adpcm_dec adpcm_enc binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac g723_enc gsm_dec h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
+ALLALL=adpcm_dec adpcm_enc binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac g723_enc gsm_dec h264_dec huff_dec iir insertsort jfdctint lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
 
 # TODO: find a small set of benchmarks that execute relative quick
 # for playing with the scripts
@@ -64,13 +62,7 @@ SPMAIN=main
 #SPMAIN=$(APP)_main
 SPM=-mpatmos-singlepath=$(SPMAIN)
 
-# -mpatmos-disable-function-splitter as not needed in a normal I$
-# -mpatmos-method-cache-size=8192 maybe not
-
 CFLAGS = -O2 -g -Xllc -mpatmos-disable-vliw=false
-# -Xllc -mpatmos-subfunction-align=32
-# -Xopt -disable-inlining
-
 
 .PHONY: all doall comp doit clean tacle-local
 
@@ -117,7 +109,7 @@ patmos_emu_prefetch.$(APP): $(APP).rpt pcache.xml
 patmos_emu_mc: XML_TYPE = method
 patmos_emu_mc: XML_ASSOC = 16
 patmos_emu_mc: mcache.xml
-	cd $(T-CREST)/patmos && git checkout b99441ede979f4c
+	cd $(T-CREST)/patmos && git checkout a173b6de37195f7a1096cc8c9a10936ad5f1ca75
 	cp mcache.xml $(PATMOS_HWDIR)/config/
 	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=mcache
 	cp $(PATMOS_HWDIR)/build/emulator $@
@@ -126,7 +118,7 @@ patmos_emu_mc: mcache.xml
 patmos_emu_ic: XML_TYPE = line
 patmos_emu_ic: XML_ASSOC = 1
 patmos_emu_ic: icache.xml
-	cd $(T-CREST)/patmos && git checkout b99441ede979f4c
+	cd $(T-CREST)/patmos && git checkout a173b6de37195f7a1096cc8c9a10936ad5f1ca75
 	cp icache.xml $(PATMOS_HWDIR)/config/
 	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=icache
 	cp $(PATMOS_HWDIR)/build/emulator $@
@@ -228,7 +220,6 @@ report: $(APP)_mc_sp.txt \
 	$(APP)_pc_sp.txt \
 	$(APP)_ic_np.txt \
 	$(APP)_lc_sp.txt
-	
 	cd $(T-CREST)/patmos; git checkout master
 
 # target-specific variables
@@ -304,9 +295,13 @@ rm_outliner:
 	rm ludcmp*.txt
 	rm minver*.txt
 
+sizes:
+	for x in *.elf ; do echo $$x $$(./calc_size.sh $$x) ; done > sizes.txt
+
 ms_copy:
 	cp *.pdf $(PAPER)
 
+# this should go - we do not need nofs values anymore
 ms_nofs:
 	cp actual_nofs/*.txt .
 	make rm_outliner
