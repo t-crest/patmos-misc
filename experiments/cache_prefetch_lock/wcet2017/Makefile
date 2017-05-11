@@ -279,7 +279,7 @@ eval:
 	mv genfig-figure0.pdf sp_lc_ic.pdf
 
 clean:
-	rm -f *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat *.rpt *.sym
+	rm -f *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat *.rpt *.sym *.sizes
 	rm -f *cache.xml
 	rm -f patmos_emu_*
 	rm -rf $(TACLE_LOCAL)
