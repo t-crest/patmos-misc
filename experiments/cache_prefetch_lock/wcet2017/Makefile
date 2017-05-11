@@ -51,8 +51,9 @@ ALLALL=adpcm_dec adpcm_enc ammunition anagram audiobeam binarysearch bitcount bi
 # following used for eval (under Ubuntu)
 ALLALL =adpcm_dec adpcm_enc audiobeam binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac fft fir2dim fmref g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
 
+# Trouble with: gsm_encode
 # following used on the Mac
-ALLALL=adpcm_dec adpcm_enc binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac g723_enc gsm_dec gsm_encode h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
+ALLALL=adpcm_dec adpcm_enc binarysearch bsort cjpeg_wrbmp complex_updates countnegative cover duff fac g723_enc gsm_dec h264_dec huff_dec iir insertsort jfdctint kernells lift lms ludcmp matrix1 md5 minver  ndes petrinet powerwindow prime sha st statemate
 
 # TODO: find a small set of benchmarks that execute relative quick
 # for playing with the scripts
