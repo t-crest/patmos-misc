@@ -25,7 +25,7 @@ join \
     grep -E "^[0-9a-f]{8} [gl]\s+F\s+.text" |\
     gawk '{print $6, strtonum("0x" $5)}' | sort -k 1b,1) |\
 tee "${OUTFILE}" |\
-grep -vE "__call_exitprocs|exit|_exit|__fini|__init|__initreent|_malloc_r|memset|__register_exitproc|_start|__start" |\
+grep -vwE "__call_exitprocs|exit|_exit|__fini|__init|__initreent|_malloc_r|memset|__register_exitproc|_start|__start" |\
 if ! awk '{
        if ($2 > '${CACHE_SIZE}') {flag = 1}
        { total += $2 }
