@@ -50,13 +50,16 @@ def printStat(t: String) {
 def printData(t: String, c1: String, c2: String) {
   println("sym y")
   val sortedBench = bench.toSeq.sorted
+  var geoMean: Double = 1
   for (b <- sortedBench) {
     val v1 = all(t)(c1)(b)
     val v2 = all(t)(c2)(b)
     val fac = v2.toDouble / v1
     val n = b.flatMap { case '_' => "\\_" case c => s"$c" }
     println(n + " " + fac)
+    geoMean = geoMean * fac
   }
+  // println("geom. mean: " + scala.math.pow(geoMean,1./sortedBench.size))
 }
 
 if (log) types.map{ t => printStat(t) }

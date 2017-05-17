@@ -300,14 +300,3 @@ sizes:
 
 ms_copy:
 	cp *.pdf $(PAPER)
-
-# this should go - we do not need nofs values anymore
-ms_nofs:
-	cp actual_nofs/*.txt .
-	make rm_outliner
-	rm gsm_encode_mc_sp.txt
-	make eval
-	mv sp_mc_ic.pdf sp_mc_ic_nofs.pdf
-	mv sp_mc_pc.pdf sp_mc_pc_nofs.pdf
-	cp *nofs.pdf $(PAPER)
-
