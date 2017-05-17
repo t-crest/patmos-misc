@@ -2,7 +2,8 @@
 
 This folder contains information and scripts to run the evaluation experiments
 for the paper "Best Practice for Caching of Single-Path Code",
-submitted to WCET 2017.
+Martin Schoeberl, Bekim Cilku, Daniel Prokesch, and Peter Puschner,
+accepted for WCET 2017.
 
 ## Prerequisites: T-CREST
 
@@ -55,15 +56,17 @@ single-path code generation).
 You can explore the benchmarks on the head of the repositories.
 For reproducibility we provide the tags of the involved repositories:
 
-patmos: b99441ede979f4cc7c4ba736fd942927d696e9d6
+tacle-bench: fcabf4630cb239f34f37a03ce7d93c563b65c897
 
-llvm: f529a1d62568f8165a9ca8b45260679f2c45ba18
+patmos: a173b6de37195f7a1096cc8c9a10936ad5f1ca75
+
+llvm: 01543c10ddabcfa635572f3ddfaa01f180dd8a89
 
 compiler-rt: 187888708bd8532789b9a4e24935cf31c70c9024
 
 gold: cdde53177a57f6a7eccb0305089cbbf32c055509
 
-misc: a43c9db4d46aec6b53ff4fcd03809e6b1b267e08
+misc: a9a0c60d69a967a872b0f61c0421ae3ec93fa89c
 
 ## Request for Help
 
