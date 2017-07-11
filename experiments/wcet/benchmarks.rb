@@ -3,7 +3,7 @@
 #
 benchfilter_from_arg()
 builds = %w{O1f} # {O0 O1 O1f O2}
-configs = %w{notrace} #  {blockglobal blocklocal minimal notrace}
+configs = %w{blockglobal blocklocal minimal notrace}
 $benchmarks = mrtc_benchmarks.select { |b|
   if b['irreducible'] || b['recursive']
     false

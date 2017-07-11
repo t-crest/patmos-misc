@@ -59,6 +59,7 @@ config.options.trace_analysis = false
 config.options.use_trace_facts = false
 # config.options.compute_criticalities = true
 config.options.disable_ait = true
+config.options.compare_trace_facts = true
 
 # run benchmarks
 build_and_run(config, BenchTool)

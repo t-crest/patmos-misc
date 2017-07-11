@@ -11,7 +11,7 @@ SHELL=/bin/bash
 CC = patmos-clang -mpatmos-method-cache-size=8192 \
      	-mpatmos-stack-cache-block-size=4 -mpatmos-stack-cache-size=1024 \
 	-mpatmos-disable-function-splitter -mpatmos-disable-vliw \
-	-Xllc -mpatmos-block-align=8
+	-Xllc -mpatmos-basicblock-align=8
 
 CFLAGS = -g -O2
 PASIM = pasim -G0 -m8M --gsize=32M
