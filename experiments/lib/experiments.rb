@@ -128,7 +128,9 @@ class BenchmarkTool
     errors = 0
     collect_build_settings.each do |build_setting, benchmark_list|
       configure(build_setting)
-      errors += Parallel.map(benchmark_list, :in_processes => nproc) { |benchmark|
+      # FIXME parallel library has changed...
+      #errors += Parallel.map(benchmark_list, :in_processes => nproc) { |benchmark|
+      errors += benchmark_list.map { |benchmark|
 
         # benchmark options
         options = @config.options.dup
@@ -146,7 +148,6 @@ class BenchmarkTool
         # For all analysis targets and all analysis configurations
         errors = 0
         benchmark['analyses'].each do |configuration|
-
           options.outdir   = File.join(@config.workdir, "#{benchmark['name']}.#{build_setting['name']}.#{configuration['name']}")
           options.output = File.join(options.outdir,"#{benchmark['name']}.pml")
           options.report=File.join(options.outdir, "report.yml")
@@ -165,7 +166,7 @@ class BenchmarkTool
             options.use_trace_facts = false
             options.runcheck = false
           else
-            options.trace_file = File.join(@config.tracedir || @config.workdir, "#{benchmark['name']}.#{build_setting['name']}.#{configuration['trace_entry']}.tar.gz")
+            options.trace_file = File.join(@config.tracedir || @config.workdir, "#{benchmark['name']}.#{build_setting['name']}.#{configuration['trace_entry']}.gz")
             options.trace_entry =  configuration['trace_entry']
             options.recorders = RecorderSpecification.parse(configuration['recorders'] || 'g:cil', 0)
             generate_trace(options, benchmark)
@@ -253,7 +254,7 @@ private
         build_msg_opts)
     else
       log("##{benchmark['index']} Generating Trace File #{options.trace_file}", build_msg_opts)
-      run("#{options.pasim} `platin tool-config -t simulator -i #{@config.pml_config_file}` --flush-caches=#{options.analysis_entry} --debug 0 --debug-fmt trace -b #{options.binary_file} 2>&1 1>/dev/null | " +
+      run("#{options.pasim} `platin tool-config -t pasim -i #{@config.pml_config_file}` --flush-caches=#{options.analysis_entry} --debug 0 --debug-fmt trace -b #{options.binary_file} 2>&1 1>/dev/null | " +
           "#{options.gzip} > #{options.trace_file}", :log => @build_log, :log_stderr => true, :log_append => true)
     end
   end

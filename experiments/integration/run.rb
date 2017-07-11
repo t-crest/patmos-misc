@@ -36,7 +36,7 @@ class BenchTool < WcetTool
   def add_timing_info(name, dict, tool = "aiT")
     origin = [name,tool].compact.join("/")
     entry = pml.timing.by_origin(origin)
-    assert("No unique timing entry for origin #{origin}") { entry.length == 1 }
+    assert("No unique timing entry for origin #{origin}") { entry != nil and entry.length == 1 }
     additional_report_info[origin] = dict
   end
   def run_analysis
