@@ -19,15 +19,14 @@ machine-configuration:
       write-transfer-time: 0
   caches:
     - name: "method-cache"
-      block-size: 64
-      associativity: 32
-      #size: 2048
-      size: 4096
+      block-size: 32
+      associativity: 8
+      size: 256
       policy: "fifo"
       type: "method-cache"
     - name: "stack-cache"
       block-size: 4
-      size: 2048
+      size: 16
       type: "stack-cache"
   memory-areas:
     - name: "code"
