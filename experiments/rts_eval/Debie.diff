@@ -1,0 +1,26 @@
+diff --git a/Debie1-e/code/harness/harness.c b/Debie1-e/code/harness/harness.c
+index d23bda9..05610be 100644
+--- a/Debie1-e/code/harness/harness.c
++++ b/Debie1-e/code/harness/harness.c
+@@ -74,6 +74,21 @@
+ #include "telem.h"
+ 
+ 
++#define PASIM_CACHE_FLUSH_TRAMPOLINE
++#ifdef PASIM_CACHE_FLUSH_TRAMPOLINE
++__attribute__((noinline))
++static void Trampoline_CacheFlush(void (*Task)(void))
++{
++  Task();
++}
++
++#define TC_InterruptService() Trampoline_CacheFlush(&TC_InterruptService)
++#define TM_InterruptService() Trampoline_CacheFlush(&TM_InterruptService)
++#define HandleTelecommand()   Trampoline_CacheFlush(&HandleTelecommand)
++#define HandleHitTrigger()    Trampoline_CacheFlush(&HandleHitTrigger)
++#define HandleAcquisition()   Trampoline_CacheFlush(&HandleAcquisition)
++#endif
++
+ /*   Processor registers : reg52.h    */
+ 
+ 
