@@ -19,23 +19,23 @@ endif
 
 #PASIMDBG ?= --debug=0 --debug-fmt=blocks --debug-file=$@
 
-CFLAGS = -fno-unroll-loops \
-	 -DTEST_PRINT_RESULTS \
-	 -mpatmos-disable-post-ra \
-	 -mpatmos-disable-function-splitter
+CFLAGS = -DTEST_PRINT_RESULTS \
+	 #-fno-unroll-loops \
+	 #-mpatmos-disable-post-ra \
+	 #-mpatmos-disable-function-splitter
 
 CFLAGSSP = $(CFLAGS) \
-	   -Xopt -disable-early-taildup \
-	   -Xopt -disable-tail-duplicate \
-	   -Xopt -enable-tail-merge \
-	   -Xllc -disable-early-taildup \
-	   -Xllc -disable-tail-duplicate \
-	   -Xllc -enable-tail-merge
+	   #-Xopt -disable-early-taildup \
+	   #-Xopt -disable-tail-duplicate \
+	   #-Xopt -enable-tail-merge \
+	   #-Xllc -disable-early-taildup \
+	   #-Xllc -disable-tail-duplicate \
+	   #-Xllc -enable-tail-merge
 
 PMLCONFIG ?= config/config_ait.pml
 
-CONFIG_CLANG = $(shell platin tool-config -i $(PMLCONFIG) -t clang)
-CONFIG_PASIM = $(shell platin tool-config -i $(PMLCONFIG) -t pasim)
+CONFIG_CLANG = #$(shell platin tool-config -i $(PMLCONFIG) -t clang)
+CONFIG_PASIM = -G0 #$(shell platin tool-config -i $(PMLCONFIG) -t pasim)
 
 
 SPROOTS = $(shell grep ^$(*:.sp=)= sproots.txt | cut -d'=' -f2)
@@ -61,12 +61,8 @@ ALL    := $(patsubst $(SRCDIR)/%.c,./%.all,   $(SOURCES))
 
 all: $(ALL)
 
-
-
-
 config.ais:
 	platin tool-config -i $(PMLCONFIG) -t ait > $@
-
 
 #%.all: %.elf %.sp.elf %.trace %.sp.trace %.dis %.sp.dis;
 %.all: %.elf %.sim %.sp.sim %.sp.elf;
@@ -88,7 +84,6 @@ config.ais:
 	  $^ -lm $(VERBOSE) 2>&1 | tee $*.log | ./cpdot.sh $*
 	@grep -E "[0-9]+ patmos-singlepath" $*.log > $*.stats || true
 
-
 # Disassemble an elf binary
 %.dis: %.elf
 	patmos-llvm-objdump -d -fpatmos-print-bytes=call $< > $@
@@ -103,7 +98,6 @@ config.ais:
 	  platin wcet -i $<.pml -i $(PMLCONFIG) -e $${func} -b $< --report \
 	      --enable-wca --combine-wca ; \
 	done | tee $@
-
 	      #--use-trace-facts --trace-entry=$${func} \
 
 
@@ -111,7 +105,6 @@ config.ais:
 %.clean:
 	rm -f $*{,-test}{*.dis,*.elf,.stats,.log,.i,*.o,*.ll,*.bc,*.trace,*.out}
 	rm -f $*{.pml,.rec,.sim}
-
 
 
 #--debug-file=>(grep -E '$(shell echo $(SPROOTS) | tr ',' '|')' >$@)

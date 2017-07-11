@@ -47,18 +47,16 @@
 /*                                                                       */
 /*************************************************************************/
 /* Changes:
- * BH 2013/06/06: Macro PRINT_RESULTS, check result and exit accordingly
  * JG 2005/12/12: Indented program.
  */
-#ifdef PRINT_RESULTS
-#include <stdio.h>
-#endif
 
 typedef unsigned char uchar;
 #define LOBYTE(x) ((uchar)((x) & 0xFF))
 #define HIBYTE(x) ((uchar)((x) >> 8))
 
-unsigned char   lin[256] = "asdffeagewaHAFEFaeDsFEawFdsFaefaeerdjgp";
+#define INPUT_SIZE 256
+
+unsigned char   lin[INPUT_SIZE] = "asdffeagewaHAFEFaeDsFEawFdsFaefaeerdjgp";
 
 unsigned short  icrc1(unsigned short crc, unsigned char onech);
 unsigned short 
@@ -71,7 +69,7 @@ icrc1(unsigned short crc, unsigned char onech)
 	int             i;
 	unsigned short  ans = (crc ^ onech << 8);
 
-        #pragma loopbound min 8 max 8
+        _Pragma("loopbound min 8 max 8")
 	for (i = 0; i < 8; i++) {
 		if (ans & 0x8000)
 			ans = (ans <<= 1) ^ 4129;
@@ -81,20 +79,20 @@ icrc1(unsigned short crc, unsigned char onech)
 	return ans;
 }
 
-__attribute__((noinline))
+__attribute__((singlepath,noinline))
 unsigned short 
 icrc(unsigned short crc, unsigned long len,
      short jinit, int jrev)
 {
 	unsigned short  icrc1(unsigned short crc, unsigned char onech);
-	static unsigned short icrctb[256], init = 0;
-	static uchar    rchr[256];
+	static unsigned short icrctb[INPUT_SIZE], init = 0;
+	static uchar    rchr[INPUT_SIZE];
 	unsigned short  tmp1, tmp2, j, cword = crc;
 	static uchar    it[16] = {0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15};
 
 	if (!init) {
 		init = 1;
-                #pragma loopbound min 256 max 256
+                _Pragma("loopbound min 256 max 256")
 		for (j = 0; j <= 255; j++) {
 			icrctb[j] = icrc1(j << 8, (uchar) 0);
 			rchr[j] = (uchar) (it[j & 0xF] << 4 | it[j >> 4]);
@@ -104,7 +102,10 @@ icrc(unsigned short crc, unsigned long len,
 		cword = ((uchar) jinit) | (((uchar) jinit) << 8);
 	else if (jrev < 0)
 		cword = rchr[HIBYTE(cword)] | rchr[LOBYTE(cword)] << 8;
-        #pragma loopbound min 42 max 42
+#ifdef DEBUG
+	printf("len = %d\n", len);
+#endif
+        _Pragma("loopbound min 40 max 42")
 	for (j = 1; j <= len; j++) {
 		if (jrev < 0) {
 			tmp1 = rchr[lin[j]] ^ HIBYTE(cword);
@@ -121,23 +122,31 @@ icrc(unsigned short crc, unsigned long len,
 	return (tmp2);
 }
 
+void init_buffer(int seed)
+{
+  int             i;
+  int             tabort;
+  
+  _Pragma("loopbound min 256 max 256")
+  for (i = 0; i < INPUT_SIZE; i++) {
+    seed = ((seed * 133) + 81) % 8095;
+    lin[i] = seed;
+  }
+}
 
+__attribute__((noinline))
 int 
-main(void)
+main_test(int seed)
 {
 
 	unsigned short  i1, i2;
 	unsigned long   n;
-
+	init_buffer(seed);
 	n = 40;
 	lin[n + 1] = 0;
 	i1 = icrc(0, n, (short) 0, 1);
 	lin[n + 1] = HIBYTE(i1);
 	lin[n + 2] = LOBYTE(i1);
 	i2 = icrc(i1, n + 2, (short) 0, 1);
-#ifdef PRINT_RESULTS
-        printf("crc: i1,i2=%d,%d\n",i1,i2);
-#endif
-        if(i1+i2 != 54027) return 1;
-	return 0;
+	return i1+i2;
 }

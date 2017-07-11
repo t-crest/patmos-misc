@@ -55,12 +55,13 @@ SOURCES := $(wildcard $(SRCDIR)/*.c)
 ALL    := $(patsubst $(SRCDIR)/%.c,./%.all,   $(SOURCES))
 
 
-.PHONY: all clean %.all
+.PHONY: all clean %.all %.clean cclean
 .PRECIOUS: %.sp.elf %.elf %.trace %.sp.trace %.sp.dis %.dis %.sim %.sp.sim
 
 all: $(ALL)
 
 
+cclean: $(patsubst $(SRCDIR)/%.c,./%.clean,   $(SOURCES))
 
 
 config.ais:
@@ -105,11 +106,14 @@ config.ais:
 
 	      #--use-trace-facts --trace-entry=$${func} \
 
+%.png: %.dot
+	dot -Tpng -o $@ $<
+
 
 # Delete all files produced by this Makefile for a benchmark
 %.clean:
 	rm -f $*{,-test}{*.dis,*.elf,.stats,.log,.i,*.o,*.ll,*.bc,*.trace,*.out}
-	rm -f $*{.pml,.rec,.sim}
+	rm -f $**{.pml,.rec,.sim}
 
 
 
