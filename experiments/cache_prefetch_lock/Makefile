@@ -22,7 +22,7 @@ SPROOTS ?= main
 SUBTRACES = $(addsuffix .trace,$(SPROOTS))
 
 TRACE_CMD = $(PASIM) --debug=0 --debug-fmt=trace $< 2>&1 >/dev/null | cut -d' ' -f1
-#TRACE_CMD = patmos-emulator -r $< | awk '{ printf("%08x\n", $1) }'
+#TRACE_CMD = patemu -r $< | awk '{ printf("%08x\n", $1) }'
 
 
 null  :=

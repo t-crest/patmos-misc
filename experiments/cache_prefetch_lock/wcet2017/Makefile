@@ -183,7 +183,7 @@ $(APP).elf: $(TACLE_LOCAL)
 # command to generate an instruction trace (pasim is faster)
 TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 	    $< 2>&1 >/dev/null | cut -d' ' -f1
-#TRACE_CMD = patmos-emulator -r $< | awk '{ printf("%08x\n", $1) }'
+#TRACE_CMD = patemu -r $< | awk '{ printf("%08x\n", $1) }'
 
 %.rpt: %.sym %.sptrace
 	python2 ../mktables.py --rpt -e \

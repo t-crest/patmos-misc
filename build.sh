@@ -889,7 +889,7 @@ function build_emulator() {
 
     run pushd "${rootdir}" > /dev/null
     run env PATH="${PATH}:${INSTALL_DIR}/bin/" make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${tmpdir}'" "CTOOLSBUILDDIR='${ctoolsbuilddir}'" "HWBUILDDIR='${hwbuilddir}'" "HWINSTALLDIR='${tmpdir}'" "INSTALLDIR='${INSTALL_DIR}'" emulator
-    install "${hwbuilddir}/emulator" "${INSTALL_DIR}/bin/patmos-emulator"
+    install "${hwbuilddir}/emulator" "${INSTALL_DIR}/bin/patemu"
     run popd > /dev/null
 }
 
@@ -1094,9 +1094,9 @@ build_target() {
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
     build_tools
     if [ "$BUILD_EMULATOR" == "false" ]; then
-	info "Skipping patmos-emulator in patmos."
+	info "Skipping patmos emulator in patmos."
     else
-	info "Building patmos-emulator in patmos .."
+	info "Building patmos emulator in patmos .."
 	build_emulator $(get_repo_dir patmos)/tmp
     fi
     ;;
