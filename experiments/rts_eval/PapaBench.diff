@@ -1,0 +1,99 @@
+diff --git a/PapaBench-0.4/sw/airborne/autopilot/mainloop.c b/PapaBench-0.4/sw/airborne/autopilot/mainloop.c
+index 24d5763..daba844 100644
+--- a/PapaBench-0.4/sw/airborne/autopilot/mainloop.c
++++ b/PapaBench-0.4/sw/airborne/autopilot/mainloop.c
+@@ -48,6 +48,25 @@ EXTERNAL_AVR_MEM; /* Memory for AVR I/O for non-AVR platforms */
+ 
+ #ifdef PAPABENCH_TEST
+ 
++#define PASIM_CACHE_FLUSH_TRAMPOLINE
++#ifdef PASIM_CACHE_FLUSH_TRAMPOLINE
++__attribute__((noinline))
++static void Trampoline_CacheFlush(void (*Task)(void))
++{
++  Task();
++}
++
++#define radio_control_task() Trampoline_CacheFlush(&radio_control_task)
++#define altitude_control_task() Trampoline_CacheFlush(&altitude_control_task)
++#define climb_control_task() Trampoline_CacheFlush(&climb_control_task)
++#define navigation_task() Trampoline_CacheFlush(&navigation_task)
++#define reporting_task() Trampoline_CacheFlush(&reporting_task)
++#define periodic_task() Trampoline_CacheFlush(&periodic_task)
++#define stabilisation_task() Trampoline_CacheFlush(&stabilisation_task)
++#define receive_gps_data_task() Trampoline_CacheFlush(&receive_gps_data_task)
++#endif
++
++
+ extern bool_t low_battery;
+ int main( void )
+ {
+diff --git a/PapaBench-0.4/sw/airborne/fly_by_wire/main.c b/PapaBench-0.4/sw/airborne/fly_by_wire/main.c
+index 037c5ae..955671b 100644
+--- a/PapaBench-0.4/sw/airborne/fly_by_wire/main.c
++++ b/PapaBench-0.4/sw/airborne/fly_by_wire/main.c
+@@ -80,6 +80,7 @@ static uint8_t ppm_cpt, last_ppm_cpt;
+ /* Prepare data to be sent to mcu0 */
+ static void to_autopilot_from_last_radio (void) {
+   uint8_t i;
++#pragma loopbound min 9 max 9
+   for(i = 0; i < RADIO_CTL_NB; i++)
+      to_mega128.channels[i] = last_radio[i];
+   to_mega128.status = (radio_ok ? _BV(STATUS_RADIO_OK) : 0);
+@@ -158,6 +159,20 @@ EXTERNAL_AVR_MEM; /* Memory for AVR I/O for non-AVR platforms */
+ 
+ #ifdef PAPABENCH_TEST
+ 
++#define PASIM_CACHE_FLUSH_TRAMPOLINE
++#ifdef PASIM_CACHE_FLUSH_TRAMPOLINE
++__attribute__((noinline))
++void Trampoline_CacheFlush(void (*Task)(void))
++{
++  Task();
++}
++
++#define check_failsafe_task_CF() Trampoline_CacheFlush(&check_failsafe_task)
++#define check_mega128_values_task_CF() Trampoline_CacheFlush(&check_mega128_values_task)
++#define send_data_to_autopilot_task_CF() Trampoline_CacheFlush(&send_data_to_autopilot_task)
++#define test_ppm_task_CF() Trampoline_CacheFlush(&test_ppm_task)
++#endif
++
+ int main( void )
+ {
+   static const int modes[] = { MODE_MANUAL, MODE_AUTO };
+@@ -171,7 +186,7 @@ int main( void )
+         mode = modes[m];
+         radio_ok = b1;
+         mega128_ok = b2;
+-        check_failsafe_task();
++        check_failsafe_task_CF();
+       }
+     /* T2: check_mega128_values_task */
+     for(b1 = 0; b1 <= 1; b1++)
+@@ -181,7 +196,7 @@ int main( void )
+           SPI_PIN = b1 ? (SPI_PIN | _BV(SPI_SS_PIN)) : (SPI_PIN & (~_BV(SPI_SS_PIN)));
+           spi_was_interrupted = b2;
+           mega128_receive_valid = b3;
+-          check_mega128_values_task();
++          check_mega128_values_task_CF();
+         }
+     /* T3: send_data_to_autopilot_task */
+     for(b1 = 0; b1 <= 1; b1++)
+@@ -191,7 +206,7 @@ int main( void )
+           SPI_PIN = b1 ? (SPI_PIN | _BV(SPI_SS_PIN)) : (SPI_PIN & (~_BV(SPI_SS_PIN)));
+           spi_was_interrupted = b2;
+           last_radio_contains_avg_channels = b3;
+-          send_data_to_autopilot_task();
++          send_data_to_autopilot_task_CF();
+         }
+     /* T4: servo_transmit */
+     servo_transmit();
+@@ -203,7 +218,7 @@ int main( void )
+           ppm_valid = b1;
+           last_radio_contains_avg_channels = b2;
+           radio_really_lost = b3;
+-          test_ppm_task();
++          test_ppm_task_CF();
+         }
+   }
+ }

@@ -26,7 +26,7 @@ class SimError(Exception):
 
 def trace(binary):
   """Generator for execution trace (instr addresses)"""
-  pasim_cmd = ['pasim', '--debug=0', '--debug-fmt=trace', binary]
+  pasim_cmd = ['pasim', '--debug=0', '--debug-fmt=trace', '-G0', '-m16M', binary]
   # send stdout to /dev/null
   with open(os.devnull, 'w') as fnull:
     pasim = Popen(pasim_cmd, stderr=PIPE, stdout=fnull)
@@ -42,7 +42,7 @@ def trace(binary):
 
 def trace_ex(binary):
   """Generator for extended execution trace in EX stage (instr addresses + PRR before)"""
-  pasim_cmd = ['pasim', '--debug=0', '--debug-fmt=default', binary]
+  pasim_cmd = ['pasim', '--debug=0', '--debug-fmt=long', binary]
   # send stdout to /dev/null
   with open(os.devnull, 'w') as fnull:
     pasim = Popen(pasim_cmd, stderr=PIPE, stdout=fnull)

@@ -5,14 +5,14 @@ machine-configuration:
   memories:
     - name: "main"
       size: 67108864
-      transfer-size: 8
-      read-latency: 4
-      read-transfer-time: 1
-      write-latency: 4
-      write-transfer-time: 1
+      transfer-size: 16
+      read-latency: 0
+      read-transfer-time: 21
+      write-latency: 0
+      write-transfer-time: 21
     - name: "local"
       size: 67108864
-      transfer-size: 8
+      transfer-size: 16
       read-latency: 0
       read-transfer-time: 0
       write-latency: 0
@@ -21,7 +21,6 @@ machine-configuration:
     - name: "method-cache"
       block-size: 64
       associativity: 32
-      #size: 2048
       size: 4096
       policy: "fifo"
       type: "method-cache"

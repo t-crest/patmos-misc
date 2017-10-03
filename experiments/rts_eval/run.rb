@@ -15,7 +15,7 @@ rescue LoadError => e
   $:.unshift File.join(File.dirname(__FILE__),"..")
   require 'lib/experiments'
 end
-require_configuration 'wcet'
+require_configuration 'rts_eval'
 
 
 # configuration
@@ -24,6 +24,7 @@ config.build_log     = File.join(config.builddir, 'build.log')
 config.report        = File.join(config.workdir, 'report.yml')
 config.do_update        = false
 config.keep_trace_files = true
+#config.nproc = 1
 
 # customized benchmark script
 class BenchTool < WcetTool
@@ -54,19 +55,18 @@ FileUtils.remove_entry_secure(config.build_log) if File.exist?(config.build_log)
 config.options = default_options(:nice_pasim => config.nice_pasim)
 config.options.enable_sweet = false
 config.options.enable_wca   = true
-config.options.runcheck     = false # true
-config.options.trace_analysis = false
-config.options.use_trace_facts = false
+config.options.combine_wca   = false
+config.options.runcheck     = true
+config.options.compare_trace_facts = true
 # config.options.compute_criticalities = true
 config.options.disable_ait = true
-config.options.compare_trace_facts = true
+config.options.sim_flush_caches = "Trampoline_CacheFlush"
+config.options.debug_type = [:all]
 
 # run benchmarks
 build_and_run(config, BenchTool)
 
 # summarize
-keys = %w{benchmark build analysis source analysis-entry cycles}
+keys = %w{benchmark build analysis source analysis-entry cycles cycles-min}
 print_csv(config.report, :keys => keys, :outfile => File.join(config.workdir,'report.csv'))
 print_table(config.report, keys)
-
-

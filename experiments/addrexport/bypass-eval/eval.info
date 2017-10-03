@@ -1,0 +1,4 @@
+
+benchmark = $1
+type = $4 (no-addresses/platin with-addresses/platin with-bypass/* min)
+cycles = $6

@@ -18,12 +18,6 @@ machine-configuration:
       write-latency: 0
       write-transfer-time: 0
   caches:
-    - name: "data-cache"
-      block-size: 32
-      associativity: 4
-      size: 2048
-      policy: "lru"
-      type: "set-associative"
     - name: "method-cache"
       block-size: 64
       associativity: 32
@@ -34,6 +28,12 @@ machine-configuration:
       block-size: 4
       size: 2048
       type: "stack-cache"
+    - name: "data-cache"
+      block-size: 32
+      associativity: 4
+      size: 2048
+      policy: "lru"
+      type: "set-associative"
   memory-areas:
     - name: "code"
       type: "code"
