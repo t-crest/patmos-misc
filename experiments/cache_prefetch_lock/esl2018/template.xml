@@ -1,0 +1,29 @@
+<patmos default="default.xml">
+  <description>configuration for WCET 2017 paper</description>
+
+  <frequency Hz="80000000"/>
+  <ExtMem size="2M" DevTypeRef="Sram16" />
+
+  <bus burstLength="XML_BURSTLENGTH" writeCombine="false" />
+  <ICache type="XML_TYPE" size="XML_SIZE" assoc="XML_ASSOC" repl="XML_REPL" />
+
+  <IOs>
+	<IO DevTypeRef="Uart" offset="8"/>
+  </IOs>
+
+  <Devs>
+  	<Dev DevType="Uart" entity="Uart" iface="OcpCore">
+  	  <params>
+  		<param name="baudRate" value="115200"/>
+  		<param name="fifoDepth" value="16"/>
+  	  </params>
+  	</Dev>
+	<Dev DevType="Sram16" entity="SRamCtrl" iface="OcpBurst">
+	    <params>
+		<param name="ocpAddrWidth" value="21" />
+		<param name="sramAddrWidth" value="20" />
+		<param name="sramDataWidth" value="16" />
+	    </params>
+	</Dev>
+  </Devs>
+</patmos>

@@ -1,0 +1,54 @@
+
+\documentclass{article}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.12}
+\usepackage{pgfplotstable}
+
+\usepgfplotslibrary{external}
+\tikzexternalize
+
+\begin{document}
+
+This latex file is to generate result figures with pgfplots.
+
+%\begin{tikzpicture}
+%\begin{axis}[
+%   title=My first figure,
+%   xlabel={$x$},
+%   ylabel={$y$},
+%]
+%\addplot[blue] table {test.dat};
+%\end{axis}
+%\end{tikzpicture}
+
+
+\pgfplotstableread{
+sym y
+p1 100
+p2 120
+p3 96
+}\mypointsinline
+
+\pgfplotstableread{data.dat}\mypoints
+
+\begin{tikzpicture}
+\begin{axis}[
+  ybar,
+%  title=Bar chart,
+  width=14cm,
+  height=5cm,
+  bar width=2mm,
+  ylabel={Relative performance},
+  xticklabels from table={\mypoints}{sym},
+  xtick=data,
+  xticklabel style={font=\footnotesize, rotate=50, anchor=east},
+  ymin=0,
+  ymajorgrids=true,
+]
+\addplot table [x expr=\coordindex] {\mypoints};
+\end{axis}
+
+\end{tikzpicture}
+
+\end{document}
