@@ -70,7 +70,7 @@ compiler-rt: 187888708bd8532789b9a4e24935cf31c70c9024
 
 gold: cdde53177a57f6a7eccb0305089cbbf32c055509
 
-misc: This will be updated when this version is commited.
+misc: f4365c9562fa44d6f6bea0b61c6efbcaf2fc8687
 
 ## Request for Help
 
