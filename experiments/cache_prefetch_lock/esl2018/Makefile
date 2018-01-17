@@ -20,7 +20,7 @@ TACLE         = ./tacle-bench
 TACLE_LOCAL   = ./tacle-src-local
 
 # cache size / burst length setup
-XML_SIZE ?= 8192
+XML_SIZE ?= 4096
 XML_BURSTLENGTH ?= 4
 XML_REPL ?= fifo
 
@@ -295,10 +295,6 @@ clean:
 # MS private targets to simplify life
 
 PAPER?=$(HOME)/paper/tcapapers/2017/patpref-jnl
-
-rm_outliner:
-	rm ludcmp*.txt
-	rm minver*.txt
 
 sizes:
 	for x in *.elf ; do echo $$x $$(./calc_size.sh $$x) ; done > sizes.txt

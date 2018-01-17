@@ -3,7 +3,7 @@
 This folder contains information and scripts to run the evaluation experiments
 for folling paper:
 
-"Prefetching Single-path Code"
+"Prefetching Single-path Code",
 Bekim Cilku, Wolfgang Puffitsch, Daniel Prokesch, Martin Schoeberl, and Peter Puschner,
 submitted to the special issue of ISROC 2017 in Embedded Systems Letters
 
@@ -49,20 +49,20 @@ single-path code generation).
 
 `make` will build and run everything.
 
-`make eval` will compute some results and produce tables in PDF form.
+`make eval` will compute some results and produce the two figures in PDF form,
+which are used in the paper. Other figures are omitted, but can be produced
+with `make unused`.
 
 `make clean` removes all generated files and folders.
 
 ## Repository Tags
 
 You can explore the benchmarks on the head of the repositories.
-For reproducibility we provide the tags of the involved repositories:
-
-TBD: update of tags
+For reproducibility we provide the tags of the involved repositories when we run the benchmarks:
 
 tacle-bench: fcabf4630cb239f34f37a03ce7d93c563b65c897
 
-patmos: a173b6de37195f7a1096cc8c9a10936ad5f1ca75
+patmos: f1da43b1dfd693085d9d95b1cab1de2d974324ef
 
 llvm: 01543c10ddabcfa635572f3ddfaa01f180dd8a89
 
@@ -70,7 +70,7 @@ compiler-rt: 187888708bd8532789b9a4e24935cf31c70c9024
 
 gold: cdde53177a57f6a7eccb0305089cbbf32c055509
 
-misc: 34d70cd2b929664b060c2238d5e7ad9599996958
+misc: This will be updated when this version is commited.
 
 ## Request for Help
 
