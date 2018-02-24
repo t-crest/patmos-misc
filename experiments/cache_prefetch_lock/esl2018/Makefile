@@ -109,7 +109,7 @@ patmos_emu_prefetch.$(APP): $(APP).rpt pcache.xml
 patmos_emu_mc: XML_TYPE = method
 patmos_emu_mc: XML_ASSOC = 16
 patmos_emu_mc: mcache.xml
-	cd $(T-CREST)/patmos && git checkout esl2018 #a173b6de37195f7a1096cc8c9a10936ad5f1ca75
+	cd $(T-CREST)/patmos && git esl2018 #checkout a173b6de37195f7a1096cc8c9a10936ad5f1ca75
 	cp mcache.xml $(PATMOS_HWDIR)/config/
 	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=mcache
 	cp $(PATMOS_HWDIR)/build/emulator $@
