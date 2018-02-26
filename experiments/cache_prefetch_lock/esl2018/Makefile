@@ -109,7 +109,8 @@ patmos_emu_prefetch.$(APP): $(APP).rpt pcache.xml
 patmos_emu_mc: XML_TYPE = method
 patmos_emu_mc: XML_ASSOC = 16
 patmos_emu_mc: mcache.xml
-	cd $(T-CREST)/patmos && git checkout icache_with_prefetcher #a173b6de37195f7a1096cc8c9a10936ad5f1ca75
+	# cd $(T-CREST)/patmos && git checkout a173b6de37195f7a1096cc8c9a10936ad5f1ca75
+	cd $(T-CREST)/patmos && git checkout esl2018
 	cp mcache.xml $(PATMOS_HWDIR)/config/
 	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=mcache
 	cp $(PATMOS_HWDIR)/build/emulator $@
@@ -118,7 +119,8 @@ patmos_emu_mc: mcache.xml
 patmos_emu_ic: XML_TYPE = line
 patmos_emu_ic: XML_ASSOC = 1
 patmos_emu_ic: icache.xml
-	cd $(T-CREST)/patmos && git checkout icache_with_prefetcher #a173b6de37195f7a1096cc8c9a10936ad5f1ca75
+	# cd $(T-CREST)/patmos && git checkout a173b6de37195f7a1096cc8c9a10936ad5f1ca75
+	cd $(T-CREST)/patmos && git checkout esl2018
 	cp icache.xml $(PATMOS_HWDIR)/config/
 	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=icache
 	cp $(PATMOS_HWDIR)/build/emulator $@
