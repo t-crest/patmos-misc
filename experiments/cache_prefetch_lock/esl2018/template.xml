@@ -1,5 +1,5 @@
 <patmos default="default.xml">
-  <description>configuration for WCET 2017 paper</description>
+  <description>configuration for ESL 2018 paper</description>
 
   <frequency Hz="80000000"/>
   <ExtMem size="2M" DevTypeRef="Sram16" />

@@ -24,7 +24,7 @@ XML_SIZE ?= 4096
 XML_BURSTLENGTH ?= 4
 XML_REPL ?= fifo
 
-
+ALLSIZE=1024 2048 4096 8192
 # bitcount, fft gives exit value of 1, broken on Patmos?
 # minver with SP code gives exit != 0
 
@@ -96,44 +96,45 @@ $(TACLE_LOCAL): $(TACLE)
 ###############################################################################
 # Hardware/Emulator
 #
-patmos_emu_prefetch.$(APP): XML_TYPE = prefetch
-patmos_emu_prefetch.$(APP): XML_ASSOC = 1
-patmos_emu_prefetch.$(APP): $(APP).rpt pcache.xml
+patmos_emu_prefetch.$(APP)_$(XML_SIZE): XML_TYPE = prefetch
+patmos_emu_prefetch.$(APP)_$(XML_SIZE): XML_ASSOC = 1
+patmos_emu_prefetch.$(APP)_$(XML_SIZE): $(APP).rpt $(XML_SIZE)_pcache.xml
 	cd $(T-CREST)/patmos && git checkout icache_with_prefetcher
-	cp pcache.xml $(PATMOS_HWDIR)/config/
+	cp $(XML_SIZE)_pcache.xml $(PATMOS_HWDIR)/config/
 	cp $< $(PATMOS_HWDIR)/src/icache/rpt.txt
-	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=pcache
+	rm $(APP).rpt
+	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=$(XML_SIZE)_pcache
 	cp $(PATMOS_HWDIR)/build/emulator $@
 
 
-patmos_emu_mc: XML_TYPE = method
-patmos_emu_mc: XML_ASSOC = 16
-patmos_emu_mc: mcache.xml
+patmos_emu_mc.$(XML_SIZE): XML_TYPE = method
+patmos_emu_mc.$(XML_SIZE): XML_ASSOC = 16
+patmos_emu_mc.$(XML_SIZE): $(XML_SIZE)_mcache.xml
 	# cd $(T-CREST)/patmos && git checkout a173b6de37195f7a1096cc8c9a10936ad5f1ca75
 	cd $(T-CREST)/patmos && git checkout esl2018
-	cp mcache.xml $(PATMOS_HWDIR)/config/
-	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=mcache
+	cp $(XML_SIZE)_mcache.xml $(PATMOS_HWDIR)/config/
+	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=$(XML_SIZE)_mcache
 	cp $(PATMOS_HWDIR)/build/emulator $@
 
 
-patmos_emu_ic: XML_TYPE = line
-patmos_emu_ic: XML_ASSOC = 1
-patmos_emu_ic: icache.xml
+patmos_emu_ic.$(XML_SIZE): XML_TYPE = line
+patmos_emu_ic.$(XML_SIZE): XML_ASSOC = 1
+patmos_emu_ic.$(XML_SIZE): $(XML_SIZE)_icache.xml
 	# cd $(T-CREST)/patmos && git checkout a173b6de37195f7a1096cc8c9a10936ad5f1ca75
 	cd $(T-CREST)/patmos && git checkout esl2018
-	cp icache.xml $(PATMOS_HWDIR)/config/
-	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=icache
+	cp $(XML_SIZE)_icache.xml $(PATMOS_HWDIR)/config/
+	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=$(XML_SIZE)_icache
 	cp $(PATMOS_HWDIR)/build/emulator $@
 
 # 2-way instruction cache not in master branch
-patmos_emu_lc: XML_TYPE = line
-patmos_emu_lc: XML_ASSOC = 2
-patmos_emu_lc: XML_REPL = lru
-patmos_emu_lc: lcache.xml
-	cd $(T-CREST)/patmos && git checkout icache_with_prefetcher
-	cp lcache.xml $(PATMOS_HWDIR)/config/
-	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=lcache
-	cp $(PATMOS_HWDIR)/build/emulator $@
+#patmos_emu_lc: XML_TYPE = line
+#patmos_emu_lc: XML_ASSOC = 2
+#patmos_emu_lc: XML_REPL = lru
+#patmos_emu_lc: lcache.xml
+#	cd $(T-CREST)/patmos && git checkout icache_with_prefetcher
+#	cp lcache.xml $(PATMOS_HWDIR)/config/
+#	$(MAKE) -C $(T-CREST)/patmos clean emulator BOARD=lcache
+#	cp $(PATMOS_HWDIR)/build/emulator $@
 
 
 
@@ -216,55 +217,64 @@ TRACE_CMD = pasim -G0 -m8M --gsize=32M --debug=0 --debug-fmt=trace \
 .PHONY: report
 
 
-report: $(APP)_mc_sp.txt \
+#report: $(APP)_mc_sp.txt \
 	$(APP)_ic_sp.txt \
 	$(APP)_mc_np.txt \
 	$(APP)_pc_sp.txt \
 	$(APP)_ic_np.txt \
 	$(APP)_lc_sp.txt
+#	cd $(T-CREST)/patmos; git checkout master
+
+report: $(APP)_$(XML_SIZE)_mc_sp.txt \
+	$(APP)_$(XML_SIZE)_ic_sp.txt \
+	$(APP)_$(XML_SIZE)_pc_sp.txt 
 	cd $(T-CREST)/patmos; git checkout master
 
+
 # target-specific variables
-$(APP)_pc_sp.txt: LABEL = pcache sp
-$(APP)_pc_sp.txt: $(APP).nofs.sp.elf  patmos_emu_prefetch.$(APP)
-	echo "$(APP) $(LABEL)" >> $@
-	./patmos_emu_prefetch.$(APP) -p $< | grep exec_cycles >> $@
+$(APP)_$(XML_SIZE)_pc_sp.txt: LABEL = pcache sp
+$(APP)_$(XML_SIZE)_pc_sp.txt: $(APP).nofs.sp.elf  patmos_emu_prefetch.$(APP)_$(XML_SIZE)
+	echo "$(APP) $(LABEL) $(XML_SIZE)" >> $@
+	./patmos_emu_prefetch.$(APP)_$(XML_SIZE) -p $< | grep exec_cycles >> $@
 
-$(APP)_mc_sp.txt: LABEL = mcache sp
-$(APP)_mc_sp.txt: $(APP).sp.elf  patmos_emu_mc
-	echo "$(APP) $(LABEL)" >> $@
-	./patmos_emu_mc -p $< | grep exec_cycles >> $@
+$(APP)_$(XML_SIZE)_mc_sp.txt: LABEL = mcache sp
+$(APP)_$(XML_SIZE)_mc_sp.txt: $(APP).sp.elf  patmos_emu_mc.$(XML_SIZE)
+	echo "$(APP) $(LABEL) $(XML_SIZE)" >> $@
+	./patmos_emu_mc.$(XML_SIZE) -p $< | grep exec_cycles >> $@
 
-$(APP)_ic_sp.txt: LABEL = icache sp
-$(APP)_ic_sp.txt: $(APP).nofs.sp.elf  patmos_emu_ic
-	echo "$(APP) $(LABEL)" >> $@
-	./patmos_emu_ic -p $< | grep exec_cycles >> $@
+$(APP)_$(XML_SIZE)_ic_sp.txt: LABEL = icache sp
+$(APP)_$(XML_SIZE)_ic_sp.txt: $(APP).nofs.sp.elf  patmos_emu_ic.$(XML_SIZE)
+	echo "$(APP) $(LABEL) $(XML_SIZE)" >> $@
+	./patmos_emu_ic.$(XML_SIZE) -p $< | grep exec_cycles >> $@
 
-$(APP)_lc_sp.txt: LABEL = lcache sp
-$(APP)_lc_sp.txt: $(APP).nofs.sp.elf  patmos_emu_lc
-	echo "$(APP) $(LABEL)" >> $@
-	./patmos_emu_lc -p $< | grep exec_cycles >> $@
+#$(APP)_lc_sp.txt: LABEL = lcache sp
+#$(APP)_lc_sp.txt: $(APP).nofs.sp.elf  patmos_emu_lc
+#	echo "$(APP) $(LABEL)" >> $@
+#	./patmos_emu_lc -p $< | grep exec_cycles >> $@
 
-$(APP)_mc_np.txt: LABEL = mcache np
-$(APP)_mc_np.txt: $(APP).elf  patmos_emu_mc
-	echo "$(APP) $(LABEL)" >> $@
-	./patmos_emu_mc -p $< | grep exec_cycles >> $@
+#$(APP)_mc_np.txt: LABEL = mcache np
+#$(APP)_mc_np.txt: $(APP).elf  patmos_emu_mc
+#	echo "$(APP) $(LABEL)" >> $@
+#	./patmos_emu_mc -p $< | grep exec_cycles >> $@
 
-$(APP)_ic_np.txt: LABEL = icache np
-$(APP)_ic_np.txt: $(APP).nofs.elf  patmos_emu_ic
-	echo "$(APP) $(LABEL)" >> $@
-	./patmos_emu_ic -p $< | grep exec_cycles >> $@
+#$(APP)_ic_np.txt: LABEL = icache np
+#$(APP)_ic_np.txt: $(APP).nofs.elf  patmos_emu_ic
+#	echo "$(APP) $(LABEL)" >> $@
+#	./patmos_emu_ic -p $< | grep exec_cycles >> $@
 
-$(APP)_lc_np.txt: LABEL = lcache np
-$(APP)_lc_np.txt: $(APP).nofs.elf  patmos_emu_lc
-	echo "$(APP) $(LABEL)" >> $@
-	./patmos_emu_lc -p $< | grep exec_cycles >> $@
+#$(APP)_lc_np.txt: LABEL = lcache np
+#$(APP)_lc_np.txt: $(APP).nofs.elf  patmos_emu_lc
+#	echo "$(APP) $(LABEL)" >> $@
+#	./patmos_emu_lc -p $< | grep exec_cycles >> $@
 
 ###############################################################################
 
 
+#doall: $(TACLE_LOCAL)
+#	for P in $(ALLAPPS); do $(MAKE) report APP=$${P}; done;
+
 doall: $(TACLE_LOCAL)
-	for P in $(ALLAPPS); do $(MAKE) report APP=$${P}; done;
+	for P in $(ALLAPPS); do for S in $(ALLSIZE); do $(MAKE) report APP=$${P} XML_SIZE=$${S} ; done; done;
 
 eval:
 	scala eval.scala sp pcache mcache > data.dat
