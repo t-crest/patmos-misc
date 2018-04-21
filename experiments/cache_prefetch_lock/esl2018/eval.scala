@@ -42,7 +42,6 @@ def addResult(f: String) {
 
 if (log) println()
 if (log) println(bench)
-println(all)
 
 def printStat(t: String) {
   println("Results for " + t + ": mcache icache")
