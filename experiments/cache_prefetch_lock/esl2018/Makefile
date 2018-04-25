@@ -277,23 +277,19 @@ doall: $(TACLE_LOCAL)
 	for P in $(ALLAPPS); do for S in $(ALLSIZE); do $(MAKE) report APP=$${P} XML_SIZE=$${S} ; done; done;
 
 eval:
-	scala eval.scala sp pcache mcache > data.dat
+	scala eval.scala 1024 pcache icache > data.dat
 	pdflatex -shell-escape genfig.tex
-	mv genfig-figure0.pdf sp_pc_mc.pdf
-	scala eval.scala sp pcache icache > data.dat
+	mv genfig-figure0.pdf pc_ic_1k.pdf
+	scala eval.scala 2048 pcache icache > data.dat
 	pdflatex -shell-escape genfig.tex
-	mv genfig-figure0.pdf sp_pc_ic.pdf
+	mv genfig-figure0.pdf pc_ic_2k.pdf
+	scala eval.scala 4096 pcache icache > data.dat
+	pdflatex -shell-escape genfig.tex
+	mv genfig-figure0.pdf pc_ic_4k.pdf
+	scala eval.scala 8192 pcache icache > data.dat
+	pdflatex -shell-escape genfig.tex
+	mv genfig-figure0.pdf pc_ic_8k.pdf
 
-unused:
-	scala eval.scala np mcache icache > data.dat
-	pdflatex -shell-escape genfig.tex
-	mv genfig-figure0.pdf np_mc_ic.pdf
-	scala eval.scala sp mcache icache > data.dat
-	pdflatex -shell-escape genfig.tex
-	mv genfig-figure0.pdf sp_mc_ic.pdf
-	scala eval.scala sp lcache icache > data.dat
-	pdflatex -shell-escape genfig.tex
-	mv genfig-figure0.pdf sp_lc_ic.pdf
 
 clean:
 	rm -f *.txt *.elf *.dpth *.log *.md5 *.pdf *.auxlock *.aux *.dat *.rpt *.sym *.sizes
