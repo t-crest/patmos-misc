@@ -277,6 +277,12 @@ doall: $(TACLE_LOCAL)
 	for P in $(ALLAPPS); do for S in $(ALLSIZE); do $(MAKE) report APP=$${P} XML_SIZE=$${S} ; done; done;
 
 eval:
+	scala eval.scala pcache icache > data1.dat
+	gnuplot all_benchmarks.gp
+	scala eval.scala pcache mcache > data2.dat
+	gnuplot mcb_benchmarks_all.gp
+
+unused:
 	scala eval.scala 1024 pcache icache > data.dat
 	pdflatex -shell-escape genfig.tex
 	mv genfig-figure0.pdf pc_ic_1k.pdf

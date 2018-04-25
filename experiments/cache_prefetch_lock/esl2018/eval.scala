@@ -52,22 +52,46 @@ def printStat(t: String) {
 }
 
 
-// execution time in cycles therefore v2/v1 normalizes to v2
-def printData(t: String, c1: String, c2: String) {
-  println("sym y")
+//// execution time in cycles therefore v2/v1 normalizes to v2
+//def printData(t: String, c1: String, c2: String) {
+//  println("sym y")
+//  val sortedBench = bench.toSeq.sorted
+//  var geoMean: Double = 1
+//  for (b <- sortedBench) {
+//    val v1 = all(t)(c1)(b)
+//    val v2 = all(t)(c2)(b)
+//    val fac = v2.toDouble / v1
+//    val n = b.flatMap { case '_' => "\\_" case c => s"$c" }
+//    println(n + " " + fac)
+//    geoMean = geoMean * fac
+//  }
+//  // println("geom. mean: " + scala.math.pow(geoMean,1./sortedBench.size))
+//}
+
+def printData(c1: String, c2: String) {
+  println("sym 1kB 2kB 4kB 8kB")
   val sortedBench = bench.toSeq.sorted
   var geoMean: Double = 1
   for (b <- sortedBench) {
-    val v1 = all(t)(c1)(b)
-    val v2 = all(t)(c2)(b)
-    val fac = v2.toDouble / v1
-    val n = b.flatMap { case '_' => "\\_" case c => s"$c" }
-    println(n + " " + fac)
-    geoMean = geoMean * fac
+    val v11 = all("1024")(c1)(b)
+    val v12 = all("1024")(c2)(b)
+    val fac1 = v12.toDouble / v11
+    val v21 = all("2048")(c1)(b)
+    val v22 = all("2048")(c2)(b)
+    val fac2 = v22.toDouble / v21
+    val v41 = all("4096")(c1)(b)
+    val v42 = all("4096")(c2)(b)
+    val fac4 = v42.toDouble / v41
+    val v81 = all("8192")(c1)(b)
+    val v82 = all("8192")(c2)(b)
+    val fac8 = v82.toDouble / v81
+    val n = b.flatMap { case '_' => "-" case c => s"$c" }
+    println(n + " " + fac1 + " " + fac2 + " " + fac4 + " " + fac8)
+//    geoMean = geoMean * fac
   }
   // println("geom. mean: " + scala.math.pow(geoMean,1./sortedBench.size))
 }
 
 if (log) sizes.map{ t => printStat(t) }
 
-if (!log) printData(args(0), args(1), args(2))
+if (!log) printData(args(0), args(1))
