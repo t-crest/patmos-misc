@@ -888,7 +888,7 @@ function build_emulator() {
     tmpdir=$(abspath $tmpdir)
 
     run pushd "${rootdir}" > /dev/null
-    run env PATH="${PATH}:${INSTALL_DIR}/bin/" make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${tmpdir}'" "CTOOLSBUILDDIR='${ctoolsbuilddir}'" "HWBUILDDIR='${hwbuilddir}'" "HWINSTALLDIR='${tmpdir}'" "INSTALLDIR='${INSTALL_DIR}'" emulator
+    run env PATH="'${PATH}:${INSTALL_DIR}/bin/'" make $MAKEJ $MAKE_VERBOSE "BUILDDIR='${tmpdir}'" "CTOOLSBUILDDIR='${ctoolsbuilddir}'" "HWBUILDDIR='${hwbuilddir}'" "HWINSTALLDIR='${tmpdir}'" "INSTALLDIR='${INSTALL_DIR}'" emulator
     install "${hwbuilddir}/emulator" "${INSTALL_DIR}/bin/patemu"
     run popd > /dev/null
 }
