@@ -1,0 +1,53 @@
+
+Neither of these loops' condition is input dependent.
+Therefore, as described in "Compiling for Time Predictability",
+the loop that is not run will not iterate multiple times.
+
+Therefore, there is no problem in just parallelizing.
+The only thing needed is to ensure they don't use the same predicate registers.
+
+So the changes we do:
+
+1. Ensure the predicate registers aren't the same:
+for the second loop, we switch p4 for p6 and p5 for p7.
+
+2. interleave
+
+3. bundle
+
+Optimizations:
+
+the 'pmov' on line 40 should have been bundled with the 'pmov' on line 42. But the two 'lwc' before them couldn't be bundled, therefore, when looking at the 'lwc' on line 39, we look at the other brach, looking for an instruction we can move up without encountering a data hazard.
+
+the 'sub' on line 45 should have been bundled with the 'add' on line 43, but because of its dependence on the value loaded in line 41 we cant bundle the 'sub' with the 'add' since there wouldn't be an instruction between the load and use.
+Luckily, when we got to the branch on line 44, it couldn't be bundle with the branch on line 46. Also, we could get any of the add below them, so we looked back and saw that the sub could be moved down and bundle with the branch.
+
+Bug report:
+
+line 23-24:
+Originally wanted to put the l1 mov on line 23, but the bundle does not compile. this order switch works.
+
+line 25-26:
+these two 'li' should be bundled, but doing so would execute to 4950 instead of 5150.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

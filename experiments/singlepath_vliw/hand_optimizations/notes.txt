@@ -1,0 +1,15 @@
+Building a c program to LLVM IR:
+	patmos-clang -S hello.c
+
+Building LLVM IR to patmos assembly:
+	patmos-llc hello.bc
+	
+Building LLVM IR to patmos assembly with single-path code generation:
+	patmos-llc hello.bc -mpatmos-singlepath=main
+	
+Building assembly to executable:
+	patmos-clang hello.asm
+
+Running simulator stats for single function:
+	pasim hello.o -v --print-stats init_func
+	
