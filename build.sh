@@ -957,7 +957,7 @@ function build_llvm() {
 	local targets=$(echo $LLVM_TARGETS | tr '[A-Z;]' '[a-z,]')
 	build_autoconf llvm make_llvm $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $config_args $LLVM_CONFIGURE_ARGS"
     else
-	build_cmake llvm make_llvm $(get_build_dir llvm) "-DCMAKE_BUILD_TYPE=$LLVM_BUILD_TYPE -DCMAKE_CXX_STANDARD=11 -DLLVM_TARGETS_TO_BUILD='$LLVM_TARGETS' $cmake_args $LLVM_CMAKE_ARGS"
+	build_cmake llvm make_llvm $(get_build_dir llvm) "-DCMAKE_BUILD_TYPE=$LLVM_BUILD_TYPE -DCMAKE_CXX_STANDARD=14 -DLLVM_TARGETS_TO_BUILD='$LLVM_TARGETS' $cmake_args $LLVM_CMAKE_ARGS"
     fi
 }
 
