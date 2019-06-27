@@ -9,9 +9,9 @@ cd patmos
 make test &>> ../result.txt
 cd ..
 # this is now the simulator test
-./misc/build.sh -t patmos >> result.txt
-./misc/build.sh bench >> result.txt
-./misc/build.sh -t bench >> result.txt
+./misc/build.sh -t patmos &>> result.txt
+./misc/build.sh bench &>> result.txt
+./misc/build.sh -t bench &>> result.txt
 ##./misc/build.sh -t gold # no tests
 ##./misc/build.sh -t llvm # fails always
 ##./misc/build.sh -t newlib # no tests
