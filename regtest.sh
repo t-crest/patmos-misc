@@ -3,15 +3,29 @@
 # within a newly created t-crest root named t-crest-test
 
 # Do individual tests as test all does not work
-./misc/build.sh &>> result.txt
+./misc/build.sh &>> build-log.txt
+
 # this test is not supported from build.sh
+echo Running Patmos test >> result.txt
 cd patmos
 make test &>> ../result.txt
 cd ..
+
 # this is now the simulator test
+echo Running Patmos benchmark test >> result.txt
 ./misc/build.sh -t patmos &>> result.txt
-./misc/build.sh bench &>> result.txt
+
+# Run llvm patmos target tests
+echo Testing LLVM Patmos Target >> result.txt
+env DEBUG_TYPE= patmos-llvm-lit llvm/test --filter="LLVM :: Patmos" -v &>> result.txt
+
+# Build benchmark
+./misc/build.sh bench &>> build-log.txt
+
+# Run benchmark
+echo Running benchmark >> result.txt
 ./misc/build.sh -t bench &>> result.txt
+
 ##./misc/build.sh -t gold # no tests
 ##./misc/build.sh -t llvm # fails always
 ##./misc/build.sh -t newlib # no tests

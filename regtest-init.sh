@@ -5,6 +5,7 @@ mkdir $HOME/t-crest-test
 cd $HOME/t-crest-test
 git clone https://github.com/t-crest/patmos-misc.git misc
 # rest is done in regtest
+echo Building T-CREST > build-log.txt
 echo Testing T-CREST > result.txt
 ./misc/regtest.sh
 if cat result.txt | ./llvm/build/bin/FileCheck ./misc/regtest-check.ll; then
@@ -12,6 +13,6 @@ if cat result.txt | ./llvm/build/bin/FileCheck ./misc/regtest-check.ll; then
 else
   SUCC_MSG=FAILURE
 fi
-zip -j $HOME/t-crest-test/result.zip $HOME/t-crest-test/result.txt
+zip -j $HOME/t-crest-test/build-log.zip $HOME/t-crest-test/build-log.txt
 RECIPIENTS=`cat $HOME/t-crest-test/misc/recipients.txt`
-echo "Attached is the build result" | mail -s "[T-CREST] Build report `date` on ${HOSTNAME}: $SUCC_MSG" ${RECIPIENTS} -A $HOME/t-crest-test/result.zip
+mail -s "[T-CREST] Build report `date` on ${HOSTNAME}: $SUCC_MSG" ${RECIPIENTS} -A $HOME/t-crest-test/build-log.zip < $HOME/t-crest-test/result.txt
