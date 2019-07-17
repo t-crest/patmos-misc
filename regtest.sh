@@ -3,14 +3,14 @@
 # within a newly created t-crest root named t-crest-test
 
 # Do individual tests as test all does not work
-./misc/build.sh &>> result.txt
+./misc/build.sh
 # this test is not supported from build.sh
 cd patmos
 make test &>> ../result.txt
 cd ..
 # this is now the simulator test
 ./misc/build.sh -t patmos >> result.txt
-./misc/build.sh bench >> result.txt
+./misc/build.sh bench
 ./misc/build.sh -t bench >> result.txt
 ##./misc/build.sh -t gold # no tests
 ##./misc/build.sh -t llvm # fails always
