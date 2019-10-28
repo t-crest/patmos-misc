@@ -4,7 +4,6 @@
 
 # Do individual tests as test all does not work
 ./misc/build.sh &>> build-log.txt
-
 # this test is not supported from build.sh
 echo Running Patmos test >> result.txt
 cd patmos

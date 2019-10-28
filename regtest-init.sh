@@ -13,6 +13,6 @@ if cat result.txt | ./llvm/build/bin/FileCheck ./misc/regtest-check.ll; then
 else
   SUCC_MSG=FAILURE
 fi
-zip -j $HOME/t-crest-test/build-log.zip $HOME/t-crest-test/build-log.txt
-RECIPIENTS=`cat $HOME/t-crest-test/misc/recipients.txt`
-mail -s "[T-CREST] Build report `date` on ${HOSTNAME}: $SUCC_MSG" ${RECIPIENTS} -A $HOME/t-crest-test/build-log.zip < $HOME/t-crest-test/result.txt
+zip -j ./build-log.zip ./build-log.txt
+RECIPIENTS=`cat ./misc/recipients.txt`
+mail -s "[T-CREST] Build report `date` on ${HOSTNAME}: $SUCC_MSG" ${RECIPIENTS} -A ./build-log.zip < ./result.txt

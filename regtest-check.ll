@@ -7,7 +7,7 @@ Therefore, this message can be seen as comments.
 
 ; CHECK-LABEL: Running Patmos benchmark test
 ; CHECK: Running tests...
-; CHECK-NEXT: Test project /home/[[USERNAME:[^/]*]]/t-crest-test/patmos/simulator/build
+; CHECK-NEXT: Test project [[TCREST:.*]]/patmos/simulator/build
 ; CHECK: 100% tests passed, 0 tests failed out of {{[0-9]*}}
 
 ; CHECK-LABEL: Testing LLVM Patmos Target
@@ -16,5 +16,5 @@ Therefore, this message can be seen as comments.
 
 ; CHECK-LABEL: Running benchmark
 ; CHECK: Running tests
-; CHECK-NEXT: Test project /home/[[USERNAME]]/t-crest-test/bench/build
+; CHECK-NEXT: Test project [[TCREST]]/bench/build
 ; CHECK: 100% tests passed, 0 tests failed out of {{[0-9]*}}
