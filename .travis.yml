@@ -1,3 +1,4 @@
 language: c++
 script:
- - cd .. & patmos-misc/build.sh
+ - cd ..
+ - patmos-misc/build.sh
