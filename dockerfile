@@ -36,6 +36,11 @@ RUN mkdir t-crest
 WORKDIR t-crest
 COPY . misc/
 
+# Ensure the regression test scripts have permission to execute
+RUN ["chmod", "+x", "./misc/regtest.sh"]
+RUN ["chmod", "+x", "./misc/regtest-init.sh"]
+RUN ["chmod", "+x", "./misc/build.sh"]
+
 # Upon non-interactive container run, execute the regression test.
 CMD ["/bin/bash", "-c", "./misc/regtest-init.sh"]
 
