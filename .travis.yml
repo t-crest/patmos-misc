@@ -1,12 +1,11 @@
 language: c++
 services:
  - docker
- 
- before_install:
+
+before_install:
   - docker build --no-cache -t t-crest/regression .
 
-script:
- - docker run t-crest/regression
+script: docker run t-crest/regression
 
 notifications:
   email:
