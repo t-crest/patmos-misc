@@ -1,6 +1,20 @@
 language: c++
+services:
+ - docker
+ 
+ before_install:
+  - docker build --no-cache -t t-crest/regression .
+
 script:
- - cd ..
- - pwd
- - mv patmos-misc misc
- - misc/build.sh
+ - docker run t-crest/regression
+
+notifications:
+  email:
+    recipients:
+      - masca@dtu.dk
+      - lpez@dtu.dk
+      - tbst@dtu.dk
+      - martin@jopdesign.com
+      - emad.maroun@tuwien.ac.at
+    on_success: change
+    on_failure: always
