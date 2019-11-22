@@ -4,8 +4,8 @@ services:
 
 before_install:
   - docker build --no-cache -t t-crest/regression .
-
-script: docker run t-crest/regression
+  
+script: travis_wait 180 docker run t-crest/regression
 
 notifications:
   email:
