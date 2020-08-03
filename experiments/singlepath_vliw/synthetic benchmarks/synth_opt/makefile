@@ -1,28 +1,35 @@
 
 GCC=patmos-clang
 OBJDUMP=patmos-llvm-objdump
-PROG=synth_opt.c
+SP_FUNC=main
 CC_FLAGS=-O2
-SIMULATOR=pasim --print-stats=main
+SP_FLAGS=$(CC_FLAGS) -mpatmos-singlepath=$(SP_FUNC)
+SIMULATOR=pasim --print-stats=$(SP_FUNC)
 
-all: a_sp.out.asm a_nosp.out.asm a_sp.out.txt a_nosp.out.txt
+all: synth_opt
 
-sim: a_sp.out.txt a_nosp.out.txt
+synth_opt: synth_opt_nosp.asm synth_opt_sp.asm synth_opt_sp_bundled.asm synth_opt_nosp_bench.txt synth_opt_sp_bench.txt synth_opt_sp_bundled_bench.txt
 
-a_sp.out: $(PROG)
-	$(GCC) $(PROG) $(CC_FLAGS) -mpatmos-singlepath=main -o a_sp.out
+%_nosp.out: %.c
+	$(GCC) $^ $(CC_FLAGS) -o $@
+
+%_sp.out: %.c
+	$(GCC) $^ $(SP_FLAGS) -o $@
 	
-a_nosp.out: $(PROG)
-	$(GCC) $(PROG) $(CC_FLAGS) -o a_nosp.out
+%_sp_bundled.out: %.c
+	$(GCC) $^ $(SP_FLAGS) -Xllc -mpatmos-disable-vliw=false -o $@
+
+%.asm: %.out
+	$(OBJDUMP) -d $^ > $@
+
+%_bench.txt: %.out
+	$(SIMULATOR) $^ 2> $@ | echo ""
+
+clean:
+	rm -rf *.out
+	rm -rf *.asm
+	rm -rf *bench.txt
 	
-a_sp.out.asm: a_sp.out
-	$(OBJDUMP) -d a_sp.out > a_sp.out.asm
+.PHONY: synth_opt
 	
-a_nosp.out.asm: a_nosp.out
-	$(OBJDUMP) -d a_nosp.out > a_nosp.out.asm
-	
-a_sp.out.txt: a_sp.out
-	$(SIMULATOR) a_sp.out 2> a_sp.out.txt | echo " "
-	
-a_nosp.out.txt: a_nosp.out
-	$(SIMULATOR) a_nosp.out 2> a_nosp.out.txt | echo " "
+.SECONDARY:
