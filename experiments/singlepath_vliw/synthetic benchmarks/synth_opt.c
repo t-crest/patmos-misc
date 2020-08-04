@@ -2,13 +2,12 @@
 // fit in a short-immediate arithmetic operation.
 #define ITER_COUNT 4095
 // We use volatile to ensure the program isn't optimized away
-static volatile int FLAG = 1;
 static volatile int _0 = 0;
 
 int main() {
 	// Load values before the loop to ensure no load instruction
 	// are in the loop.
-	int take_true_branch = FLAG;
+	int take_true_branch = _0;
 	// We don't care about the actual result of the calculation,
 	// so we just load the same value. 
 	// Optimizer will think they are different values.
