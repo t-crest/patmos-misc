@@ -76,13 +76,13 @@ CHRPATH=$(dirname $self)/patmos-chrpath
 INSTALL_SH=$(dirname $self)/scripts/install.sh
 
 # List of available targets
-ALLTARGETS="gold llvm newlib compiler-rt patmos bench otawa argo poseidon aegean"
+ALLTARGETS="simulator gold llvm newlib compiler-rt patmos bench otawa argo poseidon aegean"
 
 ########### Start of user configs, overwrite in build.cfg ##############
 
 # List of targets to build by default, developers may set this to $ALLTARGETS
 # or a subset of interesting tools
-BUILDSH_TARGETS="gold llvm newlib compiler-rt patmos argo poseidon aegean"
+BUILDSH_TARGETS="simulator gold llvm newlib compiler-rt patmos argo poseidon aegean"
 #BUILDSH_TARGETS=$ALLTARGETS
 #BUILDSH_TARGETS="llvm patmos"
 
@@ -98,6 +98,9 @@ REPO_PREFIX=
 INSTALL_DIR="$ROOT_DIR/local"
 # Directory suffix for directory containing generated files
 BUILDDIR_SUFFIX="/build"
+
+# Whether to download pre-built binaries where available.
+PREFER_DOWNLAOD=false
 
 # RTEMS subdirectory prefix. Set to empty to checkout without subdirectories.
 RTEMS_SUBDIR_PREFIX="rtems-4.10.2"
@@ -224,11 +227,16 @@ NEWLIB_TARGET_CFLAGS=
 #BENCH_LDFLAGS="-fpatmos-lto-defaultlibs"
 
 # Commandline option to pass to make/ctest for parallel builds
-MAKEJ=-j2
+MAKEJ=-j
 
 # Arguments to pass to ctest
 # Use "-jN" to enable parallel benchmark testing
-CTEST_ARGS=
+if [ "$OS_NAME" == "Darwin" ]; then
+	CORE_COUNT=$(sysctl -n hw.ncpu)
+else 
+	CORE_COUNT=$(grep -c ^processor /proc/cpuinfo)
+fi
+CTEST_ARGS=-j$CORE_COUNT
 
 # Set nice level for the whole build.sh run. No renice happens if undefined.
 #NICENESS=10
@@ -580,15 +588,40 @@ function usage() {
     -v		Show command that are executed
     -V		Make make verbosive
     -t		Run tests
-    -o		Build toolchain (gold, llvm, patmos, newlib, compiler-rt) and do clean build of bench with tests.
-
+    -o		Build toolchain (simulator, gold, llvm, patmos, newlib, compiler-rt) and do clean build of bench with tests.
+    -q		Download and install from pre-built binaries where available, instead of building from source. Disables testing of downloaded targets (with -t)
   Available targets:
-    gold llvm newlib compiler-rt patmos otawa bench rtems rtems-test rtems-examples eclipse aegean poseidon
+    simulator gold llvm newlib compiler-rt patmos otawa bench rtems rtems-test rtems-examples eclipse aegean poseidon
 
   The command-line options override the user-config read from '$CFGFILE'.
 EOT
 }
 
+function make_simulator() {
+    # absolute source dir
+    local rootdir=$1
+    # absolute build dir
+    local builddir=$2
+
+    # Build binaries
+    make $MAKEJ $MAKE_VERBOSE
+
+    # Package binaries
+    make box
+
+	if $DO_RUN_TESTS; then
+		make test
+	fi
+
+    # Install
+    echo "Installing files ..."
+
+    mkdir -p $INSTALL_DIR
+    cp $builddir/patmos-simulator*.tar.gz $INSTALL_DIR/
+    tar -xvf $INSTALL_DIR/patmos-simulator*.tar.gz --directory=$INSTALL_DIR
+
+    rm -rf $INSTALL_DIR/patmos-simulator*.tar.gz
+}
 
 function make_gold() {
     # absolute source dir
@@ -634,6 +667,33 @@ function install_platin() {
     
     echo "Installing platin toolkit .. "
     run $rootdir/tools/platin/install.sh -i $INSTALL_DIR -b $builddir/tools/platin
+}
+
+function install_simulator() {
+    echo "Installing Patmos Simulator from Pre-Built Binaries"
+    # Binary for Ubuntu
+    local ubuntu_link="https://github.com/t-crest/patmos-simulator/releases/download/1.0.1/patmos-simulator-x86_64-linux-gnu.tar.gz"
+    # Binary for OSX
+    local osx_link="https://github.com/t-crest/patmos-simulator/releases/download/1.0.1/patmos-simulator-x86_64-apple-darwin17.7.0.tar.gz"
+
+    local simulator_link=$ubuntu_link
+    if [ "$OS_NAME" == "Darwin" ]; then
+        echo "Detected MacOS"
+        local simulator_link=$osx_link
+    fi
+
+    # Local tar name
+    local tar_name="patmos-simulator.tar.gz"
+    local tar_path=$INSTALL_DIR/$tar_name
+
+    # Download tar
+    curl -L $simulator_link -o $tar_path
+
+    echo "Installed files:"
+    # Extract tar
+    tar -xvf $tar_path --directory=$INSTALL_DIR
+
+    rm -rf $tar_path
 }
 
 function make_llvm() {
@@ -727,6 +787,10 @@ function make_and_test_default() {
     if [ "$DO_RUN_TESTS" == "true" ]; then
         run make test "ARGS='${CTEST_ARGS}'"
     fi
+}
+
+function build_simulator() {
+    build_cmake simulator make_simulator $(get_build_dir simulator)
 }
 
 function build_compiler_rt() {
@@ -844,8 +908,6 @@ function build_tools() {
     # Therefore, for every 'build' directory there must be one build target here, either telling
     # the patmos Makefile where to build or calling the build scripts directly.
 
-    info "Building simulator in patmos .. "
-    build_cmake patmos/simulator make_and_test_default $(get_build_dir patmos simulator) "$PASIM_ARGS"
     info "Building tools/c in patmos .. "
     build_cmake patmos/tools/c   make_default $(get_build_dir patmos "tools/c") "$CTOOLS_ARGS"
     info "Building tools/java in patmos .. "
@@ -1135,6 +1197,14 @@ build_target() {
     clone_update ${GITHUB_BASEURL}/rtems.git $(get_repo_dir rtems/rtems)
     build_rtems
     ;;
+  'simulator')
+    if $PREFER_DOWNLAOD ; then
+        install_simulator
+    else 
+        clone_update ${GITHUB_BASEURL}/patmos-simulator.git $(get_repo_dir simulator)
+        build_simulator
+    fi
+    ;;
   "rtems-test")
     # This requires rtems target to be built already
     build_rtems_test
@@ -1150,7 +1220,7 @@ build_target() {
 
 
 # one-shot config
-while getopts ":crhi:j:pudsvxVtoea" opt; do
+while getopts ":crhi:j:pudsvxVtoeaq" opt; do
   case $opt in
     a) DO_RUN_ALL=true ;;
     c) DO_CLEAN=true ;;
@@ -1171,6 +1241,7 @@ while getopts ":crhi:j:pudsvxVtoea" opt; do
        cat build.sh | sed -n '/##* Start of user configs/,/##* End of user configs/p' | sed "$ d" | sed "/Start of user configs/d" > build.cfg.dist
        exit
        ;;
+    q) PREFER_DOWNLAOD=true ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       usage >&2
