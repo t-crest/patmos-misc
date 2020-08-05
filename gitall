@@ -57,7 +57,7 @@ base=`dirname $self`/..
 GITBASE=$base
 
 # Names of git subdirectories in $GITBASE
-GITREPOS="patmos bench newlib compiler-rt gold llvm/tools/clang llvm misc aegean poseidon"
+GITREPOS="patmos bench newlib compiler-rt gold llvm/tools/clang llvm misc argo aegean poseidon"
 
 # Color codes
 RED="\033[31m"

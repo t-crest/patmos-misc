@@ -76,13 +76,13 @@ CHRPATH=$(dirname $self)/patmos-chrpath
 INSTALL_SH=$(dirname $self)/scripts/install.sh
 
 # List of available targets
-ALLTARGETS="gold llvm newlib compiler-rt patmos bench otawa poseidon aegean"
+ALLTARGETS="gold llvm newlib compiler-rt patmos bench otawa argo poseidon aegean"
 
 ########### Start of user configs, overwrite in build.cfg ##############
 
 # List of targets to build by default, developers may set this to $ALLTARGETS
 # or a subset of interesting tools
-BUILDSH_TARGETS="gold llvm newlib compiler-rt patmos poseidon aegean"
+BUILDSH_TARGETS="gold llvm newlib compiler-rt patmos argo poseidon aegean"
 #BUILDSH_TARGETS=$ALLTARGETS
 #BUILDSH_TARGETS="llvm patmos"
 
@@ -1099,6 +1099,9 @@ build_target() {
 	info "Building patmos emulator in patmos .."
 	build_emulator $(get_repo_dir patmos)/tmp
     fi
+    ;;
+  'argo')
+    clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo)
     ;;
   'aegean')
     clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo)
