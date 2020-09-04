@@ -3,7 +3,7 @@ GCC=patmos-clang
 OBJDUMP=patmos-llvm-objdump
 SP_FUNC=main
 CC_FLAGS=-O2
-SP_FLAGS=$(CC_FLAGS) -mpatmos-singlepath=$(SP_FUNC) -Xllc -debug-only=patmos-singlepath
+SP_FLAGS=$(CC_FLAGS) -mpatmos-singlepath=$(SP_FUNC) -Xllc -debug-only=patmos-singlepath -Xllc -stats
 SIMULATOR=pasim --print-stats=$(SP_FUNC)
 
 all: synth_opt synth_if synth_asym
