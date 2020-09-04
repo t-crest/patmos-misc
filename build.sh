@@ -1189,7 +1189,7 @@ build_target() {
       fi
     fi
     if [ -d $ROOT_DIR/$repo ]; then
-      build_cmake bench make_bench $(get_build_dir bench) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin" "$BENCH_ARGS"
+      build_cmake bench make_bench $(get_build_dir bench) "-DTRIPLE=${TARGET} -DENABLE_EMULATOR=true -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin" "$BENCH_ARGS"
     fi
     ;;
   'rtems')
