@@ -227,7 +227,7 @@ NEWLIB_TARGET_CFLAGS=
 #BENCH_LDFLAGS="-fpatmos-lto-defaultlibs"
 
 # Commandline option to pass to make/ctest for parallel builds
-MAKEJ=-j
+MAKEJ=-j2
 
 # Arguments to pass to ctest
 # Use "-jN" to enable parallel benchmark testing
