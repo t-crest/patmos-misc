@@ -76,13 +76,13 @@ CHRPATH=$(dirname $self)/patmos-chrpath
 INSTALL_SH=$(dirname $self)/scripts/install.sh
 
 # List of available targets
-ALLTARGETS="simulator gold llvm newlib compiler-rt patmos bench otawa poseidon aegean"
+ALLTARGETS="simulator gold llvm newlib compiler-rt patmos bench otawa argo poseidon aegean"
 
 ########### Start of user configs, overwrite in build.cfg ##############
 
 # List of targets to build by default, developers may set this to $ALLTARGETS
 # or a subset of interesting tools
-BUILDSH_TARGETS="simulator gold llvm newlib compiler-rt patmos poseidon aegean"
+BUILDSH_TARGETS="simulator gold llvm newlib compiler-rt patmos argo poseidon aegean"
 #BUILDSH_TARGETS=$ALLTARGETS
 #BUILDSH_TARGETS="llvm patmos"
 
@@ -227,7 +227,7 @@ NEWLIB_TARGET_CFLAGS=
 #BENCH_LDFLAGS="-fpatmos-lto-defaultlibs"
 
 # Commandline option to pass to make/ctest for parallel builds
-MAKEJ=-j
+MAKEJ=-j2
 
 # Arguments to pass to ctest
 # Use "-jN" to enable parallel benchmark testing
@@ -1162,6 +1162,9 @@ build_target() {
 	build_emulator $(get_repo_dir patmos)/tmp
     fi
     ;;
+  'argo')
+    clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo)
+    ;;
   'aegean')
     clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo)
     clone_update ${GITHUB_BASEURL}/aegean.git $(get_repo_dir aegean)
@@ -1186,7 +1189,7 @@ build_target() {
       fi
     fi
     if [ -d $ROOT_DIR/$repo ]; then
-      build_cmake bench make_bench $(get_build_dir bench) "-DTRIPLE=${TARGET} -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin" "$BENCH_ARGS"
+      build_cmake bench make_bench $(get_build_dir bench) "-DTRIPLE=${TARGET} -DENABLE_EMULATOR=true -DCMAKE_TOOLCHAIN_FILE=$ROOT_DIR/$repo/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH=${INSTALL_DIR}/bin" "$BENCH_ARGS"
     fi
     ;;
   'rtems')
