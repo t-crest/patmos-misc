@@ -9,6 +9,7 @@ cd patmos
 make test &>> ../result.txt
 cd ..
 # this is now the simulator test
+./misc/build.sh -t simulator >> result.txt
 ./misc/build.sh -t patmos >> result.txt
 ./misc/build.sh bench
 ./misc/build.sh -t bench >> result.txt
