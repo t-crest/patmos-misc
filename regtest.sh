@@ -4,6 +4,8 @@
 
 # Do individual tests as test all does not work
 ./misc/build.sh
+# Following line ist a blind try to fix the regression test:
+./misc/build.sh patmos
 # this test is not supported from build.sh
 cd patmos
 make test &>> ../result.txt
