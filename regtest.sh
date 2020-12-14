@@ -3,9 +3,8 @@
 # within a newly created t-crest root named t-crest-test
 
 # Do individual tests as test all does not work
-./misc/build.sh
-# Following line ist a blind try to fix the regression test:
-./misc/build.sh patmos
+# To debug on Helena, put all output into the result (just now):
+./misc/build.sh >> ../result.txt
 # this test is not supported from build.sh
 cd patmos
 make test &>> ../result.txt
