@@ -4,7 +4,7 @@
 
 # Do individual tests as test all does not work
 # To debug on Helena, put all output into the result (just now):
-./misc/build.sh >> ../result.txt
+./misc/build.sh &>> ../result.txt
 # this test is not supported from build.sh
 cd patmos
 make test &>> ../result.txt
