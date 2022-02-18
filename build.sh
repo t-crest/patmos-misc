@@ -623,6 +623,52 @@ function make_simulator() {
     rm -rf $INSTALL_DIR/patmos-simulator*.tar.gz
 }
 
+function make_llvm-project() {
+	mkdir -p $1
+	cd $1
+    # Build binaries
+	cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD="Patmos" -DLLVM_DEFAULT_TARGET_TRIPLE=patmos-unknown-unknown-elf -DLLVM_ENABLE_PROJECTS="clang" -DCLANG_ENABLE_ARCMT=false -DCLANG_ENABLE_STATIC_ANALYZER=false -DCLANG_BUILD_EXAMPLES=false -DLLVM_ENABLE_BINDINGS=false -DLLVM_INSTALL_BINUTILS_SYMLINKS=false -DLLVM_INSTALL_CCTOOLS_SYMLINKS=false -DLLVM_INCLUDE_EXAMPLES=false -DLLVM_INCLUDE_BENCHMARKS=false -DLLVM_APPEND_VC_REV=false -DLLVM_ENABLE_WARNINGS=false -DLLVM_ENABLE_PEDANTIC=false -DLLVM_ENABLE_LIBPFM=false -DLLVM_BUILD_INSTRUMENTED_COVERAGE=false -DLLVM_INSTALL_UTILS=false 
+    make $MAKEJ $MAKE_VERBOSE
+
+	# Build Compiler-RT
+	cd ..
+	mkdir -p build-compiler-rt
+	cd build-compiler-rt
+	cmake ../compiler-rt/ -DCMAKE_TOOLCHAIN_FILE=../compiler-rt/cmake/patmos-clang-toolchain.cmake -DCMAKE_PROGRAM_PATH="$(pwd)/../build/bin" -DCOMPILER_RT_INCLUDE_TESTS=OFF
+	make $MAKEJ $MAKE_VERBOSE
+	cd ..
+	
+	# Build Newlib
+	cd patmos-newlib
+	git checkout "1304d2463ae91470d898c92216729175325afde1"
+	cd ..
+	mkdir -p build-newlib
+	cd build-newlib
+	../patmos-newlib/configure --target=patmos-unknown-unknown-elf AR_FOR_TARGET=ar CC_FOR_TARGET="$(pwd)/../build/bin/clang" CFLAGS_FOR_TARGET="-target patmos-unknown-unknown-elf -O2 -emit-llvm -D__GLIBC_USE\(...\)=0" RANLIB_FOR_TARGET=ranlib LD_FOR_TARGET="$(pwd)/../build/bin/clang"
+	make $MAKEJ $MAKE_VERBOSE
+	cd ../build
+	
+	if $DO_RUN_TESTS; then
+		make $MAKEJ llc && ./bin/llvm-lit ../llvm/test -v --filter=Patmos
+		make $MAKEJ ClangPatmosTestDeps && ./bin/llvm-lit ../clang/test -v --filter=Patmos
+		cd ../build-compiler-rt
+		./bin/llvm-lit -v test/builtins/Unit/patmos
+		cd ../build
+	fi
+
+    # Package Everything
+    make PatmosPackage
+
+    # Install
+    echo "Installing files ..."
+
+    mkdir -p $INSTALL_DIR
+    cp patmos-unknown-unknown-elf/package-temp/patmos-llvm*.tar.gz $INSTALL_DIR/
+    tar -xvf $INSTALL_DIR/patmos-llvm*.tar.gz --directory=$INSTALL_DIR
+
+    rm -rf $INSTALL_DIR/patmos-llvm*.tar.gz
+}
+
 function make_gold() {
     # absolute source dir
     local rootdir=$1
@@ -669,6 +715,30 @@ function install_platin() {
     run $rootdir/tools/platin/install.sh -i $INSTALL_DIR -b $builddir/tools/platin
 }
 
+function install_prebuilt() {
+
+	local ubuntu_link=$1
+	local osx_link=$2
+	local tar_name="patmos-$3.tar.gz"		
+	
+    local tar_link=$ubuntu_link
+    if [ "$OS_NAME" == "Darwin" ]; then
+        echo "Detected MacOS"
+        local tar_link=$osx_link
+    fi
+
+    local tar_path=$INSTALL_DIR/$tar_name
+
+    # Download tar
+    curl -L $tar_link -o $tar_path
+
+    echo "Installed files:"
+    # Extract tar
+    tar -xvf $tar_path --directory=$INSTALL_DIR
+
+    #rm -rf $tar_path
+}
+
 function install_simulator() {
     echo "Installing Patmos Simulator from Pre-Built Binaries"
     # Binary for Ubuntu
@@ -676,24 +746,7 @@ function install_simulator() {
     # Binary for OSX
     local osx_link="https://github.com/t-crest/patmos-simulator/releases/download/1.0.1/patmos-simulator-x86_64-apple-darwin17.7.0.tar.gz"
 
-    local simulator_link=$ubuntu_link
-    if [ "$OS_NAME" == "Darwin" ]; then
-        echo "Detected MacOS"
-        local simulator_link=$osx_link
-    fi
-
-    # Local tar name
-    local tar_name="patmos-simulator.tar.gz"
-    local tar_path=$INSTALL_DIR/$tar_name
-
-    # Download tar
-    curl -L $simulator_link -o $tar_path
-
-    echo "Installed files:"
-    # Extract tar
-    tar -xvf $tar_path --directory=$INSTALL_DIR
-
-    rm -rf $tar_path
+	install_prebuilt $ubuntu_link $osx_link "simulator"
 }
 
 function make_llvm() {
@@ -764,6 +817,17 @@ function make_llvm() {
     fi
 }
 
+function install_llvm2() {
+    echo "Installing Patmos LLVM from Pre-Built Binaries"
+    # Binary for Ubuntu
+    local ubuntu_link="https://github.com/t-crest/patmos-llvm-project/releases/latest/download/patmos-llvm-x86_64-linux-gnu.tar.gz"
+    # Binary for OSX
+    local osx_link="https://github.com/t-crest/patmos-llvm-project/releases/latest/download/patmos-llvm-x86_64-apple-darwin19.6.0.tar.gz"
+
+    install_prebuilt $ubuntu_link $osx_link "llvm"
+	
+}
+
 function make_bench() {
     # TODO if we do not have BUILD_SOFTFLOAT=true, then do not build softfloat benchmarks!
 
@@ -791,6 +855,10 @@ function make_and_test_default() {
 
 function build_simulator() {
     build_cmake simulator make_simulator $(get_build_dir simulator)
+}
+
+function build_llvm-project() {
+    make_llvm-project $(get_build_dir llvm-project)
 }
 
 function build_compiler_rt() {
@@ -1203,6 +1271,15 @@ build_target() {
     else 
         clone_update ${GITHUB_BASEURL}/patmos-simulator.git $(get_repo_dir simulator)
         build_simulator
+    fi
+    ;;
+  'llvm2')
+    if $PREFER_DOWNLAOD ; then
+        install_llvm2
+    else 
+        clone_update ${GITHUB_BASEURL}/patmos-llvm-project.git $(get_repo_dir llvm-project)
+        clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir llvm-project)/patmos-newlib
+        build_llvm-project
     fi
     ;;
   "rtems-test")
