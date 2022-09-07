@@ -82,7 +82,7 @@ ALLTARGETS="simulator gold llvm newlib compiler-rt argo patmos bench otawa posei
 
 # List of targets to build by default, developers may set this to $ALLTARGETS
 # or a subset of interesting tools
-BUILDSH_TARGETS="simulator gold llvm newlib compiler-rt patmos argo poseidon aegean"
+BUILDSH_TARGETS="simulator gold llvm newlib compiler-rt argo patmos poseidon aegean"
 #BUILDSH_TARGETS=$ALLTARGETS
 #BUILDSH_TARGETS="llvm patmos"
 
