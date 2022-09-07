@@ -76,7 +76,7 @@ CHRPATH=$(dirname $self)/patmos-chrpath
 INSTALL_SH=$(dirname $self)/scripts/install.sh
 
 # List of available targets
-ALLTARGETS="simulator gold llvm newlib compiler-rt patmos bench otawa argo poseidon aegean"
+ALLTARGETS="simulator gold llvm newlib compiler-rt argo patmos bench otawa poseidon aegean"
 
 ########### Start of user configs, overwrite in build.cfg ##############
 
