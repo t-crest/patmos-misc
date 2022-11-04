@@ -82,9 +82,10 @@ ALLTARGETS="simulator gold llvm newlib compiler-rt argo patmos bench otawa posei
 
 # List of targets to build by default, developers may set this to $ALLTARGETS
 # or a subset of interesting tools
-BUILDSH_TARGETS="simulator gold llvm newlib compiler-rt argo patmos poseidon aegean"
-#BUILDSH_TARGETS=$ALLTARGETS
-#BUILDSH_TARGETS="llvm patmos"
+BUILDSH_TARGETS="simulator gold llvm platin newlib compiler-rt argo patmos poseidon aegean"
+# List of targets to build for toolchain2 (using the new version of the compiler 'llvm2')
+# Should be kept up to date with 'BUILDSH_TARGETS'
+TOOLCHAIN2_TARGETS="simulator llvm2 platin argo patmos poseidon aegean"
 
 # Root directory for all repositories
 ROOT_DIR=$(pwd)
@@ -624,10 +625,42 @@ function make_simulator() {
 }
 
 function make_llvm-project() {
+	# First, Ensure that GNU tar is installed as 'tar'
+	# This is usually not the case on MacOS (usually uses bsdtar)
+	TAR_VERSION=$(tar --version)
+	if [[ $TAR_VERSION != "tar (GNU tar)"* ]]; then
+		echo "Error: Must have GNU Tar installed as 'tar'."
+		echo "Error: Your installed 'tar':"
+		echo "Error: $TAR_VERSION"
+		echo "Error: Hint: if you are using macos, bsdtar is the default 'tar' installed. You can use brew to get GNU tar instead"
+		exit 1
+	fi	
 	mkdir -p $1
 	cd $1
     # Build binaries
-	cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD="Patmos" -DLLVM_DEFAULT_TARGET_TRIPLE=patmos-unknown-unknown-elf -DLLVM_ENABLE_PROJECTS="clang" -DCLANG_ENABLE_ARCMT=false -DCLANG_ENABLE_STATIC_ANALYZER=false -DCLANG_BUILD_EXAMPLES=false -DLLVM_ENABLE_BINDINGS=false -DLLVM_INSTALL_BINUTILS_SYMLINKS=false -DLLVM_INSTALL_CCTOOLS_SYMLINKS=false -DLLVM_INCLUDE_EXAMPLES=false -DLLVM_INCLUDE_BENCHMARKS=false -DLLVM_APPEND_VC_REV=false -DLLVM_ENABLE_WARNINGS=false -DLLVM_ENABLE_PEDANTIC=false -DLLVM_ENABLE_LIBPFM=false -DLLVM_BUILD_INSTRUMENTED_COVERAGE=false -DLLVM_INSTALL_UTILS=false 
+	cmake ../llvm \
+          -DCMAKE_CXX_STANDARD=14 \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DLLVM_TARGETS_TO_BUILD="Patmos" \
+          -DLLVM_DEFAULT_TARGET_TRIPLE=patmos-unknown-unknown-elf  \
+          -DLLVM_ENABLE_PROJECTS="clang;lld" \
+          -DCLANG_ENABLE_ARCMT=false \
+          -DCLANG_ENABLE_STATIC_ANALYZER=false \
+          -DCLANG_BUILD_EXAMPLES=false \
+          -DLLVM_ENABLE_BINDINGS=false \
+          -DLLVM_INSTALL_BINUTILS_SYMLINKS=false \
+          -DLLVM_INSTALL_CCTOOLS_SYMLINKS=false \
+          -DLLVM_INCLUDE_EXAMPLES=false \
+          -DLLVM_INCLUDE_BENCHMARKS=false \
+          -DLLVM_APPEND_VC_REV=false \
+          -DLLVM_ENABLE_WARNINGS=false \
+          -DLLVM_ENABLE_PEDANTIC=false \
+          -DLLVM_ENABLE_LIBPFM=false \
+          -DLLVM_BUILD_INSTRUMENTED_COVERAGE=false \
+          -DLLVM_INSTALL_UTILS=false \
+          -DLLVM_ENABLE_ASSERTIONS=true
+		  # Compiler currently doesn't work without assertions enabled
+		  
     make $MAKEJ $MAKE_VERBOSE
 
 	# Build Compiler-RT
@@ -712,7 +745,7 @@ function install_platin() {
     local builddir=$2
     
     echo "Installing platin toolkit .. "
-    run $rootdir/tools/platin/install.sh -i $INSTALL_DIR -b $builddir/tools/platin
+    run $rootdir/install.sh -i $INSTALL_DIR -b $builddir
 }
 
 function install_prebuilt() {
@@ -800,9 +833,6 @@ function make_llvm() {
 	run ln -sf ../LLVMgold.$LIBEXT $INSTALL_DIR/lib/bfd-plugins/
 	run ln -sf ../libLTO.$LIBEXT   $INSTALL_DIR/lib/bfd-plugins/
     fi
-
-    # install platin
-    install_platin $rootdir $builddir
 
     # Update rpaths, since we are not using cmake install
     update_rpath llvm
@@ -1092,9 +1122,8 @@ function build_llvm() {
 }
 
 function build_platin() {
-  # Just install platin. This is mainly for development purposes. Platin 
-  # is also installed by build_llvm.
-  install_platin $ROOT_DIR/$(get_repo_dir llvm) $ROOT_DIR/$(get_build_dir llvm)
+  # Just install platin. This is mainly for development purposes.
+  install_platin $ROOT_DIR/$(get_repo_dir platin) $ROOT_DIR/$(get_build_dir platin)
 }
 
 function build_rtems() {
@@ -1202,6 +1231,7 @@ build_target() {
     build_llvm
     ;;
   'platin')
+    clone_update ${GITHUB_BASEURL}/patmos-platin.git $(get_repo_dir platin)
     build_platin
     ;;
   'eclipse')
@@ -1281,6 +1311,11 @@ build_target() {
         clone_update ${GITHUB_BASEURL}/patmos-newlib.git $(get_repo_dir llvm-project)/patmos-newlib
         build_llvm-project
     fi
+    ;;
+  'toolchain2')
+    for target in $TOOLCHAIN2_TARGETS; do
+	  build_target $target
+    done
     ;;
   "rtems-test")
     # This requires rtems target to be built already
