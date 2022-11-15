@@ -775,9 +775,9 @@ function install_prebuilt() {
 function install_simulator() {
     echo "Installing Patmos Simulator from Pre-Built Binaries"
     # Binary for Ubuntu
-    local ubuntu_link="https://github.com/t-crest/patmos-simulator/releases/download/1.0.1/patmos-simulator-x86_64-linux-gnu.tar.gz"
+    local ubuntu_link="https://github.com/t-crest/patmos-simulator/releases/latest/download/patmos-simulator-x86_64-linux-gnu.tar.gz"
     # Binary for OSX
-    local osx_link="https://github.com/t-crest/patmos-simulator/releases/download/1.0.1/patmos-simulator-x86_64-apple-darwin17.7.0.tar.gz"
+    local osx_link="https://github.com/t-crest/patmos-simulator/releases/latest/download/patmos-simulator-x86_64-apple-darwin.tar.gz"
 
 	install_prebuilt $ubuntu_link $osx_link "simulator"
 }
