@@ -852,7 +852,7 @@ function install_llvm2() {
     # Binary for Ubuntu
     local ubuntu_link="https://github.com/t-crest/patmos-llvm-project/releases/latest/download/patmos-llvm-x86_64-linux-gnu.tar.gz"
     # Binary for OSX
-    local osx_link="https://github.com/t-crest/patmos-llvm-project/releases/latest/download/patmos-llvm-x86_64-apple-darwin19.6.0.tar.gz"
+    local osx_link="https://github.com/t-crest/patmos-llvm-project/releases/latest/download/patmos-llvm-x86_64-apple-darwin.tar.gz"
 
     install_prebuilt $ubuntu_link $osx_link "llvm"
 	
