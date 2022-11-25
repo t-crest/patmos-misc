@@ -227,6 +227,9 @@ NEWLIB_TARGET_CFLAGS=
 #COMPILER_RT_CFLAGS="-fpatmos-emit-obj"
 #BENCH_LDFLAGS="-fpatmos-lto-defaultlibs"
 
+# If 'y' the 'patmos' target will automatically switch to the llvm2 branch as part of the build
+AUTO_PATMOS_LLVM2=n
+
 # Commandline option to pass to make/ctest for parallel builds
 MAKEJ=-j2
 
@@ -1251,7 +1254,32 @@ build_target() {
     build_otawa $(get_build_dir otawa)
     ;;
   'patmos')
-    clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)
+    clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)	
+	# Check if LLVM2 is installed, if so, switch to llvm2 branch
+	FOUND_INFO_YML=$(find "${INSTALL_DIR}" -type f -name "patmos-llvm-info.yml")
+	if [ ! -z  "$FOUND_INFO_YML" ]; then
+		YML_CONTENT=$(cat ${INSTALL_DIR}/patmos-llvm-info.yml) 
+		# Might still be version 1, check version isn't 1
+		if [[ ! "$YML_CONTENT" == *"version: 1"* ]]; then
+			PATMOS_DIR=$(get_repo_dir patmos)
+			BRANCHES=$(cd $ROOT_DIR/$PATMOS_DIR; git branch)
+			if [[ ! "$BRANCHES" == *"* llvm"* ]]; then
+				if [[ "$AUTO_PATMOS_LLVM2" == "y" ]]; then
+					cd "$ROOT_DIR/$PATMOS_DIR"; git checkout llvm2
+				else
+					echo "'patmos' repository is not on 'llvm2' branch, would you like me to switch to it [y/N]: "
+					read  -t 300 SWITCH_TO_LLVM2
+					
+					if [ "$SWITCH_TO_LLVM2" == "y" ]; then
+						cd "$ROOT_DIR/$PATMOS_DIR"; git checkout llvm2
+					else
+						echo "WARNING: The 'patmos' repository's 'master' branch (and derived branches) doesn't work with the llvm2 compiler (new compiler). "
+						echo "WARNING: Make sure the current branch is compatible with the new compiler to avoid spurious errors."
+					fi
+				fi				
+			fi 
+		fi
+	fi
     build_tools
     if [ "$BUILD_EMULATOR" == "false" ]; then
 	info "Skipping patmos emulator in patmos."
@@ -1304,6 +1332,7 @@ build_target() {
     fi
     ;;
   'llvm2')
+	AUTO_PATMOS_LLVM2=y
     if $PREFER_DOWNLAOD ; then
         install_llvm2
     else 
@@ -1313,6 +1342,7 @@ build_target() {
     fi
     ;;
   'toolchain2')
+	AUTO_PATMOS_LLVM2=y
     for target in $TOOLCHAIN2_TARGETS; do
 	  build_target $target
     done
