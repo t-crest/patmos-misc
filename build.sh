@@ -673,7 +673,7 @@ function make_llvm-project() {
 	
 	# Build Newlib
 	cd patmos-newlib
-	git checkout "1304d2463ae91470d898c92216729175325afde1"
+	git checkout "4a74fe0ca51e6f462999446f8adbfd8f6b8c91e5"
 	cd ..
 	mkdir -p build-newlib
 	cd build-newlib
