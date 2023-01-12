@@ -699,10 +699,10 @@ function make_llvm-project() {
     echo "Installing files ..."
 
     mkdir -p $INSTALL_DIR
-    cp patmos-unknown-unknown-elf/package-temp/patmos-llvm*.tar.gz $INSTALL_DIR/
-    tar -xvf $INSTALL_DIR/patmos-llvm*.tar.gz --directory=$INSTALL_DIR
+    cp patmos-unknown-unknown-elf/package-temp/patmos-llvm*.tar.gz $INSTALL_DIR/patmos-llvm.tar.gz
+    tar -xvf $INSTALL_DIR/patmos-llvm.tar.gz --directory=$INSTALL_DIR
 
-    rm -rf $INSTALL_DIR/patmos-llvm*.tar.gz
+    rm -rf $INSTALL_DIR/patmos-llvm.tar.gz
 }
 
 function make_gold() {
