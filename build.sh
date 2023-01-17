@@ -611,7 +611,7 @@ function make_simulator() {
     make $MAKEJ $MAKE_VERBOSE
 
     # Package binaries
-    make box
+    make Package
 
 	if $DO_RUN_TESTS; then
 		make test
