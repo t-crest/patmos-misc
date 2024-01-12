@@ -749,6 +749,7 @@ function install_platin() {
     local builddir=$2
     
     echo "Installing platin toolkit .. "
+    chmod u+x $rootdir/install.sh
     run $rootdir/install.sh -i $INSTALL_DIR -b $builddir
 }
 
