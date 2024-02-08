@@ -59,6 +59,7 @@ function abspath() {
 
 
 OS_NAME=$(uname -s)
+ARCH_NAME=$(uname -m)
 # avoid changing into CDPATH directories
 unset CDPATH
 
@@ -755,12 +756,18 @@ function install_prebuilt() {
 
 	local ubuntu_link=$1
 	local osx_link=$2
-	local tar_name="patmos-$3.tar.gz"		
+	local osx_arm_link=$3
+	local tar_name="patmos-$4.tar.gz"		
 	
     local tar_link=$ubuntu_link
     if [ "$OS_NAME" == "Darwin" ]; then
         echo "Detected MacOS"
-        local tar_link=$osx_link
+        if [ "$ARCH_NAME" == "arm64" ]; then
+            echo "Detected A"
+            local tar_link=$osx_arm_link
+        else
+            local tar_link=$osx_link
+        fi
     fi
 
     local tar_path=$INSTALL_DIR/$tar_name
@@ -771,8 +778,6 @@ function install_prebuilt() {
     echo "Installed files:"
     # Extract tar
     tar -xvf $tar_path --directory=$INSTALL_DIR
-
-    #rm -rf $tar_path
 }
 
 function install_simulator() {
@@ -781,8 +786,10 @@ function install_simulator() {
     local ubuntu_link="https://github.com/t-crest/patmos-simulator/releases/latest/download/patmos-simulator-x86_64-linux-gnu.tar.gz"
     # Binary for OSX
     local osx_link="https://github.com/t-crest/patmos-simulator/releases/latest/download/patmos-simulator-x86_64-apple-darwin.tar.gz"
+    # Binary for OSX ARM
+    local osx_arm_link="https://github.com/t-crest/patmos-simulator/releases/latest/download/patmos-simulator-arm64-apple-darwin.tar.gz"
 
-	install_prebuilt $ubuntu_link $osx_link "simulator"
+    install_prebuilt $ubuntu_link $osx_link $osx_arm_link "simulator"
 }
 
 function make_llvm() {
@@ -857,7 +864,7 @@ function install_llvm2() {
     # Binary for OSX
     local osx_link="https://github.com/t-crest/patmos-llvm-project/releases/latest/download/patmos-llvm-x86_64-apple-darwin.tar.gz"
 
-    install_prebuilt $ubuntu_link $osx_link "llvm"
+    install_prebuilt $ubuntu_link $osx_link $osx_link "llvm"
 	
 }
 
