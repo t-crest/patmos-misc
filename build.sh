@@ -77,16 +77,16 @@ CHRPATH=$(dirname $self)/patmos-chrpath
 INSTALL_SH=$(dirname $self)/scripts/install.sh
 
 # List of available targets
-ALLTARGETS="simulator gold llvm newlib compiler-rt argo patmos bench otawa poseidon aegean"
+ALLTARGETS="simulator gold llvm newlib compiler-rt argo patmos bench otawa poseidon aegean soc-comm"
 
 ########### Start of user configs, overwrite in build.cfg ##############
 
 # List of targets to build by default, developers may set this to $ALLTARGETS
 # or a subset of interesting tools
-BUILDSH_TARGETS="simulator gold llvm platin newlib compiler-rt argo patmos poseidon aegean"
+BUILDSH_TARGETS="simulator gold llvm platin newlib compiler-rt argo patmos poseidon aegean soc-comm"
 # List of targets to build for toolchain2 (using the new version of the compiler 'llvm2')
 # Should be kept up to date with 'BUILDSH_TARGETS'
-TOOLCHAIN2_TARGETS="simulator llvm2 platin argo patmos poseidon aegean"
+TOOLCHAIN2_TARGETS="simulator llvm2 platin argo patmos poseidon aegean soc-comm"
 
 # Root directory for all repositories
 ROOT_DIR=$(pwd)
@@ -1361,6 +1361,9 @@ build_target() {
   "rtems-examples")
     clone_update ' https://github.com/RTEMS/examples-v2' "$(get_repo_dir rtems/examples)"
     build_rtems_examples
+    ;;
+  "soc-comm")
+    clone_update ${GITHUB_BASEURL}/soc-comm.git $(get_repo_dir soc-comm)
     ;;
   *) echo "Don't know about $target." ;;
   esac
