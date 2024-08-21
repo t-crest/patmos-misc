@@ -1017,7 +1017,8 @@ function build_tools() {
     # the patmos Makefile where to build or calling the build scripts directly.
 
     info "Building tools/c in patmos .. "
-    build_cmake patmos/tools/c   make_default $(get_build_dir patmos "tools/c") "$CTOOLS_ARGS"
+    make -C patmos tools
+    # build_cmake patmos/tools/c   make_default $(get_build_dir patmos "tools/c") "$CTOOLS_ARGS"
     info "Building tools/java in patmos .. "
     build_javatools $(get_build_dir patmos "tools/java")
     info "Building tools/scripts in patmos .. "
