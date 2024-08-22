@@ -1011,13 +1011,14 @@ function build_scripttools() {
     run popd > /dev/null
 }
 
+# MS: why do we have two ways to build stuff? in the patmos Makefile and here again
 function build_tools() {
     # We need a separate build call per build directory, as the build paths may not have a common prefix!
     # Therefore, for every 'build' directory there must be one build target here, either telling
     # the patmos Makefile where to build or calling the build scripts directly.
 
-    info "Building tools/c in patmos .. "
-    make -C patmos tools
+    # info "Building tools/c in patmos .. "
+    # It is built as part of patmos
     # build_cmake patmos/tools/c   make_default $(get_build_dir patmos "tools/c") "$CTOOLS_ARGS"
     info "Building tools/java in patmos .. "
     build_javatools $(get_build_dir patmos "tools/java")
