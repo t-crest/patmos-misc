@@ -754,21 +754,26 @@ function install_platin() {
 
 function install_prebuilt() {
 
-	local ubuntu_link=$1
-	local osx_link=$2
-	local osx_arm_link=$3
-	local tar_name="patmos-$4.tar.gz"		
+	local tool_name=$1
+	local tool_link=$2
+	local tar_name="$1.tar.gz"		
 	
-    local tar_link=$ubuntu_link
+    local tar_link="${tool_link}/releases/latest/download/${tool_name}-"
     if [ "$OS_NAME" == "Darwin" ]; then
         echo "Detected MacOS"
         if [ "$ARCH_NAME" == "arm64" ]; then
-            echo "Detected A"
-            local tar_link=$osx_arm_link
+            echo "Detected ARM"
+            local tar_link="${tar_link}arm64-apple-darwin"
         else
-            local tar_link=$osx_link
+            echo "Detected x86_64"
+            local tar_link="${tar_link}x86_64-apple-darwin"
         fi
+	else
+		echo "Detected Ubuntu"
+		local tar_link="${tar_link}x86_64-linux-gnu"
     fi
+	local tar_link="${tar_link}.tar.gz"
+	echo "Downloading prebuild from: $tar_link"
 
     local tar_path=$INSTALL_DIR/$tar_name
 
@@ -782,14 +787,8 @@ function install_prebuilt() {
 
 function install_simulator() {
     echo "Installing Patmos Simulator from Pre-Built Binaries"
-    # Binary for Ubuntu
-    local ubuntu_link="https://github.com/t-crest/patmos-simulator/releases/latest/download/patmos-simulator-x86_64-linux-gnu.tar.gz"
-    # Binary for OSX
-    local osx_link="https://github.com/t-crest/patmos-simulator/releases/latest/download/patmos-simulator-x86_64-apple-darwin.tar.gz"
-    # Binary for OSX ARM
-    local osx_arm_link="https://github.com/t-crest/patmos-simulator/releases/latest/download/patmos-simulator-arm64-apple-darwin.tar.gz"
 
-    install_prebuilt $ubuntu_link $osx_link $osx_arm_link "simulator"
+    install_prebuilt "patmos-simulator" "https://github.com/t-crest/patmos-simulator"
 }
 
 function make_llvm() {
@@ -859,13 +858,8 @@ function make_llvm() {
 
 function install_llvm2() {
     echo "Installing Patmos LLVM from Pre-Built Binaries"
-    # Binary for Ubuntu
-    local ubuntu_link="https://github.com/t-crest/patmos-llvm-project/releases/latest/download/patmos-llvm-x86_64-linux-gnu.tar.gz"
-    # Binary for OSX
-    local osx_link="https://github.com/t-crest/patmos-llvm-project/releases/latest/download/patmos-llvm-x86_64-apple-darwin.tar.gz"
 
-    install_prebuilt $ubuntu_link $osx_link $osx_link "llvm"
-	
+    install_prebuilt "patmos-llvm" "https://github.com/t-crest/patmos-llvm-project"
 }
 
 function make_bench() {
