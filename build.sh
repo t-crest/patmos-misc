@@ -77,16 +77,16 @@ CHRPATH=$(dirname $self)/patmos-chrpath
 INSTALL_SH=$(dirname $self)/scripts/install.sh
 
 # List of available targets
-ALLTARGETS="simulator gold llvm newlib compiler-rt argo soc-comm patmos bench otawa poseidon aegean"
+ALLTARGETS="simulator gold llvm newlib compiler-rt argo soc-comm patmos bench otawa poseidon"
 
 ########### Start of user configs, overwrite in build.cfg ##############
 
 # List of targets to build by default, developers may set this to $ALLTARGETS
 # or a subset of interesting tools
-BUILDSH_TARGETS="simulator gold llvm platin newlib compiler-rt argo soc-comm patmos poseidon aegean"
+BUILDSH_TARGETS="simulator gold llvm platin newlib compiler-rt argo soc-comm patmos poseidon"
 # List of targets to build for toolchain2 (using the new version of the compiler 'llvm2')
 # Should be kept up to date with 'BUILDSH_TARGETS'
-TOOLCHAIN2_TARGETS="simulator llvm2 platin argo soc-comm patmos poseidon aegean"
+TOOLCHAIN2_TARGETS="simulator llvm2 platin argo soc-comm patmos poseidon"
 
 # Root directory for all repositories
 ROOT_DIR=$(pwd)
@@ -596,7 +596,7 @@ function usage() {
     -o		Build toolchain (simulator, gold, llvm, patmos, newlib, compiler-rt) and do clean build of bench with tests.
     -q		Download and install from pre-built binaries where available, instead of building from source. Disables testing of downloaded targets (with -t)
   Available targets:
-    simulator gold llvm newlib compiler-rt patmos otawa bench rtems rtems-test rtems-examples eclipse aegean poseidon
+    simulator gold llvm newlib compiler-rt patmos otawa bench rtems rtems-test rtems-examples eclipse poseidon soc-comm
 
   The command-line options override the user-config read from '$CFGFILE'.
 EOT
@@ -1065,33 +1065,6 @@ function build_emulator() {
     run popd > /dev/null
 }
 
-function build_aegean() {
-    # source path, relative to ROOT_DIR
-    local root=$(get_repo_dir patmos)
-    # build path (might be relative)
-    local builddir=$ROOT_DIR/$1
-
-    # paths to other repository sources (absolute)
-    local patmospath=$(abspath $(get_repo_dir patmos))
-    local poseidonpath=$(abspath $(get_repo_dir poseidon))
-    local argopath=$(abspath $(get_repo_dir argo))
-    # absolute path to sources
-    local rootdir=$(abspath $ROOT_DIR/$repo)
-
-    if [ $DO_CLEAN == true -o ! -e "$builddir" ] ; then
-        run rm -rf $builddir
-        run mkdir -p $builddir
-    fi
-
-    # absolute build path
-    local buildpath=$(abspath $builddir)
-
-    run pushd "${rootdir}"
-    info "Nothing to build for Aegean."
-    # make $MAKEJ $MAKE_VERBOSE "AEGEAN_PATH=${rootdir}" "BUILD_PATH=${buildpath}" "PATMOS_PATH=${patmospath}" "POSEIDON_PATH=${poseidonpath}" "ARGO_PATH=${argopath}" platform
-    run popd
-}
-
 function build_poseidon() {
     # source path, relative to ROOT_DIR
     local root=$(get_repo_dir poseidon)
@@ -1300,12 +1273,7 @@ build_target() {
   'argo')
     clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo)
     ;;
-  'aegean')
-    clone_update ${GITHUB_BASEURL}/argo.git $(get_repo_dir argo)
-    clone_update ${GITHUB_BASEURL}/aegean.git $(get_repo_dir aegean)
-    build_aegean $(get_build_dir aegean)
-    ;;
-  'poseidon')
+ 'poseidon')
     clone_update ${GITHUB_BASEURL}/poseidon.git $(get_repo_dir poseidon)
     build_poseidon $(get_build_dir poseidon)
     ;;
