@@ -77,16 +77,16 @@ CHRPATH=$(dirname $self)/patmos-chrpath
 INSTALL_SH=$(dirname $self)/scripts/install.sh
 
 # List of available targets
-ALLTARGETS="simulator gold llvm newlib compiler-rt argo patmos bench otawa poseidon aegean soc-comm"
+ALLTARGETS="simulator gold llvm newlib compiler-rt argo soc-comm patmos bench otawa poseidon aegean"
 
 ########### Start of user configs, overwrite in build.cfg ##############
 
 # List of targets to build by default, developers may set this to $ALLTARGETS
 # or a subset of interesting tools
-BUILDSH_TARGETS="simulator gold llvm platin newlib compiler-rt argo patmos poseidon aegean soc-comm"
+BUILDSH_TARGETS="simulator gold llvm platin newlib compiler-rt argo soc-comm patmos poseidon aegean"
 # List of targets to build for toolchain2 (using the new version of the compiler 'llvm2')
 # Should be kept up to date with 'BUILDSH_TARGETS'
-TOOLCHAIN2_TARGETS="simulator llvm2 platin argo patmos poseidon aegean soc-comm"
+TOOLCHAIN2_TARGETS="simulator llvm2 platin argo soc-comm patmos poseidon aegean"
 
 # Root directory for all repositories
 ROOT_DIR=$(pwd)
