@@ -77,15 +77,15 @@ CHRPATH=$(dirname $self)/patmos-chrpath
 INSTALL_SH=$(dirname $self)/scripts/install.sh
 
 # List of available targets
-ALLTARGETS="simulator gold llvm newlib compiler-rt argo soc-comm patmos bench otawa poseidon"
+ALLTARGETS="simulator gold llvm1 newlib compiler-rt argo soc-comm patmos bench otawa poseidon"
 
 ########### Start of user configs, overwrite in build.cfg ##############
 
-# List of targets to build by default, developers may set this to $ALLTARGETS
-# or a subset of interesting tools
-BUILDSH_TARGETS="simulator gold llvm platin newlib compiler-rt argo soc-comm patmos poseidon"
+# List of targets to build by default when running toolchain1 (using the new version of the compiler 'llvm2'), 
+# developers may set this to $ALLTARGETS or a subset of interesting tools
+TOOLCHAIN1_TARGETS="simulator gold llvm1 platin newlib compiler-rt argo soc-comm patmos poseidon"
 # List of targets to build for toolchain2 (using the new version of the compiler 'llvm2')
-# Should be kept up to date with 'BUILDSH_TARGETS'
+# Should be kept up to date with 'TOOLCHAIN1_TARGETS'
 TOOLCHAIN2_TARGETS="simulator llvm2 platin argo soc-comm patmos poseidon"
 
 # Root directory for all repositories
@@ -228,8 +228,8 @@ NEWLIB_TARGET_CFLAGS=
 #COMPILER_RT_CFLAGS="-fpatmos-emit-obj"
 #BENCH_LDFLAGS="-fpatmos-lto-defaultlibs"
 
-# If 'y' the 'patmos' target will automatically switch to the llvm2 branch as part of the build
-AUTO_PATMOS_LLVM2=n
+# If 'y' the 'patmos' target will automatically switch to the llvm1 branch as part of the build
+AUTO_PATMOS_LLVM1=n
 
 # Commandline option to pass to make/ctest for parallel builds
 MAKEJ=-j2
@@ -256,7 +256,6 @@ DO_SHOW_CONFIGURE=false
 DO_RUN_TESTS=false
 DRYRUN=false
 VERBOSE=false
-DO_TOOLCHAIN_RUN=false
 DO_RUN_ALL=false
 
 # user config
@@ -792,7 +791,7 @@ function install_simulator() {
     install_prebuilt "patmos-simulator" "https://github.com/t-crest/patmos-simulator"
 }
 
-function make_llvm() {
+function make_llvm1() {
     # absolute source dir
     local rootdir=$1
     # absolute build dir
@@ -916,7 +915,10 @@ function build_newlib() {
     local target=$2
     # source repository dir (relative path, always to same newlib ckeckout, independent of build-dir)
     local repo=$(get_repo_dir newlib)
-    clone_update ${GITHUB_BASEURL}/patmos-newlib.git $repo
+    clone_update ${GITHUB_BASEURL}/patmos-newlib.git $repo llvm1 
+	echo "WARNING: Explicitly building newlib will assume the use of the llvm1 compiler (old compiler)."
+	echo "WARNING: If you do not want to explicitly use the old compiler, do not build newlib manually."
+	echo "WARNING: The newlib repository will automatically be switched to the old compiler commit (tagged as llvm1)."	
 
     # Use a different install script for newlib that does not change the modification time if
     # the files did not change.
@@ -1081,7 +1083,7 @@ function build_poseidon() {
     run popd
 }
 
-function build_llvm() {
+function build_llvm1() {
     local eclipse_args=
     local config_args="--with-bug-report-url='https://github.com/t-crest/patmos-llvm/issues'"
     local cmake_args="-DBUG_REPORT_URL='https://github.com/t-crest/patmos-llvm/issues'"
@@ -1095,9 +1097,9 @@ function build_llvm() {
 
     if [ "$LLVM_USE_CONFIGURE" == "true" -a "$1" != "eclipse" ]; then
 	local targets=$(echo $LLVM_TARGETS | tr '[A-Z;]' '[a-z,]')
-	build_autoconf llvm make_llvm $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $config_args $LLVM_CONFIGURE_ARGS"
+	build_autoconf llvm make_llvm1 $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $config_args $LLVM_CONFIGURE_ARGS"
     else
-	build_cmake llvm make_llvm $(get_build_dir llvm) "-DCMAKE_BUILD_TYPE=$LLVM_BUILD_TYPE -DCMAKE_CXX_STANDARD=14 -DLLVM_TARGETS_TO_BUILD='$LLVM_TARGETS' $cmake_args $LLVM_CMAKE_ARGS"
+	build_cmake llvm make_llvm1 $(get_build_dir llvm) "-DCMAKE_BUILD_TYPE=$LLVM_BUILD_TYPE -DCMAKE_CXX_STANDARD=14 -DLLVM_TARGETS_TO_BUILD='$LLVM_TARGETS' $cmake_args $LLVM_CMAKE_ARGS"
     fi
 }
 
@@ -1203,19 +1205,20 @@ build_target() {
     info "Processing '"$target"'"
   fi
   case $target in
-  'llvm')
+  'llvm1')
+	AUTO_PATMOS_LLVM1=y
     clone_update ${GITHUB_BASEURL}/patmos-llvm.git $(get_repo_dir llvm)
     if [ "$LLVM_OMIT_CLANG" != "true" ]; then
         clone_update ${GITHUB_BASEURL}/patmos-clang.git $(get_repo_dir llvm)/tools/clang
     fi
-    build_llvm
+    build_llvm1
     ;;
   'platin')
     clone_update ${GITHUB_BASEURL}/patmos-platin.git $(get_repo_dir platin)
     build_platin
     ;;
   'eclipse')
-    build_llvm eclipse
+    build_llvm1 eclipse
     ;;
   'gold')
     clone_update ${GITHUB_BASEURL}/patmos-gold.git $(get_repo_dir gold)
@@ -1232,30 +1235,35 @@ build_target() {
     ;;
   'patmos')
     clone_update ${GITHUB_BASEURL}/patmos.git $(get_repo_dir patmos)	
-	# Check if LLVM2 is installed, if so, switch to llvm2 branch
+	# Check if LLVM2 is installed, if not, switch to llvm1 branch
+	IS_LLVM2="false"
 	FOUND_INFO_YML=$(find "${INSTALL_DIR}" -type f -name "patmos-llvm-info.yml")
 	if [ ! -z  "$FOUND_INFO_YML" ]; then
+		IS_LLVM2="true"
 		YML_CONTENT=$(cat ${INSTALL_DIR}/patmos-llvm-info.yml) 
-		# Might still be version 1, check version isn't 1
-		if [[ ! "$YML_CONTENT" == *"version: 1"* ]]; then
-			PATMOS_DIR=$(get_repo_dir patmos)
-			BRANCHES=$(cd $ROOT_DIR/$PATMOS_DIR; git branch)
-			if [[ ! "$BRANCHES" == *"* llvm"* ]]; then
-				if [[ "$AUTO_PATMOS_LLVM2" == "y" ]]; then
-					cd "$ROOT_DIR/$PATMOS_DIR"; git checkout llvm2
-				else
-					echo "'patmos' repository is not on 'llvm2' branch, would you like me to switch to it [y/N]: "
-					read  -t 300 SWITCH_TO_LLVM2
-					
-					if [ "$SWITCH_TO_LLVM2" == "y" ]; then
-						cd "$ROOT_DIR/$PATMOS_DIR"; git checkout llvm2
-					else
-						echo "WARNING: The 'patmos' repository's 'master' branch (and derived branches) doesn't work with the llvm2 compiler (new compiler). "
-						echo "WARNING: Make sure the current branch is compatible with the new compiler to avoid spurious errors."
-					fi
-				fi				
-			fi 
+		# Might still be version 1, check version is 1
+		if [[ "$YML_CONTENT" == *"version: 1"* ]]; then
+			IS_LLVM2="false"
 		fi
+	fi
+	if [ "$IS_LLVM2" == "false" ]; then
+		PATMOS_DIR=$(get_repo_dir patmos)
+		BRANCHES=$(cd $ROOT_DIR/$PATMOS_DIR; git branch)
+		if [[ ! "$BRANCHES" == *"* llvm"* ]]; then
+			if [[ "$AUTO_PATMOS_LLVM1" == "y" ]]; then
+				cd "$ROOT_DIR/$PATMOS_DIR"; git checkout llvm1
+			else
+				echo "'patmos' repository is not on 'llvm1' branch, would you like me to switch to it [y/N]: "
+				read  -t 300 SWITCH_TO_LLVM1
+				
+				if [ "$SWITCH_TO_LLVM1" == "y" ]; then
+					cd "$ROOT_DIR/$PATMOS_DIR"; git checkout llvm1
+				else
+					echo "WARNING: The 'patmos' repository's 'master' branch (and derived branches) doesn't work with the llvm1 compiler (old compiler). "
+					echo "WARNING: Make sure the current branch is compatible with the old compiler to avoid spurious errors."
+				fi
+			fi				
+		fi 
 	fi
     build_tools
     if [ "$BUILD_EMULATOR" == "false" ]; then
@@ -1304,7 +1312,6 @@ build_target() {
     fi
     ;;
   'llvm2')
-	AUTO_PATMOS_LLVM2=y
     if $PREFER_DOWNLAOD ; then
         install_llvm2
     else 
@@ -1313,8 +1320,13 @@ build_target() {
         build_llvm-project
     fi
     ;;
+  'toolchain1')
+	AUTO_PATMOS_LLVM1=y
+    for target in $TOOLCHAIN1_TARGETS; do
+	  build_target $target
+    done
+    ;;
   'toolchain2')
-	AUTO_PATMOS_LLVM2=y
     for target in $TOOLCHAIN2_TARGETS; do
 	  build_target $target
     done
@@ -1352,7 +1364,6 @@ while getopts ":crhi:j:pudsvxVtoeaq" opt; do
     v) VERBOSE=true ;;
     V) MAKE_VERBOSE="VERBOSE=1" ;;
     t) DO_RUN_TESTS=true ;;
-    o) DO_TOOLCHAIN_RUN=true ;;
     x) set -x ;;
     e) # recreate build.cfg.dist
        cat build.sh | sed -n '/##* Start of user configs/,/##* End of user configs/p' | sed "$ d" | sed "/Start of user configs/d" > build.cfg.dist
@@ -1434,25 +1445,14 @@ fi
 
 mkdir -p "${INSTALL_DIR}"
 
-if [ "$DO_TOOLCHAIN_RUN" == "true" ]; then
-    build_target gold
-    build_target llvm
-    build_target compiler-rt
-    build_target newlib
-    build_target patmos
-    DO_CLEAN=true
-    DO_RUN_TESTS=true
-    build_target bench
+if [ "$DO_RUN_ALL" == "true" ]; then
+	TARGETS=$ALLTARGETS
+	echo "** Building all targets (-a): $TARGETS"
 else
-    if [ "$DO_RUN_ALL" == "true" ]; then
-        TARGETS=$ALLTARGETS
-        echo "** Building all targets (-a): $TARGETS"
-    else
-        TARGETS=${@-$BUILDSH_TARGETS}
-        echo "** Building targets: $TARGETS"
-    fi
-    for target in $TARGETS; do
-	build_target $target
-    done
+	TARGETS=${@-$TOOLCHAIN2_TARGETS}
+	echo "** Building targets: $TARGETS"
 fi
+for target in $TARGETS; do
+build_target $target
+done
 
