@@ -762,13 +762,13 @@ function install_prebuilt() {
     local tar_link="${tool_link}/releases/latest/download/${tool_name}-"
     if [ "$OS_NAME" == "Darwin" ]; then
         echo "Detected MacOS"
-        if [ "$ARCH_NAME" == "arm64" ]; then
-            echo "Detected ARM"
-            local tar_link="${tar_link}arm64-apple-darwin"
-        else
-            echo "Detected x86_64"
+        #if [ "$ARCH_NAME" == "arm64" ]; then
+        #    echo "Detected ARM"
+        #    local tar_link="${tar_link}arm64-apple-darwin"
+        #else
+        #    echo "Detected x86_64"
             local tar_link="${tar_link}x86_64-apple-darwin"
-        fi
+        #fi
 	else
 		echo "Detected Ubuntu"
 		local tar_link="${tar_link}x86_64-linux-gnu"
