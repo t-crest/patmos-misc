@@ -83,15 +83,16 @@ function update_binary() {
     local binary=$1
 
     if [ "$DELETE" == "true" ]; then
-	if [ "$VERBOSE" == "true" ]; then
-	    echo "$CHRPATH -d $binary"
-	fi
-	$CHRPATH -d $binary >/dev/null
+        if [ "$VERBOSE" == "true" ]; then
+            echo "$CHRPATH -d $binary"
+        fi
+	    $CHRPATH -d $binary >/dev/null
     else
-	if [ "$VERBOSE" == "true" ]; then
-	    echo "$CHRPATH -r $RPATH $binary"
-	fi
-	$CHRPATH -r $RPATH $binary >/dev/null 
+        if [ "$VERBOSE" == "true" ]; then
+            echo "$CHRPATH -r $RPATH $binary"
+        fi
+        $CHRPATH -r $RPATH $binary >/dev/null 
+        
     fi
 }
 
@@ -142,11 +143,11 @@ fi
 CHRPATH=$(which chrpath)
 if [ $? != 0 -o ! -x "$CHRPATH" ]; then
     if [ "$WARN" == "true" ]; then
-	echo "** Warning: chrpath not found, skipping."
-	exit 0
+        echo "** Warning: chrpath not found, skipping."
+        exit 0
     else
-	echo "** Error: chrpath not found, exiting."
-	exit 2
+        echo "** Error: chrpath not found, exiting."
+        exit 2
     fi
 fi
 

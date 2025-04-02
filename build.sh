@@ -276,15 +276,15 @@ function info() {
 
 run() {
     if [ "$VERBOSE" == "true" ]; then
-	echo "$@"
+	    echo "$@"
     fi
     if [ "$DRYRUN" != "true" ]; then
-	eval $@
-	ret=$?
-	if [ $ret != 0 ]; then
-	    echo "$@ failed ($ret)!"
-	    return $ret
-	fi
+        eval $@
+        ret=$?
+        if [ $ret != 0 ]; then
+            echo "$@ failed ($ret)!"
+            return $ret
+        fi
     fi
 }
 
@@ -329,20 +329,20 @@ function update_rpath() {
     local repo=$1
 
     if [ "$INSTALL_RPATH" == "true" ]; then
-	if [ -x $CHRPATH ]; then
-	    echo "Setting rpath of binaries to install dir .. "
-	    run $CHRPATH -w -p $repo -i $INSTALL_DIR
-	else
-	    echo "** Warning: patmos-chrpath script not found, skipping setting rpath."
-	fi
+        if [ -x $CHRPATH ]; then
+            echo "Setting rpath of binaries to install dir .. "
+            run $CHRPATH -w -p $repo -i $INSTALL_DIR
+        else
+            echo "** Warning: patmos-chrpath script not found, skipping setting rpath."
+        fi
     fi
     if [ "$INSTALL_RPATH" == "remove" ]; then
-	if [ -x $CHRPATH ]; then
-	    echo "Removing rpath from installed binaries .. "
-	    run $CHRPATH -w -d -p $repo -i $INSTALL_DIR
-	else
-	    echo "** Warning: patmos-chrpath script not found, skipping removing rpath."
-	fi
+        if [ -x $CHRPATH ]; then
+            echo "Removing rpath from installed binaries .. "
+            run $CHRPATH -w -d -p $repo -i $INSTALL_DIR
+        else
+            echo "** Warning: patmos-chrpath script not found, skipping removing rpath."
+        fi
     fi
 }
 
@@ -805,28 +805,29 @@ function make_llvm1() {
     echo "Installing files .. "
 
     if [ "$LLVM_USE_CONFIGURE" == "true" ]; then
-	builddir=$builddir/Debug+Asserts
+	    builddir=$builddir/Debug+Asserts
     fi
 
     run mkdir -p $INSTALL_DIR/bin
     run mkdir -p $INSTALL_DIR/lib
 
+    #install executables
     for file in `find $builddir/bin -type f`; do
-	filename=`basename $file`
-
-	# Not sure how to add a program prefix for cmake install.. so just copy what we need
-	install $file $INSTALL_DIR/bin/patmos-$filename
+        filename=`basename $file`
+        # Not sure how to add a program prefix for cmake install.. so just copy what we need
+        install $file $INSTALL_DIR/bin/patmos-$filename
     done
+
     # symlinks have to be recreated anyway
     for file in `find $builddir/bin -type l`; do
-	filename=`basename $file`
-	src=$(readlink $file)
-	run ln -sf patmos-$(basename $src) $INSTALL_DIR/bin/patmos-$filename
+        filename=`basename $file`
+        src=$(readlink $file)
+        run ln -sf patmos-$(basename $src) $INSTALL_DIR/bin/patmos-$filename
     done
 
     # install all shared libraries
     for file in `find $builddir/lib -name "*.$LIBEXT"`; do
-	install $file $INSTALL_DIR/lib/
+        install $file $INSTALL_DIR/lib/
     done
 
     # Install system headers
@@ -834,25 +835,46 @@ function make_llvm1() {
 
     if [ "$BUILD_LTO" == "true" ]; then
 
-	# bin is required, otherwise auto-loading of plugins does not work!
-	run mkdir -p $INSTALL_DIR/bin
-	run mkdir -p $INSTALL_DIR/lib/bfd-plugins
+        # bin is required, otherwise auto-loading of plugins does not work!
+        run mkdir -p $INSTALL_DIR/bin
+        run mkdir -p $INSTALL_DIR/lib/bfd-plugins
 
-	run ln -sf ../LLVMgold.$LIBEXT $INSTALL_DIR/lib/bfd-plugins/
-	run ln -sf ../libLTO.$LIBEXT   $INSTALL_DIR/lib/bfd-plugins/
+        run ln -sf ../LLVMgold.$LIBEXT $INSTALL_DIR/lib/bfd-plugins/
+        run ln -sf ../libLTO.$LIBEXT   $INSTALL_DIR/lib/bfd-plugins/
     fi
 
     # Update rpaths, since we are not using cmake install
     update_rpath llvm
 
     if [ "$DO_RUN_TESTS" == "true" ]; then
-	echo "Running tests.."
+	    echo "Running tests.."
         if [ -e build.ninja ] ; then
             run ninja check-all
         else
             run make check-all
         fi
     fi
+}
+
+function install_llvm1() {
+    echo "Installing Patmos LLVM from Pre-Built Binaries"
+
+    install_prebuilt "patmos-llvm" "https://github.com/t-crest/patmos-llvm"
+
+    echo "Updating rpath"
+    update_rpath llvm
+
+    if [ -x $CHRPATH ]; then
+        for file in $INSTALL_DIR/lib/*.so; do
+            [ -f "$file" ] || continue
+            if readelf -d "$file" | grep -q 'RPATH\|RUNPATH'; then
+                $CHRPATH -w -i $INSTALL_DIR -b $file
+            fi
+        done
+    else
+        echo "** Warning: patmos-chrpath script not found, skipping RPATH updates."
+    fi
+    echo "Updating rpath done"
 }
 
 function install_llvm2() {
@@ -1095,16 +1117,16 @@ function build_llvm1() {
     fi
 
     if [ "$LLVM_USE_CONFIGURE" == "true" -a "$1" != "eclipse" ]; then
-	local targets=$(echo $LLVM_TARGETS | tr '[A-Z;]' '[a-z,]')
-	build_autoconf llvm make_llvm1 $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $config_args $LLVM_CONFIGURE_ARGS"
+	    local targets=$(echo $LLVM_TARGETS | tr '[A-Z;]' '[a-z,]')
+	    build_autoconf llvm make_llvm1 $(get_build_dir llvm) "--disable-optimized --enable-assertions --enable-targets=$targets $config_args $LLVM_CONFIGURE_ARGS"
     else
-	build_cmake llvm make_llvm1 $(get_build_dir llvm) "-DCMAKE_BUILD_TYPE=$LLVM_BUILD_TYPE -DCMAKE_CXX_STANDARD=14 -DLLVM_TARGETS_TO_BUILD='$LLVM_TARGETS' $cmake_args $LLVM_CMAKE_ARGS"
+	    build_cmake llvm make_llvm1 $(get_build_dir llvm) "-DCMAKE_BUILD_TYPE=$LLVM_BUILD_TYPE -DCMAKE_CXX_STANDARD=14 -DLLVM_TARGETS_TO_BUILD='$LLVM_TARGETS' $cmake_args $LLVM_CMAKE_ARGS"
     fi
 }
 
 function build_platin() {
-  # Just install platin. This is mainly for development purposes.
-  install_platin $ROOT_DIR/$(get_repo_dir platin) $ROOT_DIR/$(get_build_dir platin)
+    # Just install platin. This is mainly for development purposes.
+    install_platin $ROOT_DIR/$(get_repo_dir platin) $ROOT_DIR/$(get_build_dir platin)
 }
 
 function build_rtems() {
@@ -1205,12 +1227,17 @@ build_target() {
   fi
   case $target in
   'llvm1')
-	AUTO_PATMOS_LLVM1=y
-    clone_update ${GITHUB_BASEURL}/patmos-llvm.git $(get_repo_dir llvm)
-    if [ "$LLVM_OMIT_CLANG" != "true" ]; then
-        clone_update ${GITHUB_BASEURL}/patmos-clang.git $(get_repo_dir llvm)/tools/clang
+    if $PREFER_DOWNLAOD ; then
+        install_llvm1
+        AUTO_PATMOS_LLVM1=y
+    else 
+        AUTO_PATMOS_LLVM1=y
+        clone_update ${GITHUB_BASEURL}/patmos-llvm.git $(get_repo_dir llvm)
+        if [ "$LLVM_OMIT_CLANG" != "true" ]; then
+            clone_update ${GITHUB_BASEURL}/patmos-clang.git $(get_repo_dir llvm)/tools/clang
+        fi
+        build_llvm1
     fi
-    build_llvm1
     ;;
   'platin')
     clone_update ${GITHUB_BASEURL}/patmos-platin.git $(get_repo_dir platin)
