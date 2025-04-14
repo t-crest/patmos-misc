@@ -84,6 +84,7 @@ ALLTARGETS="simulator gold llvm1 newlib compiler-rt argo soc-comm poseidon patmo
 # List of targets to build by default when running toolchain1 (using the new version of the compiler 'llvm2'), 
 # developers may set this to $ALLTARGETS or a subset of interesting tools
 TOOLCHAIN1_TARGETS="simulator gold llvm1 platin newlib compiler-rt argo soc-comm poseidon patmos"
+TOOLCHAIN1_Q_TARGETS="simulator gold llvm1 platin newlib argo soc-comm poseidon patmos"
 # List of targets to build for toolchain2 (using the new version of the compiler 'llvm2')
 # Should be kept up to date with 'TOOLCHAIN1_TARGETS'
 TOOLCHAIN2_TARGETS="simulator llvm2 platin argo soc-comm poseidon patmos"
@@ -1347,10 +1348,16 @@ build_target() {
     fi
     ;;
   'toolchain1')
-	AUTO_PATMOS_LLVM1=y
-    for target in $TOOLCHAIN1_TARGETS; do
-	  build_target $target
-    done
+    AUTO_PATMOS_LLVM1=y
+    if $PREFER_DOWNLAOD ; then
+        for target in $TOOLCHAIN1_Q_TARGETS; do
+            build_target $target
+        done
+    else
+        for target in $TOOLCHAIN1_TARGETS; do
+        build_target $target
+        done
+    fi
     ;;
   'toolchain2')
     for target in $TOOLCHAIN2_TARGETS; do
