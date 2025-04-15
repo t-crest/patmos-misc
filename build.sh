@@ -1382,7 +1382,7 @@ build_target() {
 
 
 # one-shot config
-while getopts ":crhi:j:pudsvxVtoeaq" opt; do
+while getopts ":crhi:j:pudsvxVtoeaqm" opt; do
   case $opt in
     a) DO_RUN_ALL=true ;;
     c) DO_CLEAN=true ;;
@@ -1398,6 +1398,7 @@ while getopts ":crhi:j:pudsvxVtoeaq" opt; do
     V) MAKE_VERBOSE="VERBOSE=1" ;;
     t) DO_RUN_TESTS=true ;;
     x) set -x ;;
+    m) BUILD_EMULATOR=false ;;
     e) # recreate build.cfg.dist
        cat build.sh | sed -n '/##* Start of user configs/,/##* End of user configs/p' | sed "$ d" | sed "/Start of user configs/d" > build.cfg.dist
        exit
