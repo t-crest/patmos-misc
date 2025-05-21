@@ -1054,7 +1054,7 @@ function build_emulator() {
 
     # paths to build dirs of other tools (relative to ROOT_DIR)
     local ctoolsbuild=$(get_build_dir patmos "tools/c")
-    local hwbuild=$(get_build_dir patmos hardware)
+    local hwbuild=$(get_build_dir patmos hardware)emu
 
     # absolute path to sources
     local rootdir=$(abspath $ROOT_DIR/$root)
