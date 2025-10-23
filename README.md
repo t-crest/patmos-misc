@@ -41,8 +41,9 @@ The `build.sh` script supports the following targets:
 
 - **`simulator`**: Builds the Patmos simulator.
 - **`gold`**: Builds the gold linker and binutils.
-- **`llvm1`**: Builds the LLVM toolchain (version 1).
-- **`llvm2`**: Builds the LLVM toolchain (version 2).
+- **`llvm1`**: Builds the LLVM compiler (version 1).
+- **`llvm2`**: Builds the LLVM compiler (version 2).
+- **`llvm`**: An alias for the `llvm2` target.
 - **`newlib`**: Builds the Newlib C library for Patmos.
 - **`compiler-rt`**: Builds the compiler runtime for Patmos.
 - **`patmos`**: Builds the Patmos tools and emulator.
@@ -53,8 +54,8 @@ The `build.sh` script supports the following targets:
 - **`rtems-test`**: Builds and runs RTEMS tests.
 - **`rtems-examples`**: Builds RTEMS example applications.
 - **`soc-comm`**: Builds the SoC communication libraries.
-- **`toolchain1`**: Builds the first toolchain (simulator, gold, llvm1, newlib, compiler-rt, etc.).
-- **`toolchain2`**: Builds the second toolchain (simulator, llvm2, newlib, etc.).
+- **`toolchain1`**: Builds the compiler toolchain using LLVM version 1 (simulator, gold, llvm1, newlib, compiler-rt, etc.).
+- **`toolchain2`**: Builds the compiler toolchain using LLVM version 2 (simulator, llvm2, etc.).
 
 ## Key Variables
 
@@ -63,8 +64,8 @@ The `build.sh` script uses several variables to control its behavior:
 - **`ROOT_DIR`**: The root directory for all repositories. Defaults to the current working directory.
 - **`INSTALL_DIR`**: The directory where built files are installed. Defaults to `ROOT_DIR/local`.
 - **`BUILDDIR_SUFFIX`**: The suffix for directories containing generated files. Defaults to `/build`.
-- **`TOOLCHAIN1_TARGETS`**: The list of targets to build for the first toolchain.
-- **`TOOLCHAIN2_TARGETS`**: The list of targets to build for the second toolchain.
+- **`TOOLCHAIN1_TARGETS`**: The list of targets to build with the `llvm1` compiler.
+- **`TOOLCHAIN2_TARGETS`**: The list of targets to build with the `llvm2` compiler.
 - **`LLVM_BUILD_TYPE`**: The build type for LLVM (e.g., `Release` or `Debug`).
 - **`MAKEJ`**: The number of parallel jobs to use for `make`. Set using the `-j` option.
 - **`DO_RUN_TESTS`**: If `true`, tests are run after building.
