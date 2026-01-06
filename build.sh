@@ -103,7 +103,7 @@ INSTALL_DIR="$ROOT_DIR/local"
 BUILDDIR_SUFFIX="/build"
 
 # Whether to download pre-built binaries where available.
-PREFER_DOWNLAOD=false
+PREFER_DOWNLOAD=false
 
 # RTEMS subdirectory prefix. Set to empty to checkout without subdirectories.
 RTEMS_SUBDIR_PREFIX="rtems-4.10.2"
@@ -1228,7 +1228,7 @@ build_target() {
   fi
   case $target in
   'llvm1')
-    if $PREFER_DOWNLAOD ; then
+    if $PREFER_DOWNLOAD ; then
         install_llvm1
         AUTO_PATMOS_LLVM1=y
     else 
@@ -1331,7 +1331,7 @@ build_target() {
     build_rtems
     ;;
   'simulator')
-    if $PREFER_DOWNLAOD ; then
+    if $PREFER_DOWNLOAD ; then
         install_simulator
     else 
         clone_update ${GITHUB_BASEURL}/patmos-simulator.git $(get_repo_dir simulator)
@@ -1339,7 +1339,7 @@ build_target() {
     fi
     ;;
   'llvm2')
-    if $PREFER_DOWNLAOD ; then
+    if $PREFER_DOWNLOAD ; then
         install_llvm2
     else 
         clone_update ${GITHUB_BASEURL}/patmos-llvm-project.git $(get_repo_dir llvm-project)
@@ -1349,7 +1349,7 @@ build_target() {
     ;;
   'toolchain1')
     AUTO_PATMOS_LLVM1=y
-    if $PREFER_DOWNLAOD ; then
+    if $PREFER_DOWNLOAD ; then
         for target in $TOOLCHAIN1_Q_TARGETS; do
             build_target $target
         done
@@ -1403,7 +1403,7 @@ while getopts ":crhi:j:pudsvxVtoeaqm" opt; do
        cat build.sh | sed -n '/##* Start of user configs/,/##* End of user configs/p' | sed "$ d" | sed "/Start of user configs/d" > build.cfg.dist
        exit
        ;;
-    q) PREFER_DOWNLAOD=true ;;
+    q) PREFER_DOWNLOAD=true ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       usage >&2
