@@ -1376,7 +1376,7 @@ build_target() {
     clone_update ${GITHUB_BASEURL}/soc-comm.git $(get_repo_dir soc-comm)
     ;;
   "l2-cache")
-    clone_update ${GITHUB_BASEURL}/l2-cache.git $(get_repo_dir l2-cache)
+    clone_update ${GITHUB_BASEURL}/l2-cache.git $(get_repo_dir l2-cache) "main"
     ;;
   *) echo "Don't know about $target." ;;
   esac
