@@ -87,7 +87,7 @@ TOOLCHAIN1_TARGETS="simulator gold llvm1 platin newlib compiler-rt argo soc-comm
 TOOLCHAIN1_Q_TARGETS="simulator gold llvm1 platin newlib argo soc-comm poseidon patmos"
 # List of targets to build for toolchain2 (using the new version of the compiler 'llvm2')
 # Should be kept up to date with 'TOOLCHAIN1_TARGETS'
-TOOLCHAIN2_TARGETS="simulator llvm2 platin argo soc-comm poseidon patmos"
+TOOLCHAIN2_TARGETS="simulator llvm2 platin argo soc-comm l2-cache poseidon patmos"
 
 # Root directory for all repositories
 ROOT_DIR=$(pwd)
@@ -1374,6 +1374,9 @@ build_target() {
     ;;
   "soc-comm")
     clone_update ${GITHUB_BASEURL}/soc-comm.git $(get_repo_dir soc-comm)
+    ;;
+  "l2-cache")
+    clone_update ${GITHUB_BASEURL}/l2-cache.git $(get_repo_dir l2-cache) "main"
     ;;
   *) echo "Don't know about $target." ;;
   esac
